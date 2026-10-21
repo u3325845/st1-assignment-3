@@ -2,9 +2,9 @@
 
 Complete this one group record. Link actual issues, diffs, tests and reviews; avoid copying entire histories. Blank fields are intentional. Duplicate rows as needed. Use synthetic data only. Every member records their own meaningful contribution. Do not invent results, reviews or Copilot use.
 
-- Group/tutorial: [response]
-- Members, GitHub usernames and cohorts: [response]
-- Repository URL: [response]
+- Group/tutorial: Grp 2 tutorial Wed 4:30 - 6:30 
+- Members, GitHub usernames and cohorts: RachelUC, Merlin3313611, Tarnima, Novera
+- Repository URL: https://github.com/u3325845/st1-assignment-3.git
 - Starting SHA: [response]
 
 ## A Requirement to issue activities
