@@ -161,7 +161,28 @@ Prompt and purpose: I asked GitHub Copilot to review my Patient tests against th
 
 Copilot conversation: https://github.com/copilot/c/ef849b60-0a91-4c25-bfab-a5c73971846d
 
+
+
+Requirement: FR-04 — Appointment date/time validation.
+
+Acceptance criterion: Appointment date/time must be a timezone-naive Python datetime at minute precision. Invalid values raise ValueError.
+
+Behaviour to test: Check that invalid datetime types, seconds, microseconds and timezone-aware values are rejected with the correct error messages.
+
+Human-first test idea/categories: Before using Copilot, I designed nine Appointment tests covering valid construction, default status, invalid IDs, trimming, invalid Patient and Practitioner objects, invalid status and datetime validation.
+
+Human-first evidence: T7-TK-01 to T7-TK-09 in `tests/test_domain.py`.
+
+Prompt and purpose: I asked GitHub Copilot to review my datetime validation tests and suggest missing boundary cases or weak assertions. I wanted to evaluate its suggestions against my original tests without adding unnecessary cases.
+
+Copilot conversation: https://github.com/copilot/c/34063ee4-6016-4855-a321-c375854f232c
+
+Copilot limitation: It reviewed the main branch and could not access my unmerged tests.
+
 For each significant candidate, copy this entry as needed:
+
+
+
 
 ### Candidate 1 – Whitespace-only Patient IDs
 
