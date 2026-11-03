@@ -89,32 +89,34 @@ GitHub Copilot says: "Looks good; tests pass."
 
 Create at least two focused issues. Add a linked practitioner-lookup issue or an explicit supporting criterion with the tutor if needed to cover all three service targets.
 
-| Issue link | Requirement                                     | Owner | Acceptance criteria or precise link | Status |
-|---|-------------------------------------------------|---|-|---|
-| [issue 1] | [response]                                      | [response] | [response] | [response] |
-| [Issue #6](https://github.com/u3325845/st1-assignment-3/issues/6) | FR-03 supporting operation -Practitioner lookup | Merlin3313611 | Return the original stored practitioner for a valid ID; raise `LookupError` for unknown IDs and `ValueError` for invalid IDs; ignore surrounding spaces; do not modify stored data.| Closed - completed in [PR #5](https://github.com/u3325845/st1-assignment-3/pull/5) |
-
+| Issue link | Requirement | Owner | Acceptance criteria or precise link | Status |
+|---|---|---|---|---|
+| [Issue #2](https://github.com/u3325845/st1-assignment-3/issues/2) | FR-02 Patient Lookup | RachelUC | Return stored patient; unknown ID raises `LookupError`; blank ID raises `ValueError`. | Completed (PR #3 merged) |
+| [Issue #6](https://github.com/u3325845/st1-assignment-3/issues/6) | FR-03 supporting operation — Practitioner lookup | Merlin3313611 | Return the original stored practitioner for a valid ID; raise `LookupError` for unknown IDs and `ValueError` for invalid IDs; ignore surrounding spaces; do not modify stored data. | Closed — completed in [PR #5](https://github.com/u3325845/st1-assignment-3/pull/5) |
+| [issue 2] | [response] | [response] | [response] | [response] |
 ## G Pull request evidence
 
 Repeat this block per PR. Record actual events, not planned approvals.
 
-- PR link and title: [response]
-- Linked issue and requirement: [response]
-- Feature branch: [response]
-- Changed behaviour: [response]
-- Meaningful commits: [links]
-- Test command, directory and observed result: [response]
-- Another-member reviewer: [response]
-- Human observations recorded before Copilot: [link and time]
-- Requirement, responsibilities, test assertions and unrelated-scope checks: [response]
-- Key feedback: [response]
-- Author response/change and verification: [response]
-- Reviewer recheck and approval: [link]
-- Merge outcome and SHA: [response]
-- Significant Copilot assistance: [summary or none]
-- Linked issue closure: [response]
-- Each member updated main: [member and confirmation]
-- Integrated verification after merge: [command, directory, result and code SHA]
+### PR #3 – Patient Lookup (FR-02)
+
+- PR link and title: https://github.com/u3325845/st1-assignment-3/pull/3 – Patient Lookup
+- Linked issue and requirement: Issue #2 – FR-02
+- Feature branch: `feature/fr02-patient-lookup`
+- Changed behaviour: Implemented patient lookup by ID, returning the stored patient and raising errors for unknown or blank IDs.
+- Meaningful commit: `93dbbf6`
+- Test command, directory and observed result: `python -m pytest -v` from `project/` – 11 tests passed.
+- Another-member reviewer: `Merlin3313611`
+- Human observations recorded before Copilot: Retrospective human review of FR-02 Patient Lookup, recorded on 3 November 2026, after PR #3 was merged and before the additional Copilot review. Evidence: https://github.com/u3325845/st1-assignment-3/issues/2#issuecomment-6599736615
+- Requirement, responsibilities, test assertions and unrelated-scope checks: Checked the patient lookup requirements, including returning the same stored object, handling unknown and blank IDs, and keeping the changes focused on FR-02.
+- Key feedback: The reviewer commented "looks good" and approved the changes. No issues or changes were requested.
+- Author response/change and verification: No changes were needed after the review. All 11 tests had passed before merging.
+- Reviewer recheck and approval: https://github.com/u3325845/st1-assignment-3/pull/3 – Approved by Merlin3313611.
+- Merge outcome and SHA: Successfully merged into main, SHA e744281.
+- Significant Copilot assistance: A retrospective GitHub Copilot review was completed on 3 November 2026. Copilot confirmed that Patient Lookup meets the main FR-02 requirements but suggested additional tests for whitespace trimming, case sensitivity, empty-string IDs and unchanged stored data. It also identified an outdated docstring reference. These suggestions will be considered in Stage 7. No code changes were made during the review. Evidence: [GitHub Copilot review](https://github.com/copilot/share/407b5392-0860-80a1-a952-d804843600e5).
+- Linked issue closure: Issue #2 – Closed. https://github.com/u3325845/st1-assignment-3/issues/2
+- Each member updated main: RachelUC, Merlin3313611 and TarnimaKhan22 – confirmed. u3325845 (Novera) – awaiting confirmation.
+- Integrated verification after merge: Patient Lookup verification: `python -m pytest -v` from `project/` – 11 tests passed. Merge SHA: `e744281`. Final integrated test run after merge not separately recorded.
 
 
 #### Practitioner Lookup 
@@ -126,13 +128,13 @@ Repeat this block per PR. Record actual events, not planned approvals.
 - **Meaningful commits:** [`1cc43b5`](https://github.com/u3325845/st1-assignment-3/commit/1cc43b5) - Implement practitioner lookup and add tests.
 - **Test command, directory and observed result:** `python -m pytest` from `project/` — 16 tests passed.
 - **Another-member reviewer:** RachelUC.
-- **Human observations recorded before Copilot:**  I checked the practitioner lookup implementation, data store validation and five tests manually. No Copilot review was performed for this PR.
+- **Human observations recorded before Copilot:** I manually checked the practitioner lookup implementation, data store validation, test coverage and scope before PR #5 was merged. RachelUC reviewed and approved PR #5. The additional Copilot review was conducted retrospectively on 3 November 2026, after the PR had been merged.
 - **Requirement, responsibilities, test assertions and unrelated-scope checks:** Checked the service and data store responsibilities. Added five tests covering existing, unknown, blank, whitespace-padded and case-sensitive IDs. PR changed only the practitioner service implementation and its test file.
-- **Key feedback:** No specific change-request feedback recorded in the evidence available.
+- **Key feedback:** RachelUC reviewed and approved PR #5, commenting that the changes looked good. No specific defects or changes were requested.
 - **Author response/change and verification:** Verified the implementation with 16 passing tests.
 - **Reviewer recheck and approval:** RachelUC approved [PR #5](https://github.com/u3325845/st1-assignment-3/pull/5).
 - **Merge outcome and SHA:** PR #5 merged into `main`; integrated `main` SHA: `fed883f`.
-- **Significant Copilot assistance:** None. GitHub Copilot was not used for this PR.
+- **Significant Copilot assistance:** GitHub Copilot was not used during the original implementation or approval of PR #5. A retrospective Copilot review was conducted on 3 November 2026. It found no blocking functional defects but suggested additional tests for invalid IDs and unchanged stored data, as well as updating an outdated docstring. The findings and human decisions are recorded in Sections H and I.
 - **Linked issue closure:** Issue #6 closed, with a link to completed PR #5.
 - **Each member updated main:** Merlin3313611, RachelUC and TarnimaKhan22 confirmed they pulled the latest `main`. u3325845 (Novera) - confirmation pending.
 - **Integrated verification after merge:** `python -m pytest` from `project/` — 16 tests passed on `main` at `fed883f`. Working tree clean.
@@ -141,13 +143,14 @@ Repeat this block per PR. Record actual events, not planned approvals.
 
 Record meaningful required use, not every trivial completion. Repeat per significant interaction.
 
-- Member and task: [response]
-- Prompt/purpose and relevant issue/diff: [response]
-- Summary of output: [response]
-- Human check against actual code, requirements and tests: [response]
-- Decision — Accept / Modify / Reject: [select]
-- Reason: [response]
-- Verification/evidence: [link and result]
+- Member and task: RachelUC – FR-02 Patient Lookup review.
+- Prompt/purpose and relevant issue/diff: Asked Copilot to review my Patient Lookup implementation and tests against FR-02 requirements. [PR #3](https://github.com/u3325845/st1-assignment-3/pull/3).
+- Summary of output: Copilot found the implementation correct but suggested extra tests for whitespace, case sensitivity, empty IDs and unchanged stored data. It also noticed an outdated docstring.
+- Human check against actual code, requirements and tests: I compared Copilot's suggestions with my code and tests. My earlier human review had also identified missing whitespace and case-sensitivity tests.
+- Decision — Accept / Modify / Reject: Modify
+- Reason: I accepted the additional testing suggestions for Stage 7 but kept my working Stage 6 code unchanged.
+- Verification/evidence: [GitHub Copilot review](https://github.com/copilot/share/407b5392-0860-80a1-a952-d804843600e5). Retrospective review completed on 3 November 2026. Earlier test result: 11 passed.
+
 
 
 #### Practitioner Lookup
@@ -162,14 +165,14 @@ Record meaningful required use, not every trivial completion. Repeat per signifi
 
 ## I Human versus Copilot review comparison
 
-- Human reviewer noticed before consulting Copilot: [response]
-- Copilot noticed: [response]
-- Overlap: [response]
-- What did the human reviewer notice that Copilot did not: [response]
-- What did Copilot identify that the human reviewer initially missed: [response]
-- Unsupported or incorrect Copilot suggestion: [response or none identified with explanation]
-- Human judgement accepted, modified or rejected, and why: [response]
-- Which evidence justified merge approval: [response]
+- Human reviewer noticed before consulting Copilot: The existing tests did not explicitly cover whitespace trimming or case sensitivity. Recorded retrospectively after merging. [Human review evidence](https://github.com/u3325845/st1-assignment-3/issues/2#issuecomment-6599736615).
+- Copilot noticed: Missing tests for whitespace, case sensitivity, empty IDs and unchanged stored data, along with an outdated docstring.
+- Overlap: Both identified missing whitespace and case-sensitivity tests.
+- What did the human reviewer notice that Copilot did not: No additional issue was identified in my human review.
+- What did Copilot identify that the human reviewer initially missed: Additional tests for empty IDs and unchanged stored data, and the outdated docstring.
+- Unsupported or incorrect Copilot suggestion: None identified from the review.
+- Human judgement accepted, modified or rejected, and why: I accepted the extra testing suggestions for Stage 7 because they would improve test coverage. I kept the Stage 6 implementation unchanged because it was already working.
+- Which evidence justified merge approval: The original three Patient Lookup tests passed, the full suite reported 11 passed, and Merlin3313611 approved PR #3. The Copilot review was completed after merging and did not contribute to the original approval.
 
 
 
@@ -189,14 +192,16 @@ Record meaningful required use, not every trivial completion. Repeat per signifi
 
 Repeat per member. Include only categories that describe actual work; write not applicable where appropriate. Pairing or mentoring can be supported by a short corroborated note.
 
-- Member: [response]
-- Implementation: [work and evidence]
-- Testing: [work and evidence]
-- Review: [work and evidence]
-- Issue refinement: [work and evidence]
-- Design and responsibility discussion: [work and evidence]
-- Debugging or integration: [work and evidence]
-- Documentation or team support: [work and evidence]
+### Member: RachelUC (u3331755)
+
+- Member: RachelUC
+- Implementation: Implemented `PatientService.find_patient()` to search for registered patients and handle invalid or unknown IDs. Evidence: PR #3.
+- Testing: Created three tests for existing, unknown and blank patient IDs in `test_patient_lookup.py`. All 11 tests passed.
+- Review: Submitted PR #3, which was reviewed and approved by Merlin3313611.
+- Issue refinement: Created Issue #2 for FR-02 with acceptance criteria and Definition of Done.
+- Design and responsibility discussion: Used the shared data store for patient lookup and kept the changes focused on FR-02.
+- Debugging or integration: Pulled the latest `main` after merging my Patient Lookup changes.
+- Documentation or team support: Completed the FR-02 requirements and evidence in the Stage 6 Markdown, including a retrospective human and Copilot review.
 
 
 #### Practitioner Lookup
