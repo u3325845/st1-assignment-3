@@ -25,29 +25,29 @@ For each requirement, propose one positive test, one negative test and the key a
 For each, select Strong for stated behaviour or Weak/unclear and explain why. State the behaviour and limits.
 
 `assert True`
-Judgement: Weak/unclear    
+Judgement: Weak/unclear
 Why: This assertion always passes, regardless of whether the program works correctly, as it does not check any required behaviour or expected result, so it provides no useful evidence of correctness.
 
 `assert appointment is not None`
-Judgement: Weak/unclear   
+Judgement: Weak/unclear
 Why: This assertion only checks that an appointment object exists. It does not verify whether the appointment has the correct ID, practitioner, patient or status. Therefore, an incorrect appointment could still pass this test.
 
 `assert appointment.status == AppointmentStatus.CANCELLED`
-Judgement: Strong for stated behaviour   
+Judgement: Strong for stated behaviour
 Why: This assertion checks that the appointment has the expected CANCELLED status. It would fail if the appointment had a different status. However, it does not prove that the cancelled appointment remains stored or can be retrieved later.
 
 `assert len(results) > 0`
-Judgement: Weak/unclear    
+Judgement: Weak/unclear
 Why:  This assertion only checks that the results contain at least one item. It does not verify whether the correct appointments were returned or whether the results contain incorrect or unexpected records; a wrong result could still pass.
 
 `assert data_store.find_appointment('A1') is appointment`
-Judgement: Strong for stated behaviour   
+Judgement: Strong for stated behaviour
 Why: This assertion checks that the data store retrieves the exact same appointment object using the ID A1. It provides strong evidence that the appointment remains stored and retrievable. However, it does not check whether the appointment has the correct status or other details.
 
 ### Activity 3 Boundary thinking
 
 Design boundary or edge cases for blank identifiers, whitespace-only names, same-time practitioner bookings, cancelled appointments and invalid status transitions.
-For each input/state, expected result and supporting contract: 
+For each input/state, expected result and supporting contract:
 
 
 **1. Blank identifiers**
@@ -122,19 +122,23 @@ Assign TEST IDs before implementation or generation. Use canonical AC IDs with t
 | Patient domain validation         | Patient ID and name must be strings. | TEST-PAT-05 | Unit – Negative | test_patient_rejects_non_string_details() – tests/test_domain.py | Non-string inputs raise ValueError with the correct message. | Passed (4 inputs) | Student-authored |
 | Patient identity                  | Patient ID is read-only after creation. | TEST-PAT-06 | Unit – Negative | test_patient_id_is_read_only() – tests/test_domain.py | Changing the patient ID raises AttributeError and leaves the ID unchanged. | Passed | Student-authored |
 | Patient domain validation         | Valid non-blank text has no additional minimum length. | TEST-PAT-07 | Unit – Boundary | test_patient_accepts_one_character_details() – tests/test_domain.py | A one-character ID and name are accepted. | Passed | Student-authored |
-| Practitioner domain validation    | Valid ID, name and specialty are accepted (Revision 2 required-field contract). | TEST-PRAC-DOM-01 | Unit - Positive | `test_practitioner_created_with_valid_details()` - `tests/test_domain.py` | Correct practitioner ID, name and specialty are retained. | Passed | Student-authored |
+| Practitioner domain validation | Valid ID, name and specialty are accepted (Revision 2 required-field contract). | TEST-PRAC-DOM-01 | Unit - Positive | `test_practitioner_created_with_valid_details()` - `tests/test_domain.py` | Correct details are retained, including the internal space in "General Practice". | Passed | Student-authored |
 | Practitioner domain validation    | Surrounding whitespace is trimmed (Revision 2 text validation contract). | TEST-PRAC-DOM-02 | Unit - Positive | `test_practitioner_details_are_trimmed()` - `tests/test_domain.py` | ID, name and specialty are trimmed. | Passed | Student-authored |
 | Practitioner domain validation    | Practitioner ID must be non-blank (Revision 2 required-field contract). | TEST-PRAC-DOM-03 | Unit - Negative/Boundary | `test_practitioner_rejects_blank_id()` - `tests/test_domain.py` | Empty and whitespace-only IDs raise ValueError. | Passed (4 inputs) | Student-authored |
-| Practitioner domain validation    | Practitioner name must be non-blank (Revision 2 required-field contract). | TEST-PRAC-DOM-04 | Unit - Negative | `test_practitioner_rejects_whitespace_name()` - `tests/test_domain.py` | Whitespace-only name raises ValueError. | Passed | Student-authored |
-| Practitioner domain validation    | Specialty must be non-blank (Revision 2 required-field contract). | TEST-PRAC-DOM-05 | Unit - Negative | `test_practitioner_rejects_whitespace_specialty()` - `tests/test_domain.py` | Whitespace-only specialty raises ValueError. | Passed | Student-authored |
+| Practitioner domain validation | Practitioner name must be non-blank (Revision 2 required-field contract). | TEST-PRAC-DOM-04 | Unit - Negative/Boundary | `test_practitioner_rejects_whitespace_name()` - `tests/test_domain.py` | Empty strings, spaces, tabs and newlines raise ValueError. | Passed (4 inputs) | Student-authored |
+| Practitioner domain validation | Practitioner specialty must be non-blank (Revision 2 required-field contract). | TEST-PRAC-DOM-05 | Unit - Negative/Boundary | `test_practitioner_rejects_whitespace_specialty()` - `tests/test_domain.py` | Empty strings, spaces, tabs and newlines raise ValueError. | Passed (4 inputs) | Student-authored |
 | Practitioner domain validation    | Required fields must be strings (Revision 2 required-field contract). | TEST-PRAC-DOM-06 | Unit - Negative | `test_practitioner_rejects_non_string_details()` - `tests/test_domain.py` | Non-string fields raise ValueError with correct messages. | Passed (6 inputs) | Student-authored |
 | Practitioner identity             | Practitioner ID is read-only (Revision 2 identity contract). | TEST-PRAC-DOM-07 | Unit - Negative | `test_practitioner_id_is_read_only()` - `tests/test_domain.py` | Reassigning practitioner ID raises AttributeError; original remains unchanged. | Passed | Student-authored |
 | Practitioner domain validation    | One-character non-blank values are valid (Revision 2 required-field contract). | TEST-PRAC-DOM-08 | Unit - Boundary | `test_practitioner_accepts_one_character_details()` - `tests/test_domain.py` | One-character ID, name and specialty are accepted. | Passed | Student-authored |
+| Practitioner domain validation | Surrounding mixed whitespace is trimmed (Revision 2 text validation contract). | TEST-PRAC-DOM-09 | Unit - Positive/Boundary | `test_practitioner_trims_mixed_whitespace()` - `tests/test_domain.py` | Leading and trailing tabs, spaces and newlines are removed from ID, name and specialty. | Passed | Student-authored |
 | FR-03 - Practitioner registration | Duplicate practitioner IDs must be rejected (Revision 2 uniqueness contract). | TEST-PRAC-01 | Unit - Negative | `test_duplicate_practitioner_id_rejected()` - `tests/test_practitioner_lookup.py` | Duplicate registration raises ValueError; original record remains unchanged. | Passed | Student-authored |
 | FR-03 - Practitioner validation   | Practitioner names must contain non-whitespace text (Revision 2 required-field contract). | TEST-PRAC-02 | Unit - Negative/Boundary | `test_practitioner_rejects_whitespace_only_name()` - `tests/test_practitioner_lookup.py` | Whitespace-only name raises ValueError; no practitioner is stored. | Passed | Student-authored |
 | FR-03 - Practitioner validation   | Practitioner specialties must contain non-whitespace text (Revision 2 required-field contract). | TEST-PRAC-03 | Unit - Negative/Boundary | `test_practitioner_rejects_whitespace_only_specialty()` - `tests/test_practitioner_lookup.py` | Whitespace-only specialty raises ValueError; no practitioner is stored. | Passed | Student-authored |
 | FR-03 - Practitioner registration | Invalid registration must preserve existing records (Revision 2 validation and persistence contracts). | TEST-PRAC-04 | Unit - Negative/Regression | `test_failed_practitioner_registration_preserves_records()` - `tests/test_practitioner_lookup.py` | Invalid registration raises ValueError; existing record remains unchanged. | Passed | Student-authored |
 | FR-03 - Practitioner registration | Valid practitioner details must be stored and retrievable (Revision 2 required-field and persistence contracts). | TEST-PRAC-05 | Unit - Positive | `test_practitioner_registration_stores_correct_details()` - `tests/test_practitioner_lookup.py` | Correct details are stored; the same practitioner is retrievable. | Passed | Student-authored |
+| FR-03 - Practitioner validation | Practitioner ID must be non-blank (Revision 2 required-field contract). | TEST-PRAC-06 | Unit - Negative/Boundary | `test_registration_rejects_blank_practitioner_id()` - `tests/test_practitioner_lookup.py` | Empty strings, spaces, tabs and newlines raise ValueError; no practitioner is stored. | Passed (4 inputs) | Student-authored |
+| FR-03 - Practitioner validation | Registration fields must be strings (Revision 2 required-field contract). | TEST-PRAC-07 | Unit - Negative | `test_registration_rejects_non_string_details()` - `tests/test_practitioner_lookup.py` | None and integer inputs for ID, name and specialty raise ValueError; no practitioner is stored. | Passed (6 inputs) | Student-authored |
+| FR-03 - Practitioner registration | Surrounding whitespace is trimmed during registration (Revision 2 text validation contract). | TEST-PRAC-08 | Unit - Positive/Boundary | `test_registration_trims_practitioner_details()` - `tests/test_practitioner_lookup.py` | Trimmed details are stored and the registered practitioner is retrievable. | Passed | Student-authored |
 | FR-04 — Appointment construction  | Valid Appointment details are retained. | T7-TK-01 | Unit – Positive | `test_appointment_construction_preserves_valid_details()` – `tests/test_domain.py` | Correct ID, Patient, Practitioner and datetime are retained. | Passed | Student-authored |
 | Appointment initial status        | New appointments default to SCHEDULED. | T7-TK-02 | Unit – Positive | `test_new_appointment_defaults_to_scheduled()` – `tests/test_domain.py` | Status is AppointmentStatus.SCHEDULED. | Passed | Student-authored |
 | Appointment ID validation         | Appointment ID must be non-blank text. | T7-TK-03 | Unit – Negative/Boundary | `test_appointment_rejects_blank_id()` – `tests/test_domain.py` | Blank IDs raise ValueError. | Passed (4 inputs) | Student-authored |
@@ -158,19 +162,23 @@ Use descriptive test names such as test_cancel_changes_status() or test_blank_pa
 | TEST-PAT-05 | Patient domain validation | Patient details must be strings | Negative | Try creating patients with None or integer values for the ID or name. | Each input raises ValueError with the correct message. | Checks invalid types for both fields and identifies which field caused the error. |
 | TEST-PAT-06 | Patient identity | Patient ID is read-only | Negative | Create a patient and try changing its ID. | AttributeError is raised and the original ID remains unchanged. | Checks that patient identity cannot be changed through the property. |
 | TEST-PAT-07 | Patient domain validation | Non-blank text is accepted | Boundary | Create a patient with a one-character ID and name. | Patient is created and both values are stored correctly. | Checks the smallest valid non-blank text input. |
-| TEST-PRAC-DOM-01 | Practitioner construction | Revision 2 required-field contract | Positive | Create a Practitioner using valid ID, name and specialty. | All three values are stored correctly. | Checks valid practitioner construction, not service registration. |
+| TEST-PRAC-DOM-01 | Practitioner construction | Revision 2 required-field contract | Positive | Create a Practitioner with valid ID, name and multiword specialty "General Practice". | All fields retain their exact values, including the internal space in specialty. | Checks valid construction and preservation of internal whitespace. |
 | TEST-PRAC-DOM-02 | Practitioner text validation | Revision 2 text validation contract | Positive/Boundary | Create a Practitioner with surrounding whitespace. | ID, name and specialty contain no surrounding whitespace. | Checks normalization of all three practitioner fields. |
 | TEST-PRAC-DOM-03 | Practitioner ID validation | Revision 2 required-field contract | Negative/Boundary | Attempt construction with empty and whitespace-only IDs. | ValueError is raised for each invalid ID. | Checks four invalid ID inputs. |
-| TEST-PRAC-DOM-04 | Practitioner name validation | Revision 2 required-field contract | Negative | Attempt construction with a whitespace-only name. | ValueError is raised. | Checks rejection of invalid names at domain level. |
-| TEST-PRAC-DOM-05 | Practitioner specialty validation | Revision 2 required-field contract | Negative | Attempt construction with a whitespace-only specialty. | ValueError is raised. | Checks rejection of invalid specialties at domain level. |
+| TEST-PRAC-DOM-04 | Practitioner name validation | Revision 2 required-field contract | Negative/Boundary | Attempt construction with empty, spaces-only, tab and newline name values. | All four inputs raise ValueError with the correct field message. | Extends validation to four distinct blank inputs. |
+| TEST-PRAC-DOM-05 | Practitioner specialty validation | Revision 2 required-field contract | Negative/Boundary | Attempt construction with empty, spaces-only, tab and newline specialty values. | All four inputs raise ValueError with the correct field message. | Extends validation to four distinct blank inputs. |
 | TEST-PRAC-DOM-06 | Practitioner field types | Revision 2 required-field contract | Negative | Supply non-string values for ID, name and specialty. | ValueError is raised with the expected message. | Checks six invalid field/type combinations. |
 | TEST-PRAC-DOM-07 | Practitioner identity | Revision 2 identity contract | Negative | Attempt to reassign an existing practitioner's ID. | AttributeError is raised and the original ID remains unchanged. | Checks protection of practitioner identity. |
 | TEST-PRAC-DOM-08 | Practitioner field boundaries | Revision 2 required-field contract | Boundary | Construct a Practitioner with one-character field values. | One-character ID, name and specialty are accepted. | Checks the smallest valid non-blank values. |
+| TEST-PRAC-DOM-09 | Practitioner text validation | Revision 2 text validation contract | Positive/Boundary | Construct with leading and trailing tabs, spaces and newlines. | ID, name and specialty are trimmed to the expected values. | Checks mixed whitespace beyond ordinary spaces. |
 | TEST-PRAC-01 | FR-03 Practitioner registration | Revision 2 practitioner ID uniqueness contract | Negative | Register two practitioners with the same ID. | Duplicate registration raises ValueError and preserves the original record. | Checks uniqueness through the service workflow. |
 | TEST-PRAC-02 | FR-03 Practitioner registration | Revision 2 required-field contract | Negative/Boundary | Register a practitioner with a whitespace-only name. | ValueError is raised and the invalid practitioner is not stored. | Checks service-level validation and storage protection. |
 | TEST-PRAC-03 | FR-03 Practitioner registration | Revision 2 required-field contract | Negative/Boundary | Register a practitioner with a whitespace-only specialty. | ValueError is raised and the invalid practitioner is not stored. | Checks service-level validation and storage protection. |
 | TEST-PRAC-04 | FR-03 Practitioner registration | Revision 2 validation and persistence contracts | Negative/Regression | Attempt invalid registration after storing a valid practitioner. | ValueError is raised and the existing practitioner remains unchanged. | Checks that failed registration does not damage existing records. |
 | TEST-PRAC-05 | FR-03 Practitioner registration | Revision 2 registration and persistence contracts | Positive | Register a practitioner with valid details and retrieve the record. | Correct details are stored and the same practitioner is retrieved. | Checks successful service registration and retrieval. |
+| TEST-PRAC-06 | FR-03 Practitioner registration | Revision 2 required-field contract | Negative/Boundary | Attempt registration with four blank ID variants. | Each raises ValueError and leaves the store empty. | Verifies service-level rejection and no unintended storage. |
+| TEST-PRAC-07 | FR-03 Practitioner registration | Revision 2 required-field contract | Negative | Attempt registration with None or integer for each of three fields. | All six cases raise ValueError and leave the store empty. | Verifies service-level type validation and unchanged state. |
+| TEST-PRAC-08 | FR-03 Practitioner registration | Revision 2 text validation and persistence contracts | Positive/Boundary | Register practitioner details with surrounding spaces. | Returned and retrieved practitioner fields are trimmed; same object is stored. | Verifies normalization across service and data store. |
 | T7-TK-01 | Appointment construction | Valid appointment details are retained | Positive | Create an Appointment with valid Patient, Practitioner, ID and datetime. | The appointment retains the correct ID, object references and datetime. | Verifies actual stored values rather than only checking object creation. |
 | T7-TK-02 | Appointment initial status | New appointments default to SCHEDULED | Positive | Create an Appointment without specifying a status. | Status is AppointmentStatus.SCHEDULED. | Confirms the required initial status. |
 | T7-TK-03 | Appointment ID validation | Blank IDs are rejected | Negative / Boundary | Test empty, spaces-only, tab and newline IDs. | Each raises ValueError with the correct message. | Covers four forms of blank input. |
@@ -180,8 +188,6 @@ Use descriptive test names such as test_cancel_changes_status() or test_blank_pa
 | T7-TK-07 | Appointment status validation | Status must be AppointmentStatus | Negative | Pass None, a string and an integer as status. | Each raises ValueError with the correct message. | Verifies rejection of invalid status types. |
 | T7-TK-08 | FR-04 — Date/time validation | Date/time must be a Python datetime | Negative | Pass None, a datetime string and an integer. | Each raises ValueError with the correct message. | Verifies rejection of invalid datetime types. |
 | T7-TK-09 | FR-04 — Date/time validation | Datetime must be timezone-naive and minute-precise | Negative / Boundary | Test nonzero seconds, microseconds and UTC-aware datetime. | Each raises ValueError with the correct message. | Covers both precision and timezone restrictions. |
-
-
 
 ## D Arrange Act Assert Record
 
@@ -196,19 +202,23 @@ Arrange test data; act on one meaningful behaviour; assert the required observab
 | TEST-PAT-05 | Prepare None and integer inputs for patient ID and name. | Try creating a Patient with each invalid input. | Check that ValueError is raised with the correct message for the invalid field. | Confirms that non-string values are rejected and the correct field is identified. |
 | TEST-PAT-06 | Create a Patient with ID "P1" and name "Alex". | Try changing patient_id to "P2". | Check that AttributeError is raised and patient_id remains "P1". | Confirms that the patient ID cannot be changed through its read-only property. |
 | TEST-PAT-07 | Use one-character ID "P" and name "A". | Create a Patient object. | Check patient_id == "P" and name == "A". | Confirms that the smallest valid non-blank text values are accepted. |
-| TEST-PRAC-DOM-01 | Prepare valid practitioner ID "D1", name "Alex" and specialty "Cardiology". | Create a Practitioner object. | Check practitioner_id == "D1", name == "Alex" and specialty == "Cardiology". | Confirms that all three required practitioner details are retained correctly. |
+| TEST-PRAC-DOM-01 | Prepare ID "D1", name "Dr Smith" and specialty "General Practice". | Construct a Practitioner. | Check all three fields exactly, including "General Practice". | Confirms correct values and preservation of internal spaces. |
 | TEST-PRAC-DOM-02 | Prepare practitioner ID, name and specialty with surrounding spaces. | Create a Practitioner using the spaced values. | Check that all three stored values have their surrounding spaces removed. | Confirms that the domain model normalizes each required text field. |
 | TEST-PRAC-DOM-03 | Prepare four invalid IDs: empty string, spaces, tab and newline. | Attempt Practitioner construction with each invalid ID. | Check that each input raises ValueError. | Confirms rejection of several forms of blank practitioner ID. |
-| TEST-PRAC-DOM-04 | Prepare valid ID and specialty with a whitespace-only name. | Attempt Practitioner construction. | Check that ValueError is raised. | Confirms that whitespace alone is not accepted as a practitioner name. |
-| TEST-PRAC-DOM-05 | Prepare valid ID and name with a whitespace-only specialty. | Attempt Practitioner construction. | Check that ValueError is raised. | Confirms that specialty is a required non-blank field. |
+| TEST-PRAC-DOM-04 | Prepare empty string, spaces, tab and newline as invalid name inputs. | Attempt Practitioner construction for each. | Check ValueError with "Practitioner name cannot be blank" for all four. | Confirms that all forms of blank name are rejected. |
+| TEST-PRAC-DOM-05 | Prepare empty string, spaces, tab and newline as invalid specialty inputs. | Attempt Practitioner construction for each. | Check ValueError with "Specialty cannot be blank" for all four. | Confirms that all forms of blank specialty are rejected. |
 | TEST-PRAC-DOM-06 | Prepare None and integer inputs for practitioner ID, name and specialty. | Attempt Practitioner construction with each invalid value. | Check ValueError and the expected error message for each case. | Confirms correct type validation across all three fields. |
 | TEST-PRAC-DOM-07 | Create a Practitioner with ID "D1". | Attempt to assign "D2" to practitioner_id. | Check AttributeError is raised and practitioner_id remains "D1". | Confirms that practitioner identity cannot be reassigned after construction. |
 | TEST-PRAC-DOM-08 | Prepare one-character ID "D", name "A" and specialty "C". | Create a Practitioner object. | Check all three one-character values are retained. | Confirms that non-blank single-character values meet the minimum valid boundary. |
+| TEST-PRAC-DOM-09 | Prepare "\tD1\n", "\tDr Smith \n" and "\nCardiology\t". | Construct a Practitioner. | Check ID "D1", name "Dr Smith" and specialty "Cardiology". | Confirms mixed leading/trailing whitespace is stripped. |
 | TEST-PRAC-01 | Register a practitioner with ID "D1" in a fresh store. | Attempt to register another practitioner with the same ID. | Check ValueError and verify the original practitioner remains stored. | Confirms that duplicate registration is rejected without replacing existing data. |
 | TEST-PRAC-02 | Prepare a fresh store and a whitespace-only practitioner name. | Attempt practitioner registration through PractitionerService. | Check ValueError and that the invalid practitioner was not stored. | Confirms service-level name validation protects the store. |
 | TEST-PRAC-03 | Prepare a fresh store and a whitespace-only specialty. | Attempt practitioner registration through PractitionerService. | Check ValueError and that the invalid practitioner was not stored. | Confirms service-level specialty validation protects the store. |
 | TEST-PRAC-04 | Register one valid practitioner, then prepare an invalid registration. | Attempt the invalid registration. | Check ValueError and verify the original practitioner remains unchanged. | Confirms failed registration does not corrupt existing session records. |
 | TEST-PRAC-05 | Prepare a fresh store and valid practitioner ID, name and specialty. | Register the practitioner and retrieve it by ID. | Check stored details and that the retrieved object is the registered practitioner. | Confirms successful registration and persistence through the service workflow. |
+| TEST-PRAC-06 | Create a fresh store and prepare empty, spaces-only, tab and newline IDs. | Attempt service registration with each invalid ID. | Check ValueError and `store.list_practitioners() == []`. | Confirms blank IDs cannot create stored records. |
+| TEST-PRAC-07 | Create a fresh store for each None/integer ID, name or specialty case. | Attempt registration with each invalid type. | Check ValueError and an empty practitioner list. | Confirms six invalid types do not mutate the store. |
+| TEST-PRAC-08 | Prepare a fresh store and "  D8  ", "  Taylor  ", "  General Practice  ". | Register, then find the practitioner by trimmed ID. | Check trimmed fields, same object identity and single stored record. | Confirms service normalization, lookup and storage consistency. |
 | T7-TK-01 | Prepare valid Patient, Practitioner, ID "A1" and datetime. | Create an Appointment. | Check ID, Patient and Practitioner object identity, and datetime. | Confirms that valid appointment details are retained correctly. |
 | T7-TK-02 | Prepare valid Patient, Practitioner and datetime. | Create an Appointment without passing status. | Check status is AppointmentStatus.SCHEDULED. | Confirms the correct default status. |
 | T7-TK-03 | Prepare valid objects and four blank ID inputs: empty, spaces, tab and newline. | Attempt Appointment construction with each invalid ID. | Check ValueError with "Appointment ID cannot be blank". | Confirms that blank identifiers are rejected. |
@@ -235,11 +245,12 @@ Cover Patient/Practitioner construction and validation; Appointment construction
 | TEST-PRAC-DOM-01 | Create a practitioner with valid ID, name and specialty. | `tests/test_domain.py::test_practitioner_created_with_valid_details` | Passed |
 | TEST-PRAC-DOM-02 | Remove surrounding spaces from practitioner ID, name and specialty. | `tests/test_domain.py::test_practitioner_details_are_trimmed` | Passed |
 | TEST-PRAC-DOM-03 | Reject empty and whitespace-only practitioner IDs. | `tests/test_domain.py::test_practitioner_rejects_blank_id` | Passed (4 inputs) |
-| TEST-PRAC-DOM-04 | Reject a whitespace-only practitioner name. | `tests/test_domain.py::test_practitioner_rejects_whitespace_name` | Passed |
-| TEST-PRAC-DOM-05 | Reject a whitespace-only practitioner specialty. | `tests/test_domain.py::test_practitioner_rejects_whitespace_specialty` | Passed |
+| TEST-PRAC-DOM-04 | Reject empty, spaces-only, tab and newline practitioner name. | `tests/test_domain.py::test_practitioner_rejects_whitespace_name` | Passed (4 inputs) |
+| TEST-PRAC-DOM-05 | Reject empty, spaces-only, tab and newline practitioner specialty. | `tests/test_domain.py::test_practitioner_rejects_whitespace_specialty` | Passed (4 inputs) |
 | TEST-PRAC-DOM-06 | Reject non-string practitioner details with the correct error message. | `tests/test_domain.py::test_practitioner_rejects_non_string_details` | Passed (6 inputs) |
 | TEST-PRAC-DOM-07 | Prevent changes to the practitioner's read-only ID. | `tests/test_domain.py::test_practitioner_id_is_read_only` | Passed |
 | TEST-PRAC-DOM-08 | Accept one-character practitioner ID, name and specialty. | `tests/test_domain.py::test_practitioner_accepts_one_character_details` | Passed |
+| TEST-PRAC-DOM-09 | Trim mixed leading/trailing whitespace in all practitioner fields. | `tests/test_domain.py::test_practitioner_trims_mixed_whitespace` | Passed |
 | T7-TK-01 | Create an Appointment with valid ID, Patient, Practitioner and datetime. | `tests/test_domain.py::test_appointment_construction_preserves_valid_details` | Passed |
 | T7-TK-02 | Verify a new Appointment defaults to SCHEDULED. | `tests/test_domain.py::test_new_appointment_defaults_to_scheduled` | Passed |
 | T7-TK-03 | Reject empty and whitespace-only Appointment IDs. | `tests/test_domain.py::test_appointment_rejects_blank_id` | Passed (4 inputs) |
@@ -249,7 +260,6 @@ Cover Patient/Practitioner construction and validation; Appointment construction
 | T7-TK-07 | Reject invalid Appointment status values. | `tests/test_domain.py::test_appointment_rejects_invalid_status` | Passed (3 inputs) |
 | T7-TK-08 | Reject invalid Appointment datetime types. | `tests/test_domain.py::test_appointment_rejects_invalid_date_time_type` | Passed (3 inputs) |
 | T7-TK-09 | Reject datetime values with seconds, microseconds or timezone information. | `tests/test_domain.py::test_appointment_rejects_invalid_time_precision` | Passed (3 inputs) |
-
 
 ## F Service Test Evidence
 
@@ -265,8 +275,9 @@ Use fresh shared SmartCareDataStore state, registered objects and completed Stag
 | TEST-PRAC-03 | Reject practitioner registration with a whitespace-only specialty. | FR-03 Practitioner registration – required specialty must be non-blank. | `tests/test_practitioner_lookup.py::test_practitioner_rejects_whitespace_only_specialty` | Passed |
 | TEST-PRAC-04 | Preserve existing practitioner records after invalid registration. | FR-03 Practitioner registration – failed validation must not alter stored records. | `tests/test_practitioner_lookup.py::test_failed_practitioner_registration_preserves_records` | Passed |
 | TEST-PRAC-05 | Store valid practitioner details and retrieve the registered practitioner. | FR-03 Practitioner registration – valid details must be stored and retrievable. | `tests/test_practitioner_lookup.py::test_practitioner_registration_stores_correct_details` | Passed |
-
-
+| TEST-PRAC-06 | Reject four blank practitioner IDs and keep store empty. | FR-03 – required practitioner ID must be non-blank. | `tests/test_practitioner_lookup.py::test_registration_rejects_blank_practitioner_id` | Passed (4 inputs) |
+| TEST-PRAC-07 | Reject six non-string registration field cases and keep store empty. | FR-03 – required fields must be valid strings. | `tests/test_practitioner_lookup.py::test_registration_rejects_non_string_details` | Passed (6 inputs) |
+| TEST-PRAC-08 | Trim details during registration and retrieve the same stored practitioner. | FR-03 – normalize required text and persist valid registration. | `tests/test_practitioner_lookup.py::test_registration_trims_practitioner_details` | Passed |
 
 ## G Negative and Boundary Cases
 
@@ -280,8 +291,8 @@ Connect cases to actual contracts and verify unchanged state after rejection.
 | Patient identity | Attempt to change patient_id from "P1" to "P2" | AttributeError is raised and the original patient ID remains unchanged. | TEST-PAT-06 |
 | Minimum valid text | One-character ID "P" and name "A" | Patient is created successfully with both values unchanged. | TEST-PAT-07 |
 | Practitioner ID validation | Empty ID, spaces, tab or newline | ValueError is raised for each blank ID. | TEST-PRAC-DOM-03 |
-| Practitioner name validation | Name containing only whitespace | ValueError is raised. | TEST-PRAC-DOM-04 |
-| Practitioner specialty validation | Specialty containing only whitespace | ValueError is raised. | TEST-PRAC-DOM-05 |
+| Practitioner name validation | Empty string, spaces, tab or newline | ValueError is raised with the correct field message for all four inputs. | TEST-PRAC-DOM-04 |
+| Practitioner specialty validation | Empty string, spaces, tab or newline | ValueError is raised with the correct field message for all four inputs. | TEST-PRAC-DOM-05 |
 | Practitioner details validation | None or integer used as practitioner ID, name or specialty | ValueError is raised with the correct message for the invalid field. | TEST-PRAC-DOM-06 |
 | Practitioner identity | Attempt to change practitioner_id from "D1" to "D2" | AttributeError is raised and the original practitioner ID remains unchanged. | TEST-PRAC-DOM-07 |
 | Minimum valid practitioner text | One-character ID "D", name "A" and specialty "C" | Practitioner is created successfully with all three values retained. | TEST-PRAC-DOM-08 |
@@ -289,6 +300,8 @@ Connect cases to actual contracts and verify unchanged state after rejection.
 | Practitioner service name validation | Register a practitioner with a whitespace-only name | ValueError is raised and no invalid practitioner is stored. | TEST-PRAC-02 |
 | Practitioner service specialty validation | Register a practitioner with a whitespace-only specialty | ValueError is raised and no invalid practitioner is stored. | TEST-PRAC-03 |
 | Practitioner registration state preservation | Attempt invalid registration after storing a valid practitioner | ValueError is raised and the existing practitioner record remains unchanged. | TEST-PRAC-04 |
+| Practitioner service ID validation | Empty string, spaces, tab or newline ID | ValueError is raised and the store remains empty (4 inputs). | TEST-PRAC-06 |
+| Practitioner service type validation | None or integer in ID, name or specialty | ValueError is raised and the store remains empty (6 inputs). | TEST-PRAC-07 |
 | Appointment ID validation | Empty ID, spaces, tab or newline | ValueError is raised with "Appointment ID cannot be blank". | T7-TK-03 |
 | Appointment ID trimming | ID with surrounding spaces: "  A1  " | Appointment ID is stored as "A1". | T7-TK-04 |
 | Patient object validation | None, string "P1" or integer 123 | ValueError is raised with "Appointment requires a Patient object". | T7-TK-05 |
@@ -296,7 +309,6 @@ Connect cases to actual contracts and verify unchanged state after rejection.
 | Appointment status validation | None, string "scheduled" or integer 123 | ValueError is raised with "Invalid appointment status". | T7-TK-07 |
 | Appointment datetime type validation | None, datetime string or integer | ValueError is raised with "Date/time must be a datetime value". | T7-TK-08 |
 | Appointment datetime precision and timezone | Nonzero seconds, nonzero microseconds or UTC-aware datetime | ValueError is raised with "Use a local date/time at minute precision". | T7-TK-09 |
-
 
 ## H GitHub Copilot Test Design
 
@@ -337,9 +349,7 @@ Copilot limitation: It reviewed the main branch and could not access my unmerged
 For each significant candidate, copy this entry as needed:
 
 
-
-
-### Candidate 1 – Whitespace-only Patient IDs
+#### Candidate 1 - Whitespace-only Patient IDs
 
 - Copilot test idea/candidate: Add more whitespace-only ID inputs, including tabs and newlines.
 - What it claims to verify: Different types of blank patient IDs are rejected.
@@ -351,7 +361,7 @@ For each significant candidate, copy this entry as needed:
 - Final test reference if accepted/modified: TEST-PAT-03 – `tests/test_domain.py::test_patient_rejects_blank_id`
 - Actual verification result: Passed (4 inputs).
 
-### Candidate 2 – Error Messages for Non-String Inputs
+#### Candidate 2 - Error Messages for Non-String Inputs
 
 - Copilot test idea/candidate: Check the specific error messages when patient details are not strings.
 - What it claims to verify: Non-string patient IDs and names raise the correct errors.
@@ -363,7 +373,7 @@ For each significant candidate, copy this entry as needed:
 - Final test reference if accepted/modified: TEST-PAT-05 – `tests/test_domain.py::test_patient_rejects_non_string_details`
 - Actual verification result: Passed (4 inputs).
 
-### Candidate 3 – Changing Patient Name After Creation
+#### Candidate 3 - Changing Patient Name After Creation
 
 - Copilot test idea/candidate: Add a test for changing the patient's name after construction.
 - What it claims to verify: Invalid name changes are rejected.
@@ -376,6 +386,63 @@ For each significant candidate, copy this entry as needed:
 - Actual verification result: Not run because the suggestion was rejected.
 
 Before accepting: traces to a requirement/criterion; can fail for the right reason; assertion checks required behaviour; no invented business rule; no unnecessary private implementation dependence. Reject/modify weak assertions, invented requirements, excessive mocking, duplicates, wrong exceptions, obsolete architecture and unnecessary dependencies.
+
+
+
+
+### Practitioner human-first test design
+
+**Requirement:** FR-03 Practitioner Registration and Revision 2 Practitioner domain validation.
+
+**Human-first evidence:** [GitHub Issue #19 – Practitioner Testing](https://github.com/u3325845/st1-assignment-3/issues/19#issuecomment-6610803693)
+
+Before the Copilot review, I designed the following Practitioner domain tests based on the documented validation rules and existing Stage 6 tests:
+
+- TEST-PRAC-DOM-01: Valid practitioner construction.
+- TEST-PRAC-DOM-02: Trimming surrounding whitespace.
+- TEST-PRAC-DOM-03: Rejecting blank practitioner IDs.
+- TEST-PRAC-DOM-04: Rejecting blank practitioner names.
+- TEST-PRAC-DOM-05: Rejecting blank specialties.
+- TEST-PRAC-DOM-06: Rejecting non-string inputs.
+- TEST-PRAC-DOM-07: Read-only practitioner ID.
+- TEST-PRAC-DOM-08: Accepting one-character values.
+
+These tests cover positive, negative and boundary cases. I reviewed the existing Stage 6 practitioner tests to avoid unnecessary duplication.
+
+The original domain tests were later improved following the Copilot review. The changes and decisions are recorded below.
+
+
+### Practitioner Copilot review - Domain tests
+
+- Requirement: Revision 2 Practitioner required-field, text-normalization and identity contracts.
+- Human-first tests: TEST-PRAC-DOM-01 through TEST-PRAC-DOM-08 were written before the review.
+- Prompt and purpose: Asked GitHub Copilot to review practitioner domain tests against the actual Practitioner implementation, identify missing boundaries and weak assertions, and avoid inventing unsupported rules.
+- Copilot review evidence: [GitHub Issue #19 – Copilot review comment](https://github.com/u3325845/st1-assignment-3/issues/19). The original GitHub Copilot conversation is not available through a public sharing link in the current interface. The issue comment records the suggestions accepted, modified and rejected.
+- Candidate — Four blank name/specialty variants: **Modify** existing DOM-04 and DOM-05 using empty string, spaces, tab and newline; retain checks for the correct ValueError messages. **Verified:** 4 inputs passed for each test.
+- Candidate — Mixed whitespace trimming: **Accept** as DOM-09 to check tabs, spaces and newlines around all three fields. **Verified:** passed.
+- Candidate — Preserve internal whitespace: **Modify** DOM-01 to use specialty "General Practice" and assert its exact value, rather than duplicating an existing positive test. **Verified:** passed.
+- Rejected candidates: Maximum field lengths, character restrictions, case normalization, domain-level uniqueness and immutable name/specialty. These are not established by the reviewed Practitioner contract, so tests asserting them would invent requirements.
+
+### Practitioner Copilot review — Service tests
+
+- Requirement: FR-03 practitioner registration, validation, uniqueness and session-store behaviour.
+- Human-first tests: TEST-PRAC-01 through TEST-PRAC-05 were written before the review.
+- Prompt and purpose: Asked GitHub Copilot to review the practitioner service tests and the current PractitionerService and SmartCareDataStore implementation for missing negative cases and assertion quality.
+- Copilot review evidence: [GitHub Issue #19 – Copilot review comment](https://github.com/u3325845/st1-assignment-3/issues/19). The original GitHub Copilot conversation is not available through a public sharing link in the current interface. The issue comment records the suggestions accepted, modified and rejected.
+- Candidate — Blank registration IDs: **Accept** as TEST-PRAC-06, parametrized over empty string, spaces, tab and newline. Check ValueError and unchanged empty store. **Verified:** 4 inputs passed.
+- Candidate — Non-string registration fields: **Accept** as TEST-PRAC-07, parametrized over None and integer inputs for ID, name and specialty. Check ValueError and unchanged empty store. **Verified:** 6 inputs passed.
+- Candidate — Registration normalization: **Accept** as TEST-PRAC-08. Assert trimmed fields, successful lookup of the same practitioner object and exactly one stored record. **Verified:** passed.
+- Assertion quality review: Removed a redundant duplicate assertion from TEST-PRAC-05; retained meaningful state and identity assertions.
+- Rejected candidates: Duplicate tests of the same domain behaviour without service-specific evidence, and tests for unsupported maximum lengths, case-normalization, duplicate names/specialties, restart persistence or notifications.
+
+
+### Practitioner regression verification
+
+- `python -m pytest tests/test_domain.py -q` — **58 passed**.
+- `python -m pytest tests/test_practitioner_lookup.py -q` — **21 passed**.
+- `python -m pytest -q` — **108 passed in 0.20s**, no failures.
+- These results verify the local working tree before the final commit and push.
+
 
 ## I Weak Copilot Test Reflection
 
@@ -401,20 +468,25 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 |---|---|---|---|---|---|---|---|
 | `python -m pytest -v` | `project/` | `d2db485` | 47 | 0 | No failures | None | Full regression run after integrating the latest Stage 6 changes into the Stage 7 Patient branch. All 47 tests passed. Evidence: [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16). |
 | `python -m pytest` | `project/` | `614f3e9` | 82 | 0 | No failures | None | Full regression run after adding Stage 7 Appointment tests alongside existing team tests. All 82 tests passed in 0.17s. Evidence: Local PyCharm terminal output; PR link pending. |
+| `python -m pytest -q` | `project/` | Uncommitted local changes on `test/stage07-practitioner` | 108 | 0 | No failures | None | Full regression run after practitioner domain and service test improvements. All 108 tests passed in 0.20s. Evidence: local PyCharm terminal output; final commit link to be added after pushing. |
 
-Individual test runs and changed-order independence evidence: [commands, results, links]
-Optional tutor-led demonstration notes: [optional; leave blank if not used]
-A meaningful test should detect a relevant incorrect result. Students do not have to perform the demonstration or submit failure/restoration evidence for assessment. The tutor restores the example and reruns its tests. This is not a Stage 8 fault activity.
-Requirement → test → failure/observation → diagnosis → change → verification: [concise links where applicable]
+Individual test runs and changed-order independence evidence:
 
 Individual test runs: `python -m pytest tests/test_domain.py -v` — 35 passed (13 Patient cases and 22 Appointment cases). Full regression: `python -m pytest` — 82 passed, 0 failed. Changed-order independence was not separately tested.
+Practitioner test runs: `python -m pytest tests/test_domain.py -q` — 58 passed; `python -m pytest tests/test_practitioner_lookup.py -q` — 21 passed. Full regression: `python -m pytest -q` — 108 passed, 0 failed. Changed-order independence was not separately tested for these changes.
+
+Optional tutor-led demonstration notes: [optional; leave blank if not used]
+A meaningful test should detect a relevant incorrect result. Students do not have to perform the demonstration or submit failure/restoration evidence for assessment. The tutor restores the example and reruns its tests. This is not a Stage 8 fault activity.
+Requirement → test → failure/observation → diagnosis → change → verification:   FR-03 Practitioner Registration → TEST-PRAC-01 to TEST-PRAC-08 → Copilot review identified additional boundary cases and opportunities to strengthen assertions; no failing tests were reported → Existing tests needed stronger coverage of blank IDs, non-string inputs and whitespace normalization → Added TEST-PRAC-06 to TEST-PRAC-08 and improved existing assertions → Verified 21 practitioner lookup tests and 108 full-suite tests passed. Evidence: [Issue #19](https://github.com/u3325845/st1-assignment-3/issues/19).
+
 
 ## K What the Suite Still Does Not Prove
 
-What does your test suite still not prove? [response]
-Coverage if used: [result or not used]
-Which uncovered areas matter, and why does coverage percentage alone not establish correctness? [response]
-Optional fixtures/parametrisation used and why, if any: [response or not used]
+What does your test suite still not prove?
+Although all 108 tests passed, the suite does not prove that every possible input or complete user workflow works correctly. The practitioner tests focus on domain validation, registration and in-memory storage. They do not verify the full user interface, concurrent operations or persistence after restarting the application.
+Coverage if used: Code coverage was not measured. Test results were verified using pytest.
+Which uncovered areas matter, and why does coverage percentage alone not establish correctness? Integration between different application components and complete user workflows may still contain defects. A high coverage percentage only shows which code was executed, not whether the assertions correctly verify the requirements.
+Optional fixtures/parametrisation used and why, if any: `pytest.mark.parametrize` was used to check multiple blank and non-string inputs without repeating test code. Fresh `SmartCareDataStore` instances were used to keep tests independent.
 
 ## L Git and Review Evidence
 
@@ -424,6 +496,7 @@ Use links rather than copying GitHub history. Continue the Stage 6 workflow; no 
 |---|---|---|---|---|---|
 | [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13) – Patient domain tests | `test/stage7-patient` | [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) | Merlin3313611 and TarnimaKhan22 (review requested) | Awaiting feedback | 47 tests passed; PR open and awaiting review. |
 | [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17) – Appointment domain tests | `test/stage07-appointment-construction` | Pending PR | Pending reviewer | Awaiting review | 22 Appointment test cases passed; full regression suite passed (82 tests). Commit: `614f3e9`. Branch pushed to GitHub. |
+| [Issue #19](https://github.com/u3325845/st1-assignment-3/issues/19) – Practitioner domain and service tests | `test/stage07-practitioner` | Pending PR | Rachel and Tarnima (review to be requested) | Copilot review decisions documented in Issue #19; awaiting peer feedback | 58 domain tests, 21 practitioner lookup tests and 108 full-suite tests passed locally. Final commit and push pending. |
 
 ## M Contribution Evidence
 
@@ -433,6 +506,7 @@ Record actual work in test design, implementation, review, traceability, diagnos
 |---|---|---|
 | RachelUC | Designed and implemented seven Patient domain tests covering valid details, whitespace, invalid IDs and names, non-string inputs, read-only patient ID and boundary values. Improved two tests after Copilot feedback and rejected one unsupported suggestion. Retained Stage 6 Patient Lookup tests, ran the full regression suite (47 passed) and documented test evidence. | [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13), [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) |
 | TarnimaKhan22 | Designed and implemented nine Appointment domain tests covering 22 cases, including valid construction, default status, blank IDs, whitespace trimming, invalid Patient and Practitioner objects, invalid status and datetime validation. Used parametrisation for negative and boundary cases, reviewed four GitHub Copilot suggestions and rejected unnecessary or duplicate tests. Documented requirement traceability, test design, AAA structure and test evidence. Ran focused tests (35 passed) and the full regression suite (82 passed, 0 failed). | [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17), [Commit 614f3e9](https://github.com/u3325845/st1-assignment-3/commit/614f3e9), [GitHub Copilot conversation](https://github.com/copilot/c/34063ee4-6016-4855-a321-c375854f232c) |
+| Merlin3313611 | Designed and implemented Practitioner domain tests (DOM-01 to DOM-09) and service tests (PRAC-01 to PRAC-08). Reviewed Copilot suggestions, accepted relevant improvements and rejected unsupported requirements. Verified 58 domain tests, 21 practitioner lookup tests and 108 full-suite tests passing locally. Documented test design, review decisions and regression evidence. | [GitHub Issue #19](https://github.com/u3325845/st1-assignment-3/issues/19), `test/stage07-practitioner` (PR pending) |
 
 ## N Formative Questions
 

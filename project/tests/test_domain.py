@@ -77,11 +77,11 @@ def test_patient_accepts_one_character_details():
 
 # TEST-PRAC-DOM-01: Check valid practitioner details.
 def test_practitioner_created_with_valid_details():
-    practitioner = Practitioner("D1", "Dr Smith", "Cardiology")
+    practitioner = Practitioner("D1", "Dr Smith", "General Practice")
 
     assert practitioner.practitioner_id == "D1"
     assert practitioner.name == "Dr Smith"
-    assert practitioner.specialty == "Cardiology"
+    assert practitioner.specialty == "General Practice"
 
 
 # TEST-PRAC-DOM-02: Check that extra spaces are removed.
@@ -101,15 +101,16 @@ def test_practitioner_rejects_blank_id(invalid_id):
 
 
 # TEST-PRAC-DOM-04: Check that whitespace-only names are rejected.
-def test_practitioner_rejects_whitespace_name():
+@pytest.mark.parametrize("invalid_name", ["", "   ", "\t", "\n"])
+def test_practitioner_rejects_whitespace_name(invalid_name):
     with pytest.raises(ValueError, match="Practitioner name cannot be blank"):
-        Practitioner("D1", "   ", "Cardiology")
-
+        Practitioner("D1", invalid_name, "Cardiology")
 
 # TEST-PRAC-DOM-05: Check that whitespace-only specialties are rejected.
-def test_practitioner_rejects_whitespace_specialty():
+@pytest.mark.parametrize("invalid_specialty", ["", "   ", "\t", "\n"])
+def test_practitioner_rejects_whitespace_specialty(invalid_specialty):
     with pytest.raises(ValueError, match="Specialty cannot be blank"):
-        Practitioner("D1", "Dr Smith", "   ")
+        Practitioner("D1", "Taylor", invalid_specialty)
 
 
 # TEST-PRAC-DOM-06: Check that non-string fields are rejected.
@@ -148,6 +149,19 @@ def test_practitioner_accepts_one_character_details():
     assert practitioner.practitioner_id == "D"
     assert practitioner.name == "A"
     assert practitioner.specialty == "C"
+
+
+# TEST-PRAC-DOM-09: Practitioner trims mixed whitespace
+def test_practitioner_trims_mixed_whitespace():
+    practitioner = Practitioner(
+        "\tD1\n",
+        "\tDr Smith \n",
+        "\nCardiology\t"
+    )
+
+    assert practitioner.practitioner_id == "D1"
+    assert practitioner.name == "Dr Smith"
+    assert practitioner.specialty == "Cardiology"
 
 
 # Stage 7 - Appointment Domain Tests (Tarnima)
