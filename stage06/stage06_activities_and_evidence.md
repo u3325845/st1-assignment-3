@@ -5,20 +5,20 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 - Group/tutorial: Grp 2 tutorial Wed 4:30 - 6:30 
 - Members, GitHub usernames and cohorts: RachelUC, Merlin3313611, Tarnima, Novera
 - Repository URL: https://github.com/u3325845/st1-assignment-3.git
-- Starting SHA: [response]
+- Starting SHA: 94b40f1a21882af9a65a1aa53a5f7374a9a0e258
 
 ## A Requirement to issue activities
 
 ### FR-02 Patient Search
 
-- Title: [response]
-- Context: [response]
-- Requirement: [response]
-- Acceptance criteria: [response]
-- Scope: [response]
-- Definition of Done: [response]
-- Owner: [response]
-- Actual issue link: [response]
+- Title: Implement patient lookup (FR-02)
+- Context: Patient registration is working, but the patient search function is incomplete.
+- Requirement: Complete PatientService.find_patient() to search for a registered patient using their ID.
+- Acceptance criteria: Return the same stored patient if found, raise LookupError for an unknown ID, and ValueError for a blank ID. Searching should not change stored data.
+- Scope: Complete the patient lookup function and add tests.
+- Definition of Done: The function is completed, tests pass, another member reviews and approves it, and the changes are merged into main.
+- Owner: RachelUC
+- Actual issue link: https://github.com/u3325845/st1-assignment-3/issues/2
 
 ### FR-06 Appointment Cancellation with FR-07 retained history
 
