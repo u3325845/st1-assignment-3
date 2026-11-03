@@ -77,3 +77,33 @@ def test_practitioner_lookup_preserves_registered_records():
     assert store.list_practitioners() == [first, second]
     assert service.find_practitioner("D1") is first
     assert service.find_practitioner("D2") is second
+
+
+def test_practitioner_lookup_trims_surrounding_spaces():
+    store = SmartCareDataStore()
+    service = PractitionerService(store)
+
+    practitioner = service.register_practitioner(
+        "D1",
+        "Taylor",
+        "General Practice",
+    )
+
+    result = service.find_practitioner("  D1  ")
+    assert result is practitioner
+
+
+def test_practitioner_lookup_is_case_sensitive():
+    store = SmartCareDataStore()
+    service = PractitionerService(store)
+
+    practitioner = service.register_practitioner(
+        "D1",
+        "Taylor",
+        "General Practice",
+    )
+
+    with pytest.raises(LookupError):
+        service.find_practitioner("d1")
+
+    assert service.find_practitioner("D1") is practitioner
