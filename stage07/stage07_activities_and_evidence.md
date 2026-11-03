@@ -203,10 +203,19 @@ Before accepting: traces to a requirement/criterion; can fail for the right reas
 
 ## I Weak Copilot Test Reflection
 
-Which Copilot-generated test looked convincing but was weak? [response]
-Why was it weak? [response]
-How did you strengthen it? [response]
-Accepted / modified / rejected test decisions and evidence: [link actual decisions in H]
+Which Copilot-generated test looked convincing but was weak?
+Copilot suggested testing whether invalid patient names could be rejected after creating a Patient object.
+
+Why was it weak?
+The Patient class validates the name during construction, but there is no documented requirement to validate name changes afterwards.
+
+How did you strengthen it?
+I rejected the suggestion because it did not match the documented requirement. I also improved my existing tests by adding whitespace-only ID cases and checking specific error messages for non-string inputs.
+
+Accepted / modified / rejected test decisions and evidence:
+I modified TEST-PAT-03 and TEST-PAT-05 and rejected the name-change suggestion. My decisions are recorded in Section H.
+
+Copilot review: https://github.com/copilot/c/ef849b60-0a91-4c25-bfab-a5c73971846d
 
 ## J Regression Run
 
@@ -214,7 +223,8 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 
 | Command | Working directory | Code SHA | Passed | Failed | Failure summary | Product defect / test defect / unresolved | Evidence and interpretation |
 |---|---|---|---|---|---|---|---|
-| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
+| `python -m pytest -v` | `project/` | `d2db485` | 47 | 0 | No failures | None | Full regression run after integrating the latest Stage 6 changes into the Stage 7 Patient branch. All 47 tests passed. Evidence: [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16). |
+
 
 Individual test runs and changed-order independence evidence: [commands, results, links]
 Optional tutor-led demonstration notes: [optional; leave blank if not used]
@@ -234,7 +244,8 @@ Use links rather than copying GitHub history. Continue the Stage 6 workflow; no 
 
 | Issue/task | Branch | PR | Reviewer | Key feedback | Outcome |
 |---|---|---|---|---|---|
-| [complete] | [complete] | [complete] | [complete] | [complete] | [complete] |
+| [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13) – Patient domain tests | `test/stage7-patient` | [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) | Merlin3313611 and TarnimaKhan22 (review requested) | Awaiting feedback | 47 tests passed; PR open and awaiting review. |
+
 
 ## M Contribution Evidence
 
@@ -242,7 +253,8 @@ Record actual work in test design, implementation, review, traceability, diagnos
 
 | Member | Actual contribution | Evidence link |
 |---|---|---|
-| [complete] | [complete] | [complete] |
+| RachelUC | Designed and implemented seven Patient domain tests covering valid details, whitespace, invalid IDs and names, non-string inputs, read-only patient ID and boundary values. Improved two tests after Copilot feedback and rejected one unsupported suggestion. Retained Stage 6 Patient Lookup tests, ran the full regression suite (47 passed) and documented test evidence. | [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13), [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) |
+
 
 ## N Formative Questions
 
