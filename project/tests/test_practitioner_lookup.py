@@ -55,9 +55,7 @@ def test_find_practitioner_case_sensitive():
     with pytest.raises(LookupError):
         service.find_practitioner("d1")
 
-
-# Stage 7
-
+# Stage 7 - Practitioner Service Tests
 def test_duplicate_practitioner_id_rejected():
     store = SmartCareDataStore()
     service = PractitionerService(store)

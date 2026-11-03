@@ -73,6 +73,83 @@ def test_patient_accepts_one_character_details():
 
 
 
+# Stage 7 - Practitioner Domain Tests (Merlin)
+
+# TEST-PRAC-DOM-01: Check valid practitioner details.
+def test_practitioner_created_with_valid_details():
+    practitioner = Practitioner("D1", "Dr Smith", "Cardiology")
+
+    assert practitioner.practitioner_id == "D1"
+    assert practitioner.name == "Dr Smith"
+    assert practitioner.specialty == "Cardiology"
+
+
+# TEST-PRAC-DOM-02: Check that extra spaces are removed.
+def test_practitioner_details_are_trimmed():
+    practitioner = Practitioner("  D1  ", "  Dr Smith  ", "  Cardiology  ")
+
+    assert practitioner.practitioner_id == "D1"
+    assert practitioner.name == "Dr Smith"
+    assert practitioner.specialty == "Cardiology"
+
+
+# TEST-PRAC-DOM-03: Check that blank IDs are rejected.
+@pytest.mark.parametrize("invalid_id", ["", "   ", "\t", "\n"])
+def test_practitioner_rejects_blank_id(invalid_id):
+    with pytest.raises(ValueError, match="Practitioner ID cannot be blank"):
+        Practitioner(invalid_id, "Dr Smith", "Cardiology")
+
+
+# TEST-PRAC-DOM-04: Check that whitespace-only names are rejected.
+def test_practitioner_rejects_whitespace_name():
+    with pytest.raises(ValueError, match="Practitioner name cannot be blank"):
+        Practitioner("D1", "   ", "Cardiology")
+
+
+# TEST-PRAC-DOM-05: Check that whitespace-only specialties are rejected.
+def test_practitioner_rejects_whitespace_specialty():
+    with pytest.raises(ValueError, match="Specialty cannot be blank"):
+        Practitioner("D1", "Dr Smith", "   ")
+
+
+# TEST-PRAC-DOM-06: Check that non-string fields are rejected.
+@pytest.mark.parametrize(
+    "practitioner_id, name, specialty, expected_message",
+    [
+        (None, "Dr Smith", "Cardiology", "Practitioner ID cannot be blank"),
+        (123, "Dr Smith", "Cardiology", "Practitioner ID cannot be blank"),
+        ("D1", None, "Cardiology", "Practitioner name cannot be blank"),
+        ("D1", 123, "Cardiology", "Practitioner name cannot be blank"),
+        ("D1", "Dr Smith", None, "Specialty cannot be blank"),
+        ("D1", "Dr Smith", 123, "Specialty cannot be blank"),
+    ],
+)
+def test_practitioner_rejects_non_string_details(
+    practitioner_id, name, specialty, expected_message
+):
+    with pytest.raises(ValueError, match=expected_message):
+        Practitioner(practitioner_id, name, specialty)
+
+
+# TEST-PRAC-DOM-07: Check that practitioner ID is read-only.
+def test_practitioner_id_is_read_only():
+    practitioner = Practitioner("D1", "Dr Smith", "Cardiology")
+
+    with pytest.raises(AttributeError):
+        practitioner.practitioner_id = "D2"
+
+    assert practitioner.practitioner_id == "D1"
+
+
+# TEST-PRAC-DOM-08: Check that one-character fields are accepted.
+def test_practitioner_accepts_one_character_details():
+    practitioner = Practitioner("D", "A", "C")
+
+    assert practitioner.practitioner_id == "D"
+    assert practitioner.name == "A"
+    assert practitioner.specialty == "C"
+
+
 # Stage 7 - Appointment Domain Tests (Tarnima)
 
 # T7-TK-01: Verify valid Appointment construction.
