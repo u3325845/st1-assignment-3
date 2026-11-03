@@ -73,6 +73,15 @@ Assign TEST IDs before implementation or generation. Use canonical AC IDs with t
 | Patient domain validation | Patient ID and name must be strings. | TEST-PAT-05 | Unit – Negative | test_patient_rejects_non_string_details() – tests/test_patient_lookup.py | Non-string inputs raise ValueError with the correct message. | Passed (4 inputs) | Student-authored |
 | Patient identity | Patient ID is read-only after creation. | TEST-PAT-06 | Unit – Negative | test_patient_id_is_read_only() – tests/test_patient_lookup.py | Changing the patient ID raises AttributeError and leaves the ID unchanged. | Passed | Student-authored |
 | Patient domain validation | Valid non-blank text has no additional minimum length. | TEST-PAT-07 | Unit – Boundary | test_patient_accepts_one_character_details() – tests/test_patient_lookup.py | A one-character ID and name are accepted. | Passed | Student-authored |
+| FR-04 — Appointment construction | Valid Appointment details are retained. | T7-TK-01 | Unit – Positive | `test_appointment_construction_preserves_valid_details()` – `tests/test_domain.py` | Correct ID, Patient, Practitioner and datetime are retained. | Passed | Student-authored |
+| Appointment initial status | New appointments default to SCHEDULED. | T7-TK-02 | Unit – Positive | `test_new_appointment_defaults_to_scheduled()` – `tests/test_domain.py` | Status is AppointmentStatus.SCHEDULED. | Passed | Student-authored |
+| Appointment ID validation | Appointment ID must be non-blank text. | T7-TK-03 | Unit – Negative/Boundary | `test_appointment_rejects_blank_id()` – `tests/test_domain.py` | Blank IDs raise ValueError. | Passed (4 inputs) | Student-authored |
+| Appointment ID validation | Surrounding ID whitespace is removed. | T7-TK-04 | Unit – Positive | `test_appointment_id_is_trimmed()` – `tests/test_domain.py` | ID is stored without surrounding spaces. | Passed | Student-authored |
+| Appointment construction | Patient must be a Patient object. | T7-TK-05 | Unit – Negative | `test_appointment_rejects_invalid_patient()` – `tests/test_domain.py` | Invalid Patient values raise ValueError. | Passed (3 inputs) | Student-authored |
+| Appointment construction | Practitioner must be a Practitioner object. | T7-TK-06 | Unit – Negative | `test_appointment_rejects_invalid_practitioner()` – `tests/test_domain.py` | Invalid Practitioner values raise ValueError. | Passed (3 inputs) | Student-authored |
+| Appointment status validation | Status must be an AppointmentStatus value. | T7-TK-07 | Unit – Negative | `test_appointment_rejects_invalid_status()` – `tests/test_domain.py` | Invalid status raises ValueError. | Passed (3 inputs) | Student-authored |
+| FR-04 — Date/time validation | Date/time must be a Python datetime. | T7-TK-08 | Unit – Negative | `test_appointment_rejects_invalid_date_time_type()` – `tests/test_domain.py` | Invalid datetime types raise ValueError. | Passed (3 inputs) | Student-authored |
+| FR-04 — Date/time validation | Date/time must be timezone-naive and minute-precise. | T7-TK-09 | Unit – Negative/Boundary | `test_appointment_rejects_invalid_time_precision()` – `tests/test_domain.py` | Seconds, microseconds and timezone-aware values raise ValueError. | Passed (3 inputs) | Student-authored |
 
 ## C Test Design
 
@@ -87,6 +96,16 @@ Use descriptive test names such as test_cancel_changes_status() or test_blank_pa
 | TEST-PAT-05 | Patient domain validation | Patient details must be strings | Negative | Try creating patients with None or integer values for the ID or name. | Each input raises ValueError with the correct message. | Checks invalid types for both fields and identifies which field caused the error. |
 | TEST-PAT-06 | Patient identity | Patient ID is read-only | Negative | Create a patient and try changing its ID. | AttributeError is raised and the original ID remains unchanged. | Checks that patient identity cannot be changed through the property. |
 | TEST-PAT-07 | Patient domain validation | Non-blank text is accepted | Boundary | Create a patient with a one-character ID and name. | Patient is created and both values are stored correctly. | Checks the smallest valid non-blank text input. |
+| T7-TK-01 | Appointment construction | Valid appointment details are retained | Positive | Create an Appointment with valid Patient, Practitioner, ID and datetime. | The appointment retains the correct ID, object references and datetime. | Verifies actual stored values rather than only checking object creation. |
+| T7-TK-02 | Appointment initial status | New appointments default to SCHEDULED | Positive | Create an Appointment without specifying a status. | Status is AppointmentStatus.SCHEDULED. | Confirms the required initial status. |
+| T7-TK-03 | Appointment ID validation | Blank IDs are rejected | Negative / Boundary | Test empty, spaces-only, tab and newline IDs. | Each raises ValueError with the correct message. | Covers four forms of blank input. |
+| T7-TK-04 | Appointment ID validation | Surrounding whitespace is removed | Positive | Create an Appointment with spaces around its ID. | Stored ID is trimmed to A1. | Confirms ID normalization. |
+| T7-TK-05 | Appointment construction | Patient must be a Patient object | Negative | Pass None, a string and an integer as Patient. | Each raises ValueError with the correct message. | Verifies object-type validation. |
+| T7-TK-06 | Appointment construction | Practitioner must be a Practitioner object | Negative | Pass None, a string and an integer as Practitioner. | Each raises ValueError with the correct message. | Verifies Practitioner object-type validation. |
+| T7-TK-07 | Appointment status validation | Status must be AppointmentStatus | Negative | Pass None, a string and an integer as status. | Each raises ValueError with the correct message. | Verifies rejection of invalid status types. |
+| T7-TK-08 | FR-04 — Date/time validation | Date/time must be a Python datetime | Negative | Pass None, a datetime string and an integer. | Each raises ValueError with the correct message. | Verifies rejection of invalid datetime types. |
+| T7-TK-09 | FR-04 — Date/time validation | Datetime must be timezone-naive and minute-precise | Negative / Boundary | Test nonzero seconds, microseconds and UTC-aware datetime. | Each raises ValueError with the correct message. | Covers both precision and timezone restrictions. |
+
 
 ## D Arrange Act Assert Record
 
@@ -101,7 +120,15 @@ Arrange test data; act on one meaningful behaviour; assert the required observab
 | TEST-PAT-05 | Prepare None and integer inputs for patient ID and name. | Try creating a Patient with each invalid input. | Check that ValueError is raised with the correct message for the invalid field. | Confirms that non-string values are rejected and the correct field is identified. |
 | TEST-PAT-06 | Create a Patient with ID "P1" and name "Alex". | Try changing patient_id to "P2". | Check that AttributeError is raised and patient_id remains "P1". | Confirms that the patient ID cannot be changed through its read-only property. |
 | TEST-PAT-07 | Use one-character ID "P" and name "A". | Create a Patient object. | Check patient_id == "P" and name == "A". | Confirms that the smallest valid non-blank text values are accepted. |
-
+| T7-TK-01 | Prepare valid Patient, Practitioner, ID "A1" and datetime. | Create an Appointment. | Check ID, Patient and Practitioner object identity, and datetime. | Confirms that valid appointment details are retained correctly. |
+| T7-TK-02 | Prepare valid Patient, Practitioner and datetime. | Create an Appointment without passing status. | Check status is AppointmentStatus.SCHEDULED. | Confirms the correct default status. |
+| T7-TK-03 | Prepare valid objects and four blank ID inputs: empty, spaces, tab and newline. | Attempt Appointment construction with each invalid ID. | Check ValueError with "Appointment ID cannot be blank". | Confirms that blank identifiers are rejected. |
+| T7-TK-04 | Prepare valid objects and ID "  A1  ". | Create an Appointment with the spaced ID. | Check appointment_id == "A1". | Confirms that surrounding whitespace is removed. |
+| T7-TK-05 | Prepare valid Practitioner, datetime and invalid Patient inputs: None, "P1", 123. | Attempt construction with each invalid Patient value. | Check ValueError with "Appointment requires a Patient object". | Confirms that invalid Patient types are rejected. |
+| T7-TK-06 | Prepare valid Patient, datetime and invalid Practitioner inputs: None, "D1", 123. | Attempt construction with each invalid Practitioner value. | Check ValueError with "Appointment requires a Practitioner object". | Confirms that invalid Practitioner types are rejected. |
+| T7-TK-07 | Prepare valid appointment details and invalid status values: None, "scheduled", 123. | Attempt construction with each invalid status. | Check ValueError with "Invalid appointment status". | Confirms that only valid AppointmentStatus values are accepted. |
+| T7-TK-08 | Prepare valid Patient and Practitioner with invalid datetime inputs: None, string and integer. | Attempt construction with each invalid datetime. | Check ValueError with "Date/time must be a datetime value". | Confirms that incorrect datetime types are rejected. |
+| T7-TK-09 | Prepare datetimes with nonzero seconds, microseconds and UTC timezone information. | Attempt construction with each invalid datetime. | Check ValueError with "Use a local date/time at minute precision". | Confirms enforcement of minute precision and timezone-naive datetime. |
 
 ## E Domain Test Evidence
 
@@ -116,7 +143,15 @@ Cover Patient/Practitioner construction and validation; Appointment construction
 | TEST-PAT-05 | Reject non-string patient details with the correct error message. | `tests/test_patient_lookup.py::test_patient_rejects_non_string_details` | Passed (4 inputs) |
 | TEST-PAT-06 | Prevent changes to the patient's read-only ID. | `tests/test_patient_lookup.py::test_patient_id_is_read_only` | Passed |
 | TEST-PAT-07 | Accept one-character patient ID and name. | `tests/test_patient_lookup.py::test_patient_accepts_one_character_details` | Passed |
-
+| T7-TK-01 | Create an Appointment with valid ID, Patient, Practitioner and datetime. | `tests/test_domain.py::test_appointment_construction_preserves_valid_details` | Passed |
+| T7-TK-02 | Verify a new Appointment defaults to SCHEDULED. | `tests/test_domain.py::test_new_appointment_defaults_to_scheduled` | Passed |
+| T7-TK-03 | Reject empty and whitespace-only Appointment IDs. | `tests/test_domain.py::test_appointment_rejects_blank_id` | Passed (4 inputs) |
+| T7-TK-04 | Remove surrounding whitespace from Appointment IDs. | `tests/test_domain.py::test_appointment_id_is_trimmed` | Passed |
+| T7-TK-05 | Reject invalid Patient objects during Appointment construction. | `tests/test_domain.py::test_appointment_rejects_invalid_patient` | Passed (3 inputs) |
+| T7-TK-06 | Reject invalid Practitioner objects during Appointment construction. | `tests/test_domain.py::test_appointment_rejects_invalid_practitioner` | Passed (3 inputs) |
+| T7-TK-07 | Reject invalid Appointment status values. | `tests/test_domain.py::test_appointment_rejects_invalid_status` | Passed (3 inputs) |
+| T7-TK-08 | Reject invalid Appointment datetime types. | `tests/test_domain.py::test_appointment_rejects_invalid_date_time_type` | Passed (3 inputs) |
+| T7-TK-09 | Reject datetime values with seconds, microseconds or timezone information. | `tests/test_domain.py::test_appointment_rejects_invalid_time_precision` | Passed (3 inputs) |
 
 ## F Service Test Evidence
 
@@ -140,7 +175,13 @@ Connect cases to actual contracts and verify unchanged state after rejection.
 | Patient details validation | None or integer used as patient ID or name | ValueError is raised with the correct message for the invalid field. | TEST-PAT-05 |
 | Patient identity | Attempt to change patient_id from "P1" to "P2" | AttributeError is raised and the original patient ID remains unchanged. | TEST-PAT-06 |
 | Minimum valid text | One-character ID "P" and name "A" | Patient is created successfully with both values unchanged. | TEST-PAT-07 |
-
+| Appointment ID validation | Empty ID, spaces, tab or newline | ValueError is raised with "Appointment ID cannot be blank". | T7-TK-03 |
+| Appointment ID trimming | ID with surrounding spaces: "  A1  " | Appointment ID is stored as "A1". | T7-TK-04 |
+| Patient object validation | None, string "P1" or integer 123 | ValueError is raised with "Appointment requires a Patient object". | T7-TK-05 |
+| Practitioner object validation | None, string "D1" or integer 123 | ValueError is raised with "Appointment requires a Practitioner object". | T7-TK-06 |
+| Appointment status validation | None, string "scheduled" or integer 123 | ValueError is raised with "Invalid appointment status". | T7-TK-07 |
+| Appointment datetime type validation | None, datetime string or integer | ValueError is raised with "Date/time must be a datetime value". | T7-TK-08 |
+| Appointment datetime precision and timezone | Nonzero seconds, nonzero microseconds or UTC-aware datetime | ValueError is raised with "Use a local date/time at minute precision". | T7-TK-09 |
 
 
 ## H GitHub Copilot Test Design
@@ -245,12 +286,14 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 | Command | Working directory | Code SHA | Passed | Failed | Failure summary | Product defect / test defect / unresolved | Evidence and interpretation |
 |---|---|---|---|---|---|---|---|
 | `python -m pytest -v` | `project/` | `d2db485` | 47 | 0 | No failures | None | Full regression run after integrating the latest Stage 6 changes into the Stage 7 Patient branch. All 47 tests passed. Evidence: [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16). |
-
+| `python -m pytest` | `project/` | `614f3e9` | 82 | 0 | No failures | None | Full regression run after adding Stage 7 Appointment tests alongside existing team tests. All 82 tests passed in 0.17s. Evidence: Local PyCharm terminal output; PR link pending. |
 
 Individual test runs and changed-order independence evidence: [commands, results, links]
 Optional tutor-led demonstration notes: [optional; leave blank if not used]
 A meaningful test should detect a relevant incorrect result. Students do not have to perform the demonstration or submit failure/restoration evidence for assessment. The tutor restores the example and reruns its tests. This is not a Stage 8 fault activity.
 Requirement → test → failure/observation → diagnosis → change → verification: [concise links where applicable]
+
+Individual test runs: `python -m pytest tests/test_domain.py -v` — 35 passed (13 Patient cases and 22 Appointment cases). Full regression: `python -m pytest` — 82 passed, 0 failed. Changed-order independence was not separately tested.
 
 ## K What the Suite Still Does Not Prove
 
@@ -266,7 +309,7 @@ Use links rather than copying GitHub history. Continue the Stage 6 workflow; no 
 | Issue/task | Branch | PR | Reviewer | Key feedback | Outcome |
 |---|---|---|---|---|---|
 | [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13) – Patient domain tests | `test/stage7-patient` | [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) | Merlin3313611 and TarnimaKhan22 (review requested) | Awaiting feedback | 47 tests passed; PR open and awaiting review. |
-
+| [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17) – Appointment domain tests | `test/stage07-appointment-construction` | Pending PR | Pending reviewer | Awaiting review | 22 Appointment test cases passed; full regression suite passed (82 tests). Commit: `614f3e9`. Branch pushed to GitHub. |
 
 ## M Contribution Evidence
 
@@ -275,7 +318,7 @@ Record actual work in test design, implementation, review, traceability, diagnos
 | Member | Actual contribution | Evidence link |
 |---|---|---|
 | RachelUC | Designed and implemented seven Patient domain tests covering valid details, whitespace, invalid IDs and names, non-string inputs, read-only patient ID and boundary values. Improved two tests after Copilot feedback and rejected one unsupported suggestion. Retained Stage 6 Patient Lookup tests, ran the full regression suite (47 passed) and documented test evidence. | [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13), [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) |
-
+| TarnimaKhan22 | Designed and implemented nine Appointment domain tests covering 22 cases, including valid construction, default status, blank IDs, whitespace trimming, invalid Patient and Practitioner objects, invalid status and datetime validation. Used parametrisation for negative and boundary cases, reviewed four GitHub Copilot suggestions and rejected unnecessary or duplicate tests. Documented requirement traceability, test design, AAA structure and test evidence. Ran focused tests (35 passed) and the full regression suite (82 passed, 0 failed). | [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17), [Commit 614f3e9](https://github.com/u3325845/st1-assignment-3/commit/614f3e9), [GitHub Copilot conversation](https://github.com/copilot/c/34063ee4-6016-4855-a321-c375854f232c) |
 
 ## N Formative Questions
 
