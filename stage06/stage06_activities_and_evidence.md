@@ -44,56 +44,54 @@ Complete this one group record. Link actual issues, diffs, tests and reviews; av
 - Actual issue link: [response]
 
 ## B Commit quality
-
-| Original example | Strong or Weak | Reason |
-|---|---|---|
-| changes | [select] | [response] |
-| final version | [select] | [response] |
-| Add patient search by ID | [select] | [response] |
-| fix stuff | [select] | [response] |
-| Prevent cancellation of completed appointments | [select] | [response] |
+| Original example | Strong or Weak | Reason                                                         |
+|---|---|----------------------------------------------------------------|
+| changes | Weak | Too vague, does not explain what was changed.                  |
+| final version | Weak | Does not identify the feature or purpose of the commit.        |
+| Add patient search by ID | Strong | Clearly describes the functionality added.                     |
+| fix stuff | Weak | Does not identify the problem or solution.                     |
+| Prevent cancellation of completed appointments | Strong | Describes a specific change to appointment cancellation rules. |
 
 ## C Over scoped PR review
 
 A cancellation PR also renames unrelated patient fields, restructures unrelated code and adds a new dependency.
-
-- Scope concerns: [response]
-- Responsibility and architecture concerns: [response]
-- Testing and review concerns: [response]
-- Changes to remove or separate, with reasons: [response]
+- Scope concerns: The PR includes unrelated patient field renaming, code restructuring and a new dependency alongside appointment cancellation.
+- Responsibility and architecture concerns: Unrelated changes make it harder to identify which components are responsible for cancellation and may introduce unnecessary dependencies.
+- Testing and review concerns: A large PR makes it difficult to review individual changes and determine which change caused a test failure.
+- Changes to remove or separate, with reasons: Keep only appointment cancellation and its relevant tests in this PR. Move patient field renaming, unrelated restructuring and the new dependency into separate PRs if they are necessary.
 
 ## D Challenge a weak Copilot review
 
 GitHub Copilot says: "Looks good; tests pass."
 
-- Missing evidence: [response]
-- Follow-up review question 1: [response]
-- Follow-up review question 2: [response]
-- Follow-up review question 3: [response]
-- Follow-up review question 4: [response]
-- Follow-up review question 5: [response]
-- Additional questions if useful: [response]
+- Missing evidence: The review does not explain which requirements were checked, whether the implementation preserves stored records, whether invalid inputs are handled or whether unrelated changes were introduced.
+- Follow-up review question 1: Does cancellation change a scheduled appointment's status to `CANCELLED`?
+- Follow-up review question 2: Does the cancelled appointment remain stored as the same object?
+- Follow-up review question 3: Does cancelling an already-cancelled appointment raise `ValueError` without changing its state?
+- Follow-up review question 4: Are unknown and invalid appointment IDs handled with the required exceptions?
+- Follow-up review question 5: Does the PR contain unrelated changes that should be separated?
 
 ## E Team workflow agreement
 
 | Practice | Team agreement |
 |---|---|
-| Branch naming | [response] |
-| Commit message convention | [response] |
-| PR size | [response] |
-| Another-member review requirement | [response] |
-| Merge rule | [response] |
-| Significant Copilot disclosure rule | [response] |
+| Branch naming | Use descriptive names such as `feature/fr02-patient-lookup`, `test/stage06-validation` and `docs/stage06-validation-evidence`. |
+| Commit message convention | Write short, meaningful messages describing the change, such as `test: add patient and practitioner validation tests`. |
+| PR size | Keep PRs focused on one feature, testing task or documentation update. |
+| Another-member review requirement | Have at least one other group member review the changes before merging. |
+| Merge rule | Merge only after required reviews, passing tests and resolution of merge conflicts. |
+| Significant Copilot disclosure rule | Record meaningful Copilot assistance, review findings, human decisions and verification evidence in the Stage 6 documentation. |
 
 ## F Issue and backlog index
 
 Create at least two focused issues. Add a linked practitioner-lookup issue or an explicit supporting criterion with the tutor if needed to cover all three service targets.
 
 | Issue link | Requirement | Owner | Acceptance criteria or precise link | Status |
-|---|---|---|---|---|
+|-|-|-|-|-|
 | [Issue #2](https://github.com/u3325845/st1-assignment-3/issues/2) | FR-02 Patient Lookup | RachelUC | Return stored patient; unknown ID raises `LookupError`; blank ID raises `ValueError`. | Completed (PR #3 merged) |
 | [Issue #6](https://github.com/u3325845/st1-assignment-3/issues/6) | FR-03 supporting operation — Practitioner lookup | Merlin3313611 | Return the original stored practitioner for a valid ID; raise `LookupError` for unknown IDs and `ValueError` for invalid IDs; ignore surrounding spaces; do not modify stored data. | Closed — completed in [PR #5](https://github.com/u3325845/st1-assignment-3/pull/5) |
 | [issue 2] | [response] | [response] | [response] | [response] |
+| [Issue #7](https://github.com/u3325845/st1-assignment-3/issues/7) | Stage 6 patient and practitioner validation | TarnimaKhan22 | Validate IDs, case sensitivity, whitespace handling, object identity and unchanged stored records. | Validation completed — PR #8 merged; appointment testing tracked separately. |
 ## G Pull request evidence
 
 Repeat this block per PR. Record actual events, not planned approvals.
@@ -119,7 +117,7 @@ Repeat this block per PR. Record actual events, not planned approvals.
 - Integrated verification after merge: Patient Lookup verification: `python -m pytest -v` from `project/` – 11 tests passed. Merge SHA: `e744281`. Final integrated test run after merge not separately recorded.
 
 
-#### Practitioner Lookup 
+#### PR #5 Practitioner Lookup 
 
 - **PR link and title:** [PR #5 - Implement practitioner lookup and add tests](https://github.com/u3325845/st1-assignment-3/pull/5)
 - **Linked issue and requirement:** [Issue #6](https://github.com/u3325845/st1-assignment-3/issues/6) - FR-03 supporting operation, practitioner lookup. Issue documented after implementation.
@@ -138,6 +136,19 @@ Repeat this block per PR. Record actual events, not planned approvals.
 - **Linked issue closure:** Issue #6 closed, with a link to completed PR #5.
 - **Each member updated main:** Merlin3313611, RachelUC and TarnimaKhan22 confirmed they pulled the latest `main`. u3325845 (Novera) - confirmation pending.
 - **Integrated verification after merge:** `python -m pytest` from `project/` — 16 tests passed on `main` at `fed883f`. Working tree clean.
+
+### PR #8 — Independent Validation Tests
+
+- **PR link and title:** [PR #8 — Patient and Practitioner Validation Tests](https://github.com/u3325845/st1-assignment-3/pull/8)
+- **Linked issue:** Issue #7 — Stage 6 Validation and Testing.
+- **Feature branch:** `test/stage06-validation`
+- **Changed behaviour:** Added 12 independent validation test cases without changing application functionality.
+- **Meaningful commit:** `e3e9746`
+- **Test command, directory and observed result:** `python -m pytest -v` from `project/` — 28 tests passed in 0.10 seconds.
+- **Another-member review:** Two approving reviews were received. (Rachel and merlin)
+- **Key feedback:** No blocking issues were identified in the approvals shown.
+- **Merge outcome:** PR #8 successfully merged into `main`.
+- **Remaining work:** Appointment cancellation validation will be completed separately once the implementation is available.
 
 ## H Copilot collaboration record
 
@@ -192,7 +203,7 @@ Record meaningful required use, not every trivial completion. Repeat per signifi
 
 Repeat per member. Include only categories that describe actual work; write not applicable where appropriate. Pairing or mentoring can be supported by a short corroborated note.
 
-### Member: RachelUC (u3331755)
+### Patient Lookup
 
 - Member: RachelUC
 - Implementation: Implemented `PatientService.find_patient()` to search for registered patients and handle invalid or unknown IDs. Evidence: PR #3.
@@ -215,9 +226,22 @@ Repeat per member. Include only categories that describe actual work; write not 
 - **Debugging or integration:** Pulled the updated `main` after PR #5 was merged and confirmed all 16 tests passed.
 - **Documentation or team support:** Added my practitioner lookup evidence to Sections A, F, G, H, I and J. Reviewed RachelUC's Stage 6 documentation and checked TarnimaKhan22's additional tests against Copilot's findings.
 
+###  Validation and testing
+- **Member:** TarnimaKhan22
+- **Implementation:** Developed `project/tests/test_stage06_validation.py`, containing six test functions and 12 executable validation test cases.
+- **Testing:** Ran the independent validation suite (12 passed in 0.09 seconds) and the full project suite (28 passed in 0.10 seconds).
+- **Review:** Submitted PR #8, which received two approving reviews and was merged into `main`.
+- **Issue refinement:** Created Issue #7 for Stage 6 validation and testing.
+- **Design and responsibility discussion:** Verified patient and practitioner lookup, including invalid IDs, case sensitivity, surrounding spaces, object identity and preservation of existing records.
+- **Debugging/integration:** Confirmed that the existing 16 tests continued passing after adding 12 new validation cases.
+- **Documentation/team support:** Recorded independent testing results and coordinated further appointment cancellation validation.
+
 ## K Exit question
 
 Why is a high commit count not necessarily evidence of strong contribution?
+
+A high commit count does not necessarily demonstrate a strong contribution because commits vary in quality and significance. One member may make several small changes, while another may contribute substantial implementation, testing, debugging or review work in fewer commits. Contribution should be evaluated using the quality of work, requirements satisfied, testing evidence, code reviews and teamwork rather than commit count alone.
+
 
 [response]
 
@@ -225,43 +249,43 @@ Why is a high commit count not necessarily evidence of strong contribution?
 
 1. What is version control?
 
-[response]
+Version control is a system that tracks changes to project files over time. It allows developers to collaborate, review previous changes and restore earlier versions when needed.
 
 2. Why is a feature branch useful?
 
-[response]
+A feature branch allows developers to work on a specific task without directly changing the main project. It helps keep changes organised and reduces conflicts.
 
 3. What makes a commit a good engineering commit?
 
-[response]
+A good commit contains a focused, meaningful change with a clear message explaining its purpose. It should be easy to understand, review and test.
 
 4. What is a pull request?
 
-[response]
+A pull request is a request to merge changes from one branch into another. It allows team members to review the code, discuss improvements and approve changes before merging.
 
 5. What is the purpose of code review?
 
-[response]
+Code review helps identify errors, verify requirements, improve code quality and ensure changes follow project standards.
 
 6. What does a Git diff show?
 
-[response]
+A Git diff shows the differences between versions of files, including added, removed and modified lines.
 
 7. What is a Definition of Done?
 
-[response]
+A Definition of Done is a set of conditions that must be satisfied before a task is considered complete, such as implemented functionality, passing tests, completed reviews and merged changes.
 
 8. What is the appropriate role of GitHub Copilot in pull-request review?
 
-[response]
+GitHub Copilot can assist by identifying potential bugs, missing tests and improvements. However, developers must verify its suggestions against the actual requirements and code. Human review remains essential.
 
 9. Why should individual contribution not be judged only by commit count?
 
-[response]
+Commit count does not measure the complexity, quality or impact of work. Testing, debugging, reviewing and documentation are also meaningful contributions.
 
 10. What is the Stage 6 engineering rule?
 
-[response]
+A change should be traceable from its requirement and GitHub issue through implementation, testing, review and merge. Passing tests alone is not enough; the team must verify the requirements and record meaningful evidence.
 
 ## M Completion and handover
 
