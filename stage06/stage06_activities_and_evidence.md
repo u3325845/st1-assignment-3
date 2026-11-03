@@ -174,7 +174,7 @@ Record meaningful required use, not every trivial completion. Repeat per signifi
 - **Reason:** Copilot found no functional defects. The additional approved tests address both coverage gaps. The outdated docstring remains a minor documentation issue.
 - **Verification/evidence:** [PR #5](https://github.com/u3325845/st1-assignment-3/pull/5). All 16 tests passed when the PR was merged. Copilot reviewed the PR after it was merged; its suggestions were not part of the original approval.
 
-## I Human versus Copilot review comparison
+## Copilot review comparison
 
 - Human reviewer noticed before consulting Copilot: The existing tests did not explicitly cover whitespace trimming or case sensitivity. Recorded retrospectively after merging. [Human review evidence](https://github.com/u3325845/st1-assignment-3/issues/2#issuecomment-6599736615).
 - Copilot noticed: Missing tests for whitespace, case sensitivity, empty IDs and unchanged stored data, along with an outdated docstring.
@@ -184,6 +184,15 @@ Record meaningful required use, not every trivial completion. Repeat per signifi
 - Unsupported or incorrect Copilot suggestion: None identified from the review.
 - Human judgement accepted, modified or rejected, and why: I accepted the extra testing suggestions for Stage 7 because they would improve test coverage. I kept the Stage 6 implementation unchanged because it was already working.
 - Which evidence justified merge approval: The original three Patient Lookup tests passed, the full suite reported 11 passed, and Merlin3313611 approved PR #3. The Copilot review was completed after merging and did not contribute to the original approval.
+
+## Validation AI review
+- Member and task: TarnimaKhan22 – Stage 6 Independent Validation AI Review.
+- Prompt/purpose and relevant issue/diff: Asked Copilot to review patient and practitioner validation tests against Stage 6 requirements. [PR #8](https://github.com/u3325845/st1-assignment-3/pull/8).
+- Summary of output: Copilot identified two missing practitioner lookup tests for whitespace and case sensitivity, plus optional improvements.
+- Human check against actual code, requirements and tests:** Checked existing test coverage and evaluated Copilot's suggestions. Confirmed the two new tests passed.
+- Decision — Accept / Modify / Reject:** Modify.
+- Reason: Added the two tests but rejected unnecessary improvements because existing tests already covered those behaviours.
+- Verification/evidence: 14/14 validation tests and 30/30 full tests passed. Commit: `3660fd3` (local, not yet pushed).
 
 
 
@@ -217,14 +226,15 @@ Repeat per member. Include only categories that describe actual work; write not 
 
 #### Practitioner Lookup
 
-- **Member:** Merlin3313611
-- **Implementation:** Implemented `PractitionerService.find_practitioner()` in `project/smartcare/services.py`. The function returns the stored practitioner and raises `LookupError` for unknown IDs. Evidence: [PR #5](https://github.com/u3325845/st1-assignment-3/pull/5).
-- **Testing:** Added five tests covering existing IDs, unknown IDs, blank IDs, surrounding spaces and case sensitivity. Ran `python -m pytest` from `project/` — 16 tests passed.
-- **Review:** Reviewed and approved RachelUC's and TarnimaKhan22's pull requests, including code, tests and Stage 6 documentation.
-- **Issue refinement:** Created [Issue #6](https://github.com/u3325845/st1-assignment-3/issues/6) for practitioner lookup as an FR-03 supporting operation and linked it to PR #5.
-- **Design and responsibility discussion:** Checked that the service uses the data store for validation and lookup instead of duplicating validation logic.
-- **Debugging or integration:** Pulled the updated `main` after PR #5 was merged and confirmed all 16 tests passed.
-- **Documentation or team support:** Added my practitioner lookup evidence to Sections A, F, G, H, I and J. Reviewed RachelUC's Stage 6 documentation and checked TarnimaKhan22's additional tests against Copilot's findings.
+- Member: Merlin3313611
+- Implementation: Implemented `PractitionerService.find_practitioner()` in `project/smartcare/services.py`. The function returns the stored practitioner and raises `LookupError` for unknown IDs. Evidence: [PR #5](https://github.com/u3325845/st1-assignment-3/pull/5).
+- Testing: Added five tests covering existing IDs, unknown IDs, blank IDs, surrounding spaces and case sensitivity. Ran `python -m pytest` from `project/` — 16 tests passed.
+- Review: Reviewed and approved RachelUC's and TarnimaKhan22's pull requests, including code, tests and Stage 6 documentation.
+- Issue refinement: Created [Issue #6](https://github.com/u3325845/st1-assignment-3/issues/6) for practitioner lookup as an FR-03 supporting operation and linked it to PR #5.
+- Design and responsibility discussion: Checked that the service uses the data store for validation and lookup instead of duplicating validation logic.
+- Debugging or integration: Pulled the updated `main` after PR #5 was merged and confirmed all 16 tests passed.
+- Documentation or team support: Added my practitioner lookup evidence to Sections A, F, G, H, I and J. Reviewed RachelUC's Stage 6 documentation and checked TarnimaKhan22's additional tests against Copilot's findings.
+- Additional commit: 3660fd3 — two AI-reviewed tests have been added.
 
 ###  Validation and testing
 - **Member:** TarnimaKhan22
