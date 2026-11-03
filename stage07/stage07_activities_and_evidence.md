@@ -468,7 +468,7 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 |---|---|---|---|---|---|---|---|
 | `python -m pytest -v` | `project/` | `d2db485` | 47 | 0 | No failures | None | Full regression run after integrating the latest Stage 6 changes into the Stage 7 Patient branch. All 47 tests passed. Evidence: [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16). |
 | `python -m pytest` | `project/` | `614f3e9` | 82 | 0 | No failures | None | Full regression run after adding Stage 7 Appointment tests alongside existing team tests. All 82 tests passed in 0.17s. Evidence: Local PyCharm terminal output; PR link pending. |
-| `python -m pytest -q` | `project/` | Uncommitted local changes on `test/stage07-practitioner` | 108 | 0 | No failures | None | Full regression run after practitioner domain and service test improvements. All 108 tests passed in 0.20s. Evidence: local PyCharm terminal output; final commit link to be added after pushing. |
+| `python -m pytest -q` | `project/` | `0b6bb58` | 108 | 0 | No failures | None | Full regression run after practitioner domain and service test improvements. All 108 tests passed in 0.20s. Evidence: local PyCharm terminal output; [Commit 0b6bb58](https://github.com/u3325845/st1-assignment-3/commit/0b6bb58). |
 
 Individual test runs and changed-order independence evidence:
 
@@ -492,11 +492,11 @@ Optional fixtures/parametrisation used and why, if any: `pytest.mark.parametrize
 
 Use links rather than copying GitHub history. Continue the Stage 6 workflow; no commit/PR count, conflict or individual test quota is imposed.
 
-| Issue/task | Branch | PR | Reviewer | Key feedback | Outcome |
-|---|---|---|---|---|---|
-| [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13) – Patient domain tests | `test/stage7-patient` | [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) | Merlin3313611 and TarnimaKhan22 (review requested) | Awaiting feedback | 47 tests passed; PR open and awaiting review. |
-| [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17) – Appointment domain tests | `test/stage07-appointment-construction` | Pending PR | Pending reviewer | Awaiting review | 22 Appointment test cases passed; full regression suite passed (82 tests). Commit: `614f3e9`. Branch pushed to GitHub. |
-| [Issue #19](https://github.com/u3325845/st1-assignment-3/issues/19) – Practitioner domain and service tests | `test/stage07-practitioner` | Pending PR | Rachel and Tarnima (review to be requested) | Copilot review decisions documented in Issue #19; awaiting peer feedback | 58 domain tests, 21 practitioner lookup tests and 108 full-suite tests passed locally. Final commit and push pending. |
+| Issue/task | Branch | PR | Reviewer | Key feedback | Outcome                                                                                                                       |
+|---|---|---|---|---|-------------------------------------------------------------------------------------------------------------------------------|
+| [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13) – Patient domain tests | `test/stage7-patient` | [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) | Merlin3313611 and TarnimaKhan22 (review requested) | Awaiting feedback | 47 tests passed; PR open and awaiting review.                                                                                 |
+| [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17) – Appointment domain tests | `test/stage07-appointment-construction` | Pending PR | Pending reviewer | Awaiting review | 22 Appointment test cases passed; full regression suite passed (82 tests). Commit: `614f3e9`. Branch pushed to GitHub.        |
+| [Issue #19](https://github.com/u3325845/st1-assignment-3/issues/19) – Practitioner domain and service tests | `test/stage07-practitioner` | Pending PR | Rachel and Tarnima (review to be requested) | Copilot review decisions documented in Issue #19; awaiting peer feedback | 58 domain tests, 21 practitioner lookup tests and 108 full-suite tests passed locally.Commit: `0b6bb58`. Push and PR pending. |
 
 ## M Contribution Evidence
 
