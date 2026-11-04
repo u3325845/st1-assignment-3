@@ -2,7 +2,7 @@
 
 Group/tutorial: Grp 2 tutorial Wed 4:30 - 6:30
 Members/cohorts: RachelUC, Merlin3313611, TarnimaKhan22, u3325845 (Novera)
- Requirements baseline: SmartCare A3 Requirements Baseline 2026, revision 2.
+Requirements baseline: SmartCare A3 Requirements Baseline 2026, revision 2.
 Use the same project/. Link actual evidence; keep responses concise. Blank fields are for your group. Copy rows only as needed.
 
 All Assignment 3 stage materials are provided from the beginning. Complete this stage only after the previous applicable stage has been integrated, verified and recorded. Use this supplied record in stage07/ in your EXISTING repository. Preserve project/, all earlier tests, records and responses. Do not download another starter or copy staff solutions.
@@ -148,6 +148,11 @@ Assign TEST IDs before implementation or generation. Use canonical AC IDs with t
 | Appointment status validation     | Status must be an AppointmentStatus value. | T7-TK-07 | Unit – Negative | `test_appointment_rejects_invalid_status()` – `tests/test_domain.py` | Invalid status raises ValueError. | Passed (3 inputs) | Student-authored |
 | FR-04 — Date/time validation      | Date/time must be a Python datetime. | T7-TK-08 | Unit – Negative | `test_appointment_rejects_invalid_date_time_type()` – `tests/test_domain.py` | Invalid datetime types raise ValueError. | Passed (3 inputs) | Student-authored |
 | FR-04 — Date/time validation      | Date/time must be timezone-naive and minute-precise. | T7-TK-09 | Unit – Negative/Boundary | `test_appointment_rejects_invalid_time_precision()` – `tests/test_domain.py` | Seconds, microseconds and timezone-aware values raise ValueError. | Passed (3 inputs) | Student-authored |
+| FR-06 – Cancel appointment | Cancellation service validation: appointment ID must be non-blank. | T7-NOV-01 | Service – Negative | `test_cancel_blank_id_raises_value_error()` – `tests/test_services.py` | Empty appointment ID raises ValueError; existing appointment remains SCHEDULED. | Passed (reported) | Student-authored |
+| FR-06 – Cancel appointment | Cancellation service validation: whitespace-only ID is invalid. | T7-NOV-02 | Service – Negative/Boundary | `test_cancel_spaces_only_id_raises_value_error()` – `tests/test_services.py` | Spaces-only ID raises ValueError; existing appointment remains SCHEDULED. | Passed (reported) | Student-authored |
+| FR-06 – Cancel appointment | Cancellation service validation: ID must be valid text. | T7-NOV-03 | Service – Negative | `test_cancel_none_id_raises_value_error()` – `tests/test_services.py` | None ID raises ValueError; existing appointment remains SCHEDULED. | Passed (reported) | Student-authored |
+| FR-06 – Cancel appointment | Cancellation guard: only SCHEDULED appointments may be cancelled. | T7-NOV-04 | Service – Negative | `test_cancel_completed_appointment_raises_value_error()` – `tests/test_services.py` | Cancelling COMPLETED raises ValueError; status remains COMPLETED. | Passed (reported) | Student-authored |
+| FR-06 – Cancel appointment | Cancellation must not change unrelated appointments. | T7-NOV-05 | Service – Regression | `test_cancelling_one_appointment_leaves_other_unchanged()` – `tests/test_services.py` | Target becomes CANCELLED; other appointment stays SCHEDULED. | Passed (reported) | Student-authored |
 
 ## C Test Design
 
@@ -188,6 +193,11 @@ Use descriptive test names such as test_cancel_changes_status() or test_blank_pa
 | T7-TK-07 | Appointment status validation | Status must be AppointmentStatus | Negative | Pass None, a string and an integer as status. | Each raises ValueError with the correct message. | Verifies rejection of invalid status types. |
 | T7-TK-08 | FR-04 — Date/time validation | Date/time must be a Python datetime | Negative | Pass None, a datetime string and an integer. | Each raises ValueError with the correct message. | Verifies rejection of invalid datetime types. |
 | T7-TK-09 | FR-04 — Date/time validation | Datetime must be timezone-naive and minute-precise | Negative / Boundary | Test nonzero seconds, microseconds and UTC-aware datetime. | Each raises ValueError with the correct message. | Covers both precision and timezone restrictions. |
+| T7-NOV-01 | FR-06 Cancellation | Non-blank appointment ID contract | Negative | Attempt cancellation with an empty ID. | ValueError; existing appointment remains SCHEDULED. | Verifies empty-ID validation at the service boundary. |
+| T7-NOV-02 | FR-06 Cancellation | Non-blank appointment ID contract | Negative/Boundary | Attempt cancellation with a spaces-only ID. | ValueError; existing appointment remains SCHEDULED. | Checks whitespace-only IDs separately from empty IDs. |
+| T7-NOV-03 | FR-06 Cancellation | Valid text ID contract | Negative | Attempt cancellation with None as the ID. | ValueError; existing appointment remains SCHEDULED. | Checks invalid ID types without altering existing state. |
+| T7-NOV-04 | FR-06 Cancellation | Only SCHEDULED appointments can be cancelled | Negative | Attempt cancellation of a COMPLETED appointment. | ValueError; status remains COMPLETED. | Verifies the cancellation status guard. |
+| T7-NOV-05 | FR-06 Cancellation | Preserve unrelated appointment state | Regression | Cancel one of two appointments. | First becomes CANCELLED; second remains SCHEDULED. | Verifies cancellation does not affect other appointments. |
 
 ## D Arrange Act Assert Record
 
@@ -228,6 +238,11 @@ Arrange test data; act on one meaningful behaviour; assert the required observab
 | T7-TK-07 | Prepare valid appointment details and invalid status values: None, "scheduled", 123. | Attempt construction with each invalid status. | Check ValueError with "Invalid appointment status". | Confirms that only valid AppointmentStatus values are accepted. |
 | T7-TK-08 | Prepare valid Patient and Practitioner with invalid datetime inputs: None, string and integer. | Attempt construction with each invalid datetime. | Check ValueError with "Date/time must be a datetime value". | Confirms that incorrect datetime types are rejected. |
 | T7-TK-09 | Prepare datetimes with nonzero seconds, microseconds and UTC timezone information. | Attempt construction with each invalid datetime. | Check ValueError with "Use a local date/time at minute precision". | Confirms enforcement of minute precision and timezone-naive datetime. |
+| T7-NOV-01 | Create a valid SCHEDULED appointment A1. | Call cancel_appointment(""). | ValueError; A1 remains SCHEDULED. | Confirms empty IDs are rejected without changing an existing appointment. |
+| T7-NOV-02 | Create a valid SCHEDULED appointment A1. | Call cancel_appointment("   "). | ValueError; A1 remains SCHEDULED. | Confirms whitespace-only IDs are rejected without changing existing state. |
+| T7-NOV-03 | Create a valid SCHEDULED appointment A1. | Call cancel_appointment(None). | ValueError; A1 remains SCHEDULED. | Confirms invalid ID types are rejected without changing existing state. |
+| T7-NOV-04 | Create and store a COMPLETED appointment A2. | Attempt to cancel A2. | ValueError; A2 remains COMPLETED. | Confirms completed appointments cannot be cancelled. |
+| T7-NOV-05 | Book A1 at 09:00 and A2 at 10:00. | Cancel A1. | A1 is CANCELLED; A2 remains SCHEDULED. | Confirms cancellation changes only the selected appointment. |
 
 ## E Domain Test Evidence
 
@@ -261,6 +276,7 @@ Cover Patient/Practitioner construction and validation; Appointment construction
 | T7-TK-08 | Reject invalid Appointment datetime types. | `tests/test_domain.py::test_appointment_rejects_invalid_date_time_type` | Passed (3 inputs) |
 | T7-TK-09 | Reject datetime values with seconds, microseconds or timezone information. | `tests/test_domain.py::test_appointment_rejects_invalid_time_precision` | Passed (3 inputs) |
 
+
 ## F Service Test Evidence
 
 Use fresh shared SmartCareDataStore state, registered objects and completed Stage 6 services.
@@ -270,14 +286,24 @@ Use fresh shared SmartCareDataStore state, registered objects and completed Stag
 | S6-PAT-01 | Find an existing registered patient. | FR-02 Patient Lookup – return the matching patient. | `tests/test_patient_lookup.py::test_find_existing_patient` | Passed (retained Stage 6 test) |
 | S6-PAT-02 | Reject a patient ID that does not exist. | FR-02 Patient Lookup – unknown ID raises LookupError. | `tests/test_patient_lookup.py::test_find_unknown_patient` | Passed (retained Stage 6 test) |
 | S6-PAT-03 | Reject a blank patient ID. | FR-02 Patient Lookup – blank ID raises ValueError. | `tests/test_patient_lookup.py::test_find_blank_patient_id` | Passed (retained Stage 6 test) |
-| TEST-PRAC-01 | Reject duplicate practitioner registration while preserving the original record. | FR-03 Practitioner registration – practitioner IDs must be unique. | `tests/test_practitioner_lookup.py::test_duplicate_practitioner_id_rejected` | Passed |
-| TEST-PRAC-02 | Reject practitioner registration with a whitespace-only name. | FR-03 Practitioner registration – required name must be non-blank. | `tests/test_practitioner_lookup.py::test_practitioner_rejects_whitespace_only_name` | Passed |
-| TEST-PRAC-03 | Reject practitioner registration with a whitespace-only specialty. | FR-03 Practitioner registration – required specialty must be non-blank. | `tests/test_practitioner_lookup.py::test_practitioner_rejects_whitespace_only_specialty` | Passed |
-| TEST-PRAC-04 | Preserve existing practitioner records after invalid registration. | FR-03 Practitioner registration – failed validation must not alter stored records. | `tests/test_practitioner_lookup.py::test_failed_practitioner_registration_preserves_records` | Passed |
-| TEST-PRAC-05 | Store valid practitioner details and retrieve the registered practitioner. | FR-03 Practitioner registration – valid details must be stored and retrievable. | `tests/test_practitioner_lookup.py::test_practitioner_registration_stores_correct_details` | Passed |
-| TEST-PRAC-06 | Reject four blank practitioner IDs and keep store empty. | FR-03 – required practitioner ID must be non-blank. | `tests/test_practitioner_lookup.py::test_registration_rejects_blank_practitioner_id` | Passed (4 inputs) |
-| TEST-PRAC-07 | Reject six non-string registration field cases and keep store empty. | FR-03 – required fields must be valid strings. | `tests/test_practitioner_lookup.py::test_registration_rejects_non_string_details` | Passed (6 inputs) |
-| TEST-PRAC-08 | Trim details during registration and retrieve the same stored practitioner. | FR-03 – normalize required text and persist valid registration. | `tests/test_practitioner_lookup.py::test_registration_trims_practitioner_details` | Passed |
+| TEST-PRAC-01 | Reject duplicate practitioner registration while preserving the original record. | FR-03 Practitioner registration – practitioner IDs must be unique. | `tests/test_practitioner_lookup.py::test_duplicate_practitioner_id_rejected` | Passed (Stage 7 student-authored) |
+| TEST-PRAC-02 | Reject practitioner registration with a whitespace-only name. | FR-03 Practitioner registration – required name must be non-blank. | `tests/test_practitioner_lookup.py::test_practitioner_rejects_whitespace_only_name` | Passed (Stage 7 student-authored) |
+| TEST-PRAC-03 | Reject practitioner registration with a whitespace-only specialty. | FR-03 Practitioner registration – required specialty must be non-blank. | `tests/test_practitioner_lookup.py::test_practitioner_rejects_whitespace_only_specialty` | Passed (Stage 7 student-authored) |
+| TEST-PRAC-04 | Preserve existing practitioner records after invalid registration. | FR-03 Practitioner registration – failed validation must not alter stored records. | `tests/test_practitioner_lookup.py::test_failed_practitioner_registration_preserves_records` | Passed (Stage 7 student-authored) |
+| TEST-PRAC-05 | Store valid practitioner details and retrieve the registered practitioner. | FR-03 Practitioner registration – valid details must be stored and retrievable. | `tests/test_practitioner_lookup.py::test_practitioner_registration_stores_correct_details` | Passed (Stage 7 student-authored) |
+| TEST-PRAC-06 | Reject four blank practitioner IDs and keep the store empty. | FR-03 – required practitioner ID must be non-blank. | `tests/test_practitioner_lookup.py::test_registration_rejects_blank_practitioner_id` | Passed (4 inputs; Stage 7 student-authored) |
+| TEST-PRAC-07 | Reject six non-string registration field cases and keep the store empty. | FR-03 – required fields must be valid strings. | `tests/test_practitioner_lookup.py::test_registration_rejects_non_string_details` | Passed (6 inputs; Stage 7 student-authored) |
+| TEST-PRAC-08 | Trim details during registration and retrieve the same stored practitioner. | FR-03 – normalize required text and persist valid registration. | `tests/test_practitioner_lookup.py::test_registration_trims_practitioner_details` | Passed (Stage 7 student-authored) |
+| EXIST-CAN-01 | Cancel a SCHEDULED appointment and return the same object with CANCELLED status. | FR-06, AC-05.1 – successful cancellation. | `tests/test_services.py::test_cancel_scheduled_appointment_sets_cancelled_and_returns_same_object` | Passed (retained existing test) |
+| EXIST-CAN-02 | Retrieve a cancelled appointment and verify it remains stored. | FR-07, AC-05.2 – retain cancelled appointment history. | `tests/test_services.py::test_cancelled_appointment_is_retained_and_findable` | Passed (retained existing test) |
+| EXIST-CAN-03 | Reject repeated cancellation and preserve CANCELLED status. | FR-06, AC-05.3 – repeated cancellation is rejected. | `tests/test_services.py::test_cancel_already_cancelled_appointment_raises_value_error` | Passed (existing test; assertion strengthened in PR #22) |
+| EXIST-CAN-04 | Reject cancellation of an unknown appointment ID. | FR-06 – unknown appointment raises LookupError. | `tests/test_services.py::test_cancel_unknown_appointment_id_raises_lookup_error` | Passed (retained existing test) |
+| T7-NOV-01 | Reject cancellation with an empty appointment ID; preserve existing state. | FR-06 – cancellation service validation. | `tests/test_services.py::test_cancel_blank_id_raises_value_error` | Passed (reported in PR #22; Stage 7 student-authored) |
+| T7-NOV-02 | Reject cancellation with a whitespace-only appointment ID; preserve existing state. | FR-06 – cancellation service validation. | `tests/test_services.py::test_cancel_spaces_only_id_raises_value_error` | Passed (reported in PR #22; Stage 7 student-authored) |
+| T7-NOV-03 | Reject cancellation with a None appointment ID; preserve existing state. | FR-06 – cancellation service validation. | `tests/test_services.py::test_cancel_none_id_raises_value_error` | Passed (reported in PR #22; Stage 7 student-authored) |
+| T7-NOV-04 | Reject cancellation of a COMPLETED appointment without changing its status. | FR-06 – cancellation guard. | `tests/test_services.py::test_cancel_completed_appointment_raises_value_error` | Passed (reported in PR #22; Stage 7 student-authored) |
+| T7-NOV-05 | Cancel one appointment while preserving another appointment's status. | FR-06 – state preservation. | `tests/test_services.py::test_cancelling_one_appointment_leaves_other_unchanged` | Passed (reported in PR #22; Stage 7 student-authored) |
+
 
 ## G Negative and Boundary Cases
 
@@ -309,6 +335,11 @@ Connect cases to actual contracts and verify unchanged state after rejection.
 | Appointment status validation | None, string "scheduled" or integer 123 | ValueError is raised with "Invalid appointment status". | T7-TK-07 |
 | Appointment datetime type validation | None, datetime string or integer | ValueError is raised with "Date/time must be a datetime value". | T7-TK-08 |
 | Appointment datetime precision and timezone | Nonzero seconds, nonzero microseconds or UTC-aware datetime | ValueError is raised with "Use a local date/time at minute precision". | T7-TK-09 |
+| Cancellation ID validation | Empty ID | ValueError; A1 remains SCHEDULED. | T7-NOV-01 |
+| Cancellation ID validation | Spaces-only ID | ValueError; A1 remains SCHEDULED. | T7-NOV-02 |
+| Cancellation ID type validation | None ID | ValueError; A1 remains SCHEDULED. | T7-NOV-03 |
+| Cancellation status guard | COMPLETED appointment | ValueError; status remains COMPLETED. | T7-NOV-04 |
+| Cancellation state preservation | Cancel A1 while A2 is scheduled | A1 becomes CANCELLED; A2 remains SCHEDULED. | T7-NOV-05 |
 
 ## H GitHub Copilot Test Design
 
@@ -349,6 +380,7 @@ Copilot limitation: It reviewed the main branch and could not access my unmerged
 For each significant candidate, copy this entry as needed:
 
 
+### Rachel — Patient Copilot review
 #### Candidate 1 - Whitespace-only Patient IDs
 
 - Copilot test idea/candidate: Add more whitespace-only ID inputs, including tabs and newlines.
@@ -467,8 +499,9 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 | Command | Working directory | Code SHA | Passed | Failed | Failure summary | Product defect / test defect / unresolved | Evidence and interpretation |
 |---|---|---|---|---|---|---|---|
 | `python -m pytest -v` | `project/` | `d2db485` | 47 | 0 | No failures | None | Full regression run after integrating the latest Stage 6 changes into the Stage 7 Patient branch. All 47 tests passed. Evidence: [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16). |
-| `python -m pytest` | `project/` | `614f3e9` | 82 | 0 | No failures | None | Full regression run after adding Stage 7 Appointment tests alongside existing team tests. All 82 tests passed in 0.17s. Evidence: Local PyCharm terminal output; PR link pending. |
+| `python -m pytest` | `project/` | `614f3e9` | 82 | 0 | No failures | None | Full regression run after adding Stage 7 Appointment tests alongside existing team tests. All 82 tests passed in 0.17s. Evidence: Local PyCharm terminal output; [PR #18](https://github.com/u3325845/st1-assignment-3/pull/18).|
 | `python -m pytest -q` | `project/` | `0b6bb58` | 108 | 0 | No failures | None | Full regression run after practitioner domain and service test improvements. All 108 tests passed in 0.20s. Evidence: local PyCharm terminal output; [Commit 0b6bb58](https://github.com/u3325845/st1-assignment-3/commit/0b6bb58). |
+| `python -m pytest` | `project/` | `1bc002e` | 113 | 0 | No failures reported | None reported | PR #22 reports 113 tests passed after adding cancellation tests. Final main regression still needs verification. |
 
 Individual test runs and changed-order independence evidence:
 
@@ -482,21 +515,35 @@ Requirement → test → failure/observation → diagnosis → change → verifi
 
 ## K What the Suite Still Does Not Prove
 
-What does your test suite still not prove?
-Although all 108 tests passed, the suite does not prove that every possible input or complete user workflow works correctly. The practitioner tests focus on domain validation, registration and in-memory storage. They do not verify the full user interface, concurrent operations or persistence after restarting the application.
-Coverage if used: Code coverage was not measured. Test results were verified using pytest.
-Which uncovered areas matter, and why does coverage percentage alone not establish correctness? Integration between different application components and complete user workflows may still contain defects. A high coverage percentage only shows which code was executed, not whether the assertions correctly verify the requirements.
-Optional fixtures/parametrisation used and why, if any: `pytest.mark.parametrize` was used to check multiple blank and non-string inputs without repeating test code. Fresh `SmartCareDataStore` instances were used to keep tests independent.
+**What does your test suite still not prove?**
+
+The latest PR (#22) reported 113 passing tests, but the final regression run on the integrated main branch has not yet been recorded. Even when all tests pass, the suite does not prove that every possible input or complete user workflow works correctly. The tests cover Patient, Practitioner and Appointment domain validation, registration, lookup and cancellation behaviour. However, they do not fully verify the user interface, concurrent operations or persistence after restarting the application.
+
+**Coverage if used:**
+
+Code coverage was not measured. Test results were verified using pytest.
+
+**Which uncovered areas matter, and why does coverage percentage alone not establish correctness?**
+
+Integration between different application components and complete user workflows may still contain defects. A high coverage percentage only shows which code was executed, not whether the assertions correctly verify the requirements. Strong assertions and positive, negative and boundary tests are also needed.
+
+**Optional fixtures/parametrisation used and why, if any:**
+
+`pytest.mark.parametrize` was used to check multiple blank, non-string and invalid inputs without repeating test code. Fresh `SmartCareDataStore` instances were used to keep tests independent and prevent one test from affecting another.
+
 
 ## L Git and Review Evidence
 
 Use links rather than copying GitHub history. Continue the Stage 6 workflow; no commit/PR count, conflict or individual test quota is imposed.
 
-| Issue/task | Branch | PR | Reviewer | Key feedback | Outcome                                                                                                                       |
-|---|---|---|---|---|-------------------------------------------------------------------------------------------------------------------------------|
-| [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13) – Patient domain tests | `test/stage7-patient` | [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) | Merlin3313611 and TarnimaKhan22 (review requested) | Awaiting feedback | 47 tests passed; PR open and awaiting review.                                                                                 |
-| [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17) – Appointment domain tests | `test/stage07-appointment-construction` | Pending PR | Pending reviewer | Awaiting review | 22 Appointment test cases passed; full regression suite passed (82 tests). Commit: `614f3e9`. Branch pushed to GitHub.        |
-| [Issue #19](https://github.com/u3325845/st1-assignment-3/issues/19) – Practitioner domain and service tests | `test/stage07-practitioner` | Pending PR | Rachel and Tarnima (review to be requested) | Copilot review decisions documented in Issue #19; awaiting peer feedback | 58 domain tests, 21 practitioner lookup tests and 108 full-suite tests passed locally.Commit: `0b6bb58`. Push and PR pending. |
+
+| Issue/task | Branch | PR | Reviewer | Key feedback | Outcome |
+|---|---|---|---|---|---|
+| [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13) – Patient domain tests | `test/stage7-patient` | [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) | Merlin3313611 and TarnimaKhan22 (reviewed and approved) | Patient validation tests cover valid details, blank IDs, whitespace, non-string inputs, read-only patient ID and boundary values. Copilot feedback helped strengthen assertions and add boundary cases. | Approved and merged into main. 47 tests passed during branch verification. Tested commit: `d2db485`. |
+| [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17) – Appointment domain tests | `test/stage07-appointment-construction` | [PR #18](https://github.com/u3325845/st1-assignment-3/pull/18) | Merlin3313611 and RachelUC (both reviewed and approved) | Reviewed nine Appointment domain tests covering 22 cases, including valid construction, default SCHEDULED status, invalid Patient and Practitioner objects, status validation and datetime restrictions. | Approved and merged into main. 35 domain tests and 82 full-suite tests passed during branch verification. Commit: `614f3e9`. |
+| [Issue #19](https://github.com/u3325845/st1-assignment-3/issues/19) – Practitioner domain and service tests | `test/stage07-practitioner` | [PR #20](https://github.com/u3325845/st1-assignment-3/pull/20) | RachelUC (reviewed and approved) | Reviewed Practitioner construction, validation, registration, duplicate IDs and boundary cases. Copilot suggestions were evaluated, and relevant assertions were strengthened. | Approved and merged into main. 58 domain tests, 21 practitioner lookup tests and 108 full-suite tests passed during branch verification. Commit: `0b6bb58`. |
+| [Issue #21](https://github.com/u3325845/st1-assignment-3/issues/21) – Cancellation validation and history tests | `test/stage07-appointment-validation` | [PR #22](https://github.com/u3325845/st1-assignment-3/pull/22) | RachelUC (reviewed and approved) | Reviewed five new cancellation tests covering empty, whitespace-only and None IDs, COMPLETED appointment cancellation and preservation of unrelated appointments. The repeated-cancellation assertion was also strengthened. | Approved and merged into main. 113 tests passed as reported in PR #22. Commit: `1bc002e`. |
+
 
 ## M Contribution Evidence
 
@@ -504,9 +551,11 @@ Record actual work in test design, implementation, review, traceability, diagnos
 
 | Member | Actual contribution | Evidence link |
 |---|---|---|
-| RachelUC | Designed and implemented seven Patient domain tests covering valid details, whitespace, invalid IDs and names, non-string inputs, read-only patient ID and boundary values. Improved two tests after Copilot feedback and rejected one unsupported suggestion. Retained Stage 6 Patient Lookup tests, ran the full regression suite (47 passed) and documented test evidence. | [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13), [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16) |
-| TarnimaKhan22 | Designed and implemented nine Appointment domain tests covering 22 cases, including valid construction, default status, blank IDs, whitespace trimming, invalid Patient and Practitioner objects, invalid status and datetime validation. Used parametrisation for negative and boundary cases, reviewed four GitHub Copilot suggestions and rejected unnecessary or duplicate tests. Documented requirement traceability, test design, AAA structure and test evidence. Ran focused tests (35 passed) and the full regression suite (82 passed, 0 failed). | [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17), [Commit 614f3e9](https://github.com/u3325845/st1-assignment-3/commit/614f3e9), [GitHub Copilot conversation](https://github.com/copilot/c/34063ee4-6016-4855-a321-c375854f232c) |
-| Merlin3313611 | Designed and implemented Practitioner domain tests (DOM-01 to DOM-09) and service tests (PRAC-01 to PRAC-08). Reviewed Copilot suggestions, accepted relevant improvements and rejected unsupported requirements. Verified 58 domain tests, 21 practitioner lookup tests and 108 full-suite tests passing locally. Documented test design, review decisions and regression evidence. | [GitHub Issue #19](https://github.com/u3325845/st1-assignment-3/issues/19), `test/stage07-practitioner` (PR pending) |
+| RachelUC | Designed and implemented seven Patient domain tests covering valid details, whitespace trimming, invalid IDs and names, non-string inputs, read-only patient ID and boundary values. Improved two tests after reviewing Copilot suggestions and rejected an unsupported suggestion. Retained Stage 6 Patient Lookup tests, ran regression testing (47 passed), documented test evidence and reviewed PRs #18, #20 and #22. | [Issue #13](https://github.com/u3325845/st1-assignment-3/issues/13), [PR #16](https://github.com/u3325845/st1-assignment-3/pull/16), [Commit d2db485](https://github.com/u3325845/st1-assignment-3/commit/d2db485) |
+| TarnimaKhan22 | Designed and implemented nine Appointment domain tests covering 22 cases, including valid construction, default SCHEDULED status, blank IDs, invalid Patient and Practitioner objects, status validation and datetime restrictions. Used parametrisation for negative and boundary cases, evaluated Copilot suggestions and documented traceability and test evidence. Ran 35 domain tests and 82 full-suite tests successfully. Her work was reviewed and merged through PR #18. | [Issue #17](https://github.com/u3325845/st1-assignment-3/issues/17), [PR #18](https://github.com/u3325845/st1-assignment-3/pull/18), [Commit 614f3e9](https://github.com/u3325845/st1-assignment-3/commit/614f3e9) |
+| Merlin3313611 | Designed and implemented nine Practitioner domain tests and eight service tests covering construction, validation, registration, duplicate IDs, whitespace handling, non-string inputs and unchanged state after failed registration. Reviewed Copilot suggestions, strengthened assertions and rejected unsupported requirements. Verified 58 domain tests, 21 practitioner lookup tests and 108 full-suite tests passing. His work was reviewed and merged through PR #20. | [Issue #19](https://github.com/u3325845/st1-assignment-3/issues/19), [PR #20](https://github.com/u3325845/st1-assignment-3/pull/20), [Commit 0b6bb58](https://github.com/u3325845/st1-assignment-3/commit/0b6bb58) |
+| u3325845 (Novera) | Added five Stage 7 service tests covering empty, whitespace-only and None cancellation IDs, cancellation of COMPLETED appointments and preservation of unrelated appointment state. Strengthened an existing repeated-cancellation test by checking that its status remains CANCELLED after rejection. Did not use Copilot. Reported 113 passing tests, and her changes were reviewed and merged through PR #22. | [Issue #21](https://github.com/u3325845/st1-assignment-3/issues/21), [PR #22](https://github.com/u3325845/st1-assignment-3/pull/22), [Commit 1bc002e](https://github.com/u3325845/st1-assignment-3/commit/1bc002e) |
+
 
 ## N Formative Questions
 
