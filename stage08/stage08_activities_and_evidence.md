@@ -82,12 +82,17 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 
 ## D. F8-02 diagnosis and repair
 
-- Symptom / observed behaviour: [complete]
-- Expected behaviour and requirement: [complete]
-- Minimal synthetic reproduction steps: [complete]
-- Meaningful failing test path/name and exact relevant failure: [complete]
+- Symptom / observed behaviour: After A1 is cancelled, the store's find_appointment("A1") returns None, so AppointmentService.find_appointment raises LookupError: Appointment not found. As a result, a second cancel_appointment("A1") also raises LookupError instead of ValueError.
+- Expected behaviour and requirement: A cancelled appointment stays stored and findable with status CANCELLED, and a repeated cancellation is rejected with ValueError. Requirements: FR-06, FR-07, FR-08, BR-07 and AC-05.2 (cancelled appointments are retained as history and lookup still finds them).
+- Minimal synthetic reproduction steps: (1) register patient P1 and practitioner D1; 
+(2) book A1 for P1 with D1 on 1 Oct 2026 at 09:00;
+(3) cancel A1 with service.cancel_appointment("A1"); 
+(4) look it up with service.find_appointment("A1"); 
+(5) observe LookupError instead of the cancelled appointment.
+
+- Meaningful failing test path/name and exact relevant failure: project/tests/test_services.py::test_cancelled_appointment_is_retained_and_findable fails with LookupError: Appointment not found at smartcare/services.py line 147. Related: test_cancel_already_cancelled_appointment_raises_value_error fails with the same LookupError.
 - Human hypothesis and intended checks: see E, F8-02.
-- Supported root cause and inspected code/runtime evidence: [complete after diagnosis]
+- Supported root cause and inspected code/runtime evidence: [complete]
 - Smallest justified fix / diff / why other behaviour is preserved: [complete]
 - Repair SHA / focused verification result: [complete]
 
@@ -101,9 +106,10 @@ Evidence intended to inspect / competing explanation / discriminating check: [co
 Member and saved sequence/time or commit showing this preceded consultation: [complete]
 
 ### F8-02 human entry
-Likely cause and why plausible: [complete]
-Evidence intended to inspect / competing explanation / discriminating check: [complete]
-Member and saved sequence/time or commit showing this preceded consultation: [complete]
+Likely cause and why plausible: The store's find_appointment loops over the stored appointments but only returns an appointment if appointment.status.value != "cancelled". A cancelled A1 therefore fails the condition, the loop ends and the method returns None. This is plausible because the failure appears only after cancelling and only in lookup, and the condition contradicts FR-07 / AC-05.2.
+
+Evidence intended to inspect / competing explanation / discriminating check: Inspect find_appointment, list_appointments and add_appointment in data_store.py. Competing explanation: the cancelled appointment is no longer in the store, or list_appointments() leaves it out. Discriminating check: book and cancel A1, then print list_appointments() and find_appointment("A1"). Result on 5 Nov 2026, 21:51: [('A1', 'cancelled')] and None. A1 is still stored but the lookup does not return it, so the competing explanation is not supported.
+Member and saved sequence/time or commit showing this preceded consultation: Novera. Hypothesis committed on fix/stage08-f8-02 before consulting Copilot: [commit SHA after commit]. I identified the condition by reading the code and ran the check above before consulting Copilot.
 
 ## F. GitHub Copilot prompts, findings and human decisions
 
@@ -126,10 +132,10 @@ Final human conclusion and comparison with initial hypothesis: [complete]
 ## G. Failing to passing regression evidence
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
-|---|---|---|---|
+|---|--|-|-|
 | F8-01 before repair | [complete] | [complete] | [complete] |
 | F8-01 after repair | [complete] | [complete] | [complete] |
-| F8-02 before repair | [complete] | [complete] | [complete] |
+| F8-02 before repair | ec3fc09 | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable, run from project/ on fix/stage08-f8-02|1 failed, LookupError: Appointment not found (services.py:147). Full-suite failure summary recorded in B (3 failed, 110 passed) |
 | F8-02 after repair | [complete] | [complete] | [complete] |
 | Full suite after both repairs, before refactor | [complete] | [complete] | [complete] |
 
