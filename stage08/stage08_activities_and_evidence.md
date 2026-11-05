@@ -54,18 +54,20 @@ Classification responses (1–5, each with reason): [complete]
 Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: [complete]
 Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: [complete]
 
+
+
 ## B. Stage 7 baseline and safe preparation
 
-- Stage 7 code SHA and requirement baseline: [complete]
-- Baseline test command / working directory / observed result / evidence: [complete]
-- Clean preparation SHA if a record-only commit followed Stage 7: [complete]
-- Branch and preparer / how teammates obtained this branch: [complete]
-- Downloaded tool version, source SHA256 and --check outcome: [complete]
-- --apply and --verify output summaries / artefact references: [complete]
-- Bounded diff inspected and recovery location (not committed): [complete]
-- Prepared faulty-state commit SHA: [complete]
-- Preparation or recovery issues and resolution, if any: [complete]
-- Initial prepared full-suite command / result / key failures: [complete]
+- Stage 7 code SHA and requirement baseline: `c384995f7ba8bf12679f59720700037b04411291`. Requirements baseline: SmartCare Assignment 3 Revision 2.
+- Baseline test command / working directory / observed result / evidence: The Stage 7 baseline was identified by Git SHA `c384995`. The original baseline test result was not separately recorded during Stage 8 preparation. The prepared faulty-state test result is recorded below.
+- Clean preparation SHA if a record-only commit followed Stage 7: No separate record-only commit was confirmed.
+- Branch and preparer / how teammates obtained this branch: Rachel prepared and pushed `debug/stage08` to GitHub. Teammates can access it using `git fetch origin` and `git switch --track origin/debug/stage08`.
+- Downloaded tool version, source SHA256 and --check outcome: Stage 8 preparation tool version 1.1. Script SHA256: `cd9a6786cd9fb518376716fb15a33be63ccbb80282600b453fbf6095b3754f30`. The `--check` command reported preflight PASS, verified both proposed faults in a temporary copy and left the project unchanged.
+- --apply and --verify output summaries / artifact references: The `--apply` command introduced F8-01 (practitioner conflict) and F8-02 (retained-history lookup). The tool confirmed 2 expected failures. The `--verify` command later confirmed exactly 2 expected failures with both approved fault signatures present.
+- Bounded diff inspected and recovery location (not committed): Compared the original and faulty versions of `project/smartcare/data_store.py`. The changes were limited to `find_appointment()` and `has_practitioner_conflict()`. The debugging tool saved backup and recovery information in `.stage8_faults`. Confirmed using `git ls-files` that these recovery files are not tracked by Git.
+- Prepared faulty-state commit SHA: `ec3fc09` on `debug/stage08`, pushed to GitHub. Evidence: https://github.com/u3325845/st1-assignment-3/commit/ec3fc09
+- Preparation or recovery issues and resolution, if any: The first verification attempt failed because the script path was incorrect. After locating the script in `Stage_8_Assets` outside the repository, verification completed successfully.
+- Initial prepared full-suite command / result / key failures: Ran `python -m pytest -q` from the `project/` directory. Result: **110 passed, 3 failed (113 total)**. Two tests failed because cancelled appointments could not be found (`LookupError`). One practitioner conflict test failed because the expected `ValueError` was not raised. These three test failures relate to the two introduced faults.
 
 ## C. F8-01 diagnosis and repair
 
