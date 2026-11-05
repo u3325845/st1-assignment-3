@@ -123,11 +123,52 @@ Actual prompt / output reference and member: [complete]
 Final human conclusion and comparison with initial hypothesis: [complete]
 
 ### F8-02 Copilot review
-Actual prompt / output reference and member: [complete]
-1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-Final human conclusion and comparison with initial hypothesis: [complete]
+Actual prompt / output reference and member: Observed behaviour:
+After booking and then cancelling appointment A1, the data store's find_appointment("A1") returns None. AppointmentService.find_appointment then raises LookupError: Appointment not found. A second cancel_appointment("A1") also raises LookupError instead of ValueError.
+
+Expected behaviour:
+A cancelled appointment stays stored and findable with status CANCELLED (FR-07, AC-05.2: cancelled appointments are retained as history). Repeated cancellation should raise ValueError.
+
+Steps to reproduce:
+1. Register patient P1 and practitioner D1.
+2. Book appointment A1 (P1, D1, 2026-10-01 09:00).
+3. Cancel A1 with cancel_appointment("A1").
+4. Look it up with find_appointment("A1").
+5. LookupError: Appointment not found (services.py line 147).
+
+Failing test:
+tests/test_services.py::test_cancelled_appointment_is_retained_and_findable
+LookupError: Appointment not found
+
+My hypothesis:
+The store's find_appointment skips cancelled appointments because of the condition appointment.status.value != "cancelled", so the loop ends and returns None. A competing explanation is that the cancelled appointment is no longer stored or list_appointments() leaves it out. My check printed list_appointments() after cancelling and got [('A1', 'cancelled')], while find_appointment("A1") returned None.
+
+Relevant code:
+def find_appointment(self, appointment_id: str) -> Appointment | None:
+    if not isinstance(appointment_id, str) or not appointment_id.strip():
+        raise ValueError("Appointment ID cannot be blank")
+    for appointment in self.list_appointments():
+        if (appointment.appointment_id == appointment_id.strip()
+                and appointment.status.value != "cancelled"):
+            return appointment
+    return None
+
+def list_appointments(self) -> list[Appointment]:
+    return list(self._appointments.values())
+
+Task:
+Rank the three most likely causes. For each, identify
+the evidence I should inspect to distinguish it from
+the other possible causes.
+Do not rewrite the entire application.
+Do not invent requirements.
+Treat all suggested explanations as hypotheses. Consulted 5 Nov 2026 in a separate Copilot chat for F8-02, after my hypothesis commit e95806d.
+Chat link: https://github.com/copilot/share/02194300-0840-8080-8051-ce4dc4b049e8
+1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: Copilot: find_appointment filters out cancelled records, so the appointment is in list_appointments() but the status.value != "cancelled" condition stops it being returned; the second cancel then raises LookupError before appointment.cancel() can raise ValueError. Suggested check: inspect the ID and status at the loop and whether the ID matches. Observed evidence: the code in data_store.py contains `and appointment.status.value != "cancelled"`; my runtime check printed [('A1', 'cancelled')] for list_appointments() and None for find_appointment("A1"); the second-cancel test fails at services.py line 157 through the same failed lookup. Correct. Accept: it matches my hypothesis and the evidence.
+2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason:  Copilot: the runtime is loading different code from the repository version it inspected (it described a plain dictionary lookup with no cancelled filter). Suggested check: verify the loaded module path, working directory, import path and commit. Observed evidence: smartcare.data_store.__file__ is ...\st1-assignment-3\project\smartcare\data_store.py on branch fix/stage08-f8-02; `git diff c384995 ec3fc09 -- project/smartcare/data_store.py` shows the Stage 7 find_appointment was a plain dictionary lookup (self._appointments.get(required_text(...))), replaced in the prepared commit ec3fc09 by a loop that skips cancelled appointments. Wrong as a cause of my failure (it accurately describes the unprepared Stage 7 code, which is not the code under test). Reject as a cause: the code I ran is the prepared faulty file in my repo, so the failure comes from the planted change.
+3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: Copilot: the list and the lookup do not observe the same store state or exact key (different store instances, a mock, or an ID mismatch). Suggested check: confirm service.data_store is the store used for the list call and compare repr of the stored ID with the lookup argument. Observed evidence: `a.data_store is s` printed True; repr(x.appointment_id) printed 'A1' and `x.appointment_id == 'A1'` printed True; find_appointment('A1') still printed None. Wrong. Reject: the service, list and lookup use the same store and the same key, so neither explains the failure. 
+
+Final human conclusion and comparison with initial hypothesis: My initial hypothesis (saved before Copilot in commit e95806d) was that the store's find_appointment skips cancelled appointments because of status.value != "cancelled". Copilot's top suggestion agreed; I checked it against the code and my runtime output. Suggestions 2 and 3 were plausible but contradicted by evidence. Root cause: the condition `appointment.status.value != "cancelled"` in SmartCareDataStore.find_appointment, which contradicts FR-07 and AC-05.2 by hiding retained cancelled appointments from lookup. Copilot did not change my diagnosis; it confirmed the hypothesis and added two alternatives that I had to rule out.
 
 ## G. Failing to passing regression evidence
 
