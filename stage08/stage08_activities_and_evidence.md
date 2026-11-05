@@ -92,9 +92,10 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 
 - Meaningful failing test path/name and exact relevant failure: project/tests/test_services.py::test_cancelled_appointment_is_retained_and_findable fails with LookupError: Appointment not found at smartcare/services.py line 147. Related: test_cancel_already_cancelled_appointment_raises_value_error fails with the same LookupError.
 - Human hypothesis and intended checks: see E, F8-02.
-- Supported root cause and inspected code/runtime evidence: [complete]
-- Smallest justified fix / diff / why other behaviour is preserved: [complete]
-- Repair SHA / focused verification result: [complete]
+- Supported root cause and inspected code/runtime evidence: The condition `appointment.status.value != "cancelled"` in SmartCareDataStore.find_appointment skips cancelled appointments, so the loop ends and returns None. Evidence: the code in data_store.py; runtime check after booking and cancelling A1 printed [('A1', 'cancelled')] for list_appointments() and None for find_appointment("A1"); `git diff c384995 ec3fc09 -- project/smartcare/data_store.py` shows the prepared commit replaced the Stage 7 dictionary lookup with this filtering loop. This contradicts FR-07 and AC-05.2.
+- Smallest justified fix / diff / why other behaviour is preserved: Removed `and appointment.status.value != "cancelled"` from the condition in SmartCareDataStore.find_appointment, a one-line change (1 insertion, 2 deletions). The ID check, the blank-ID ValueError and None for an unknown ID are unchanged, so lookup now finds a stored appointment whatever its status (FR-07, AC-05.2, FR-08).
+
+- Repair SHA / focused verification result: e7fad56 on fix/stage08-f8-02 (PR #26). Focused: the two F8-02 tests pass (2 passed). Full suite: 112 passed, 1 failed (test_conflict_rule_and_different_practitioner, F8-01).
 
 ## E. Human-first hypotheses
 
@@ -173,12 +174,12 @@ Final human conclusion and comparison with initial hypothesis: My initial hypoth
 ## G. Failing to passing regression evidence
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
-|---|--|-|-|
-| F8-01 before repair | [complete] | [complete] | [complete] |
-| F8-01 after repair | [complete] | [complete] | [complete] |
-| F8-02 before repair | ec3fc09 | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable, run from project/ on fix/stage08-f8-02|1 failed, LookupError: Appointment not found (services.py:147). Full-suite failure summary recorded in B (3 failed, 110 passed) |
-| F8-02 after repair | [complete] | [complete] | [complete] |
-| Full suite after both repairs, before refactor | [complete] | [complete] | [complete] |
+|---|-------------------|-|-|
+| F8-01 before repair | [complete]        | [complete] | [complete] |
+| F8-01 after repair | [complete]        | [complete] | [complete] |
+| F8-02 before repair | ec3fc09           | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable, run from project/ on fix/stage08-f8-02|1 failed, LookupError: Appointment not found (services.py:147). Full-suite failure summary recorded in B (3 failed, 110 passed) |
+| F8-02 after repair | e7fad56                  | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable tests/test_services.py::test_cancel_already_cancelled_appointment_raises_value_error, then python -m pytest -q, run from project/ on fix/stage08-f8-02 | Focused: 2 passed. Full suite: 112 passed, 1 failed (test_conflict_rule_and_different_practitioner, F8-01, not part of this fix) |
+| Full suite after both repairs, before refactor | [complete]        | [complete] | [complete] |
 
 Explain how the assertions detect each relevant incorrect result and protect previous behaviour: [complete]
 Unrelated failures investigated / resolution: [complete or not applicable with reason]
