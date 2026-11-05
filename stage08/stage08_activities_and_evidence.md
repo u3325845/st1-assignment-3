@@ -103,7 +103,7 @@ Likely cause and why plausible: The practitioner ID comparison in `has_practitio
 
 Evidence intended to inspect / competing explanation / discriminating check: Inspected `has_practitioner_conflict()` in `data_store.py` and `test_conflict_rule_and_different_practitioner()` in `test_starter.py`. Another possible cause was an incorrect date/time or appointment status comparison. The test checks that two appointments for D1 at the same time should raise `ValueError`, while D2 should be allowed at the same time. The incorrect practitioner ID comparison is the most likely cause.
 
-Member and saved sequence/time or commit showing this preceded consultation: Rachel – [Add commit SHA after saving this entry before Copilot.]
+Member and saved sequence/time or commit showing this preceded consultation: Rachel – Initial F8-01 investigation saved in commit `8e07d5f`, before consulting GitHub Copilot.
 
 ### F8-02 human entry
 Likely cause and why plausible: [complete]
@@ -114,12 +114,20 @@ Member and saved sequence/time or commit showing this preceded consultation: [co
 
 Use the full handout prompt separately for BOTH defects, after E. Keep each actual prompt or accessible reference; include observed behaviour, expected behaviour, reproduction, failing test, human hypothesis, relevant code, three ranked causes and discriminating checks, with the no-rewrite/no-invented-requirements constraints.
 
+
 ### F8-01 Copilot review
-Actual prompt / output reference and member: [complete]
-1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-Final human conclusion and comparison with initial hypothesis: [complete]
+
+**Actual prompt / output reference and member:** Rachel used GitHub Copilot after recording the human-first hypothesis in commit `8e07d5f`. The investigation included the observed behaviour (double booking allowed), expected behaviour (`ValueError` for the same practitioner and time), reproduction using A1 and A2 for D1 at the same time, failing test `tests/test_starter.py::test_conflict_rule_and_different_practitioner`, initial hypothesis and relevant code in `has_practitioner_conflict()`. Copilot was asked for three ranked causes with supporting evidence and checks, without rewriting code or inventing requirements.
+
+**Copilot conversation:** https://github.com/copilot/share/8a1b1200-0064-8025-b902-480c84f629b6
+
+| Ranked suggestion                      | Evidence check | Observed evidence | Evaluation | Human decision and reason |
+|----------------------------------------|---|---|---|---|
+| 1. Incorrect practitioner comparison   | Inspect the `!=` comparison and rerun the focused test after correction. | The code used `!=`. Changing it to `==` made the focused test pass. | Correct | **Accept.** This confirmed the root cause. |
+| 2. Booking service not handling conflicts | Check whether `book_appointment()` calls the conflict function and raises `ValueError`. | The focused test passed without changing the booking service. | Wrong as main cause | **Reject.** No booking service changes were needed. |
+| 3. Datetime or status mismatch         | Compare booking times and check appointment status. | The test used the same datetime, and the one-line fix resolved the failure. | Wrong as main cause | **Reject.** The practitioner comparison caused the failure. |
+
+Final human conclusion and comparison with initial hypothesis: My initial hypothesis was correct. The practitioner ID comparison used `!=` instead of `==`, which prevented the system from detecting double bookings for the same practitioner. Copilot's first suggestion supported my hypothesis, and the focused test passed after correcting the comparison.
 
 ### F8-02 Copilot review
 Actual prompt / output reference and member: [complete]
