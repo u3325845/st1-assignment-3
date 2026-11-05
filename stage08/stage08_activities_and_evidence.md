@@ -71,14 +71,16 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 
 ## C. F8-01 diagnosis and repair
 
-- Symptom / observed behaviour: [complete]
-- Expected behaviour and requirement: [complete]
-- Minimal synthetic reproduction steps: [complete]
-- Meaningful failing test path/name and exact relevant failure: [complete]
-- Human hypothesis and intended checks: see E, F8-01.
-- Supported root cause and inspected code/runtime evidence: [complete after diagnosis]
-- Smallest justified fix / diff / why other behaviour is preserved: [complete]
-- Repair SHA / focused verification result: [complete]
+- Fault: F8-01 – Practitioner conflict.
+- Branch: `fix/stage08-f8-01`.
+- Starting SHA: `e6319d8`.
+- Failing test: `tests/test_starter.py::test_conflict_rule_and_different_practitioner`.
+- Command: `python -m pytest tests/test_starter.py::test_conflict_rule_and_different_practitioner -v`
+- Working directory: `project/`.
+- Expected behaviour: Booking another appointment for the same practitioner at the same date and time should raise `ValueError`.
+- Observed behaviour: The expected `ValueError` was not raised.
+- Result: 1 failed in 0.02s.
+- Failure location: `tests/test_starter.py:127`.
 
 ## D. F8-02 diagnosis and repair
 
@@ -96,9 +98,12 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 Complete both entries BEFORE Copilot. C/D supply observed/expected/reproduction/test; retain those initial facts and link them here.
 
 ### F8-01 human entry
-Likely cause and why plausible: [complete]
-Evidence intended to inspect / competing explanation / discriminating check: [complete]
-Member and saved sequence/time or commit showing this preceded consultation: [complete]
+
+Likely cause and why plausible: The practitioner ID comparison in `has_practitioner_conflict()` uses `!=` instead of `==`. This checks different practitioners instead of the same practitioner, which explains why a conflicting booking is allowed.
+
+Evidence intended to inspect / competing explanation / discriminating check: Inspected `has_practitioner_conflict()` in `data_store.py` and `test_conflict_rule_and_different_practitioner()` in `test_starter.py`. Another possible cause was an incorrect date/time or appointment status comparison. The test checks that two appointments for D1 at the same time should raise `ValueError`, while D2 should be allowed at the same time. The incorrect practitioner ID comparison is the most likely cause.
+
+Member and saved sequence/time or commit showing this preceded consultation: Rachel – [Add commit SHA after saving this entry before Copilot.]
 
 ### F8-02 human entry
 Likely cause and why plausible: [complete]
