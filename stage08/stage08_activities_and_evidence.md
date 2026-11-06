@@ -4,9 +4,14 @@ UG and PG | One evolving group project | Complete this blank record using the St
 
 All Assignment 3 stage materials are provided from the beginning. Complete this stage only after the previous applicable stage has been integrated, verified and recorded. Use this supplied record in stage08/ in your EXISTING repository. Preserve project/, all earlier tests, records and responses. Do not download another starter or copy staff solutions. The Stage 8 preparation utility is supplied or run by teaching staff when Stage 8 begins. Follow your tutor’s controlled workflow and the handout. If temporarily supplied, keep it outside the repository in a sibling Stage_8_Assets/ folder; exclude it from Git and the final submission.
 
-Group/tutorial: [complete]
-Members and UG/PG cohorts: [complete]
-Record owner / contribution links for each member: [complete]
+Group/tutorial: Grp 2 tutorial Wed 4:30 - 6:30
+Members and UG cohorts: RachelUC, Merlin3313611, TarnimaKhan22, u3325845 (Novera)
+Record owner / contribution links for each member:
+- Rachel: Stage 8 preparation, F8-01 diagnosis, repair, regression testing and test organisation. PR #27: https://github.com/u3325845/st1-assignment-3/pull/27
+- Novera: F8-02 diagnosis, repair and regression testing. PR #26: https://github.com/u3325845/st1-assignment-3/pull/26
+- Merlin: Stage 8 refactoring and verification (pending).
+- Tarnima: Stage 8 review and integration evidence (pending).
+
 
 Use concise results and accessible artefact links rather than copying entire logs. Keep human-first entries before consulting GitHub Copilot. Link shared evidence once; do not repeat it across sections. No entries below are specimen answers or claimed results.
 
@@ -81,6 +86,11 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 - Observed behaviour: The expected `ValueError` was not raised.
 - Result: 1 failed in 0.02s.
 - Failure location: `tests/test_starter.py:127`.
+- Human hypothesis and intended checks: See Section E, F8-01.
+- Root cause: The practitioner ID comparison in `SmartCareDataStore.has_practitioner_conflict()` used `!=` instead of `==`. This prevented the system from detecting bookings for the same practitioner at the same time.
+- Smallest justified fix: Changed `!=` to `==` in `has_practitioner_conflict()`. No other application behaviour was changed.
+- Repair SHA / focused verification result: `3c4ea3e` on `fix/stage08-f8-01` (PR #27). Focused test: 1 passed. Full suite: 111 passed, 2 failed (both related to F8-02).
+
 
 ## D. F8-02 diagnosis and repair
 
@@ -187,15 +197,18 @@ Final human conclusion and comparison with initial hypothesis: My initial hypoth
 ## G. Failing to passing regression evidence
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
-|---|-------------------|-|-|
-| F8-01 before repair | [complete]        | [complete] | [complete] |
-| F8-01 after repair | [complete]        | [complete] | [complete] |
-| F8-02 before repair | ec3fc09           | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable, run from project/ on fix/stage08-f8-02|1 failed, LookupError: Appointment not found (services.py:147). Full-suite failure summary recorded in B (3 failed, 110 passed) |
-| F8-02 after repair | e7fad56                  | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable tests/test_services.py::test_cancel_already_cancelled_appointment_raises_value_error, then python -m pytest -q, run from project/ on fix/stage08-f8-02 | Focused: 2 passed. Full suite: 112 passed, 1 failed (test_conflict_rule_and_different_practitioner, F8-01, not part of this fix) |
-| Full suite after both repairs, before refactor | [complete]        | [complete] | [complete] |
+|---|---|---|---|
+| F8-01 before repair | `e6319d8` | `python -m pytest tests/test_starter.py::test_conflict_rule_and_different_practitioner -v` from `project/` | 1 failed in 0.02s; expected `ValueError` was not raised. |
+| F8-01 after repair | `3c4ea3e` | Focused test above, then `python -m pytest -q` from `project/` | Focused: 1 passed in 0.01s. Full suite: 111 passed, 2 failed (F8-02). |
+| F8-02 before repair | `ec3fc09` | `python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable` from `project/` | 1 failed with `LookupError: Appointment not found`. |
+| F8-02 after repair | `e7fad56` | Both F8-02 tests in `tests/test_services.py`, then `python -m pytest -q` from `project/` | Focused: 2 passed. Full suite: 112 passed, 1 failed (F8-01). |
+| Full suite after both repairs, before refactor | `8c70964` | `python -m pytest -q` from `project/` | 113 passed in 0.05s. Both repairs integrated into `debug/stage08`. |
 
-Explain how the assertions detect each relevant incorrect result and protect previous behaviour: [complete]
-Unrelated failures investigated / resolution: [complete or not applicable with reason]
+**Stage 8 test organisation:** After both repairs were merged, the two F8-02 regression tests were moved from `tests/test_services.py` to `tests/test_starter.py`. The original tests were removed from `test_services.py` to avoid duplication. The full suite still contained 113 tests, and all passed in 0.06s.
+
+Explain how the assertions detect each relevant incorrect result and protect previous behaviour: The F8-01 test rejects double bookings for the same practitioner while allowing different practitioners at the same time. The F8-02 tests confirm that cancelled appointments remain findable and cannot be cancelled twice. The full suite checks that previous behaviour is preserved.
+
+Unrelated failures investigated / resolution: No unrelated failures remained. The full suite passed with 113 tests.
 
 ## H. Refactoring decision and before/after verification
 
@@ -209,62 +222,77 @@ Result — accepted, revised or rejected / reason / behaviour-preservation concl
 
 ## I. Git, human review and integration
 
-Issues for both defects / refactor scope and owners: [complete]
-Branch / prepared, repair and refactor checkpoints: [link B/C/D/H]
-PR link and another member's reviewer identity: [complete]
-Key human feedback, difference from Copilot findings and response/outcome: [complete]
-Actual review approval / merge evidence: [complete]
-Integrated code SHA and team pull/retest command / working directory / result: [complete]
-Evidence-only later SHA / explanation if different: [complete or not applicable]
-Each member's substantive contribution and artefact: [complete]
+Issues for both defects / refactor scope and owners: F8-01 – Rachel, Issue #24, PR #27. F8-02 – Novera, PR #26. Refactoring – Merlin (pending).
+
+Branch / prepared, repair and refactor checkpoints: Prepared branch `debug/stage08`, faulty-state SHA `ec3fc09`. F8-01 repair SHA `3c4ea3e`. F8-02 repair SHA `e7fad56`. Integrated repair SHA `8c70964`. Refactor pending.
+
+PR link and another member's reviewer identity: F8-01 PR #27: https://github.com/u3325845/st1-assignment-3/pull/27 (Merlin and Tarnima requested as reviewers). F8-02 PR #26: https://github.com/u3325845/st1-assignment-3/pull/26 (reviewed and approved by Rachel).
+
+Key human feedback, difference from Copilot findings and response/outcome: Both defects were investigated by group members before consulting Copilot. Copilot's suggested causes were checked against the code and failing tests. Both repairs were limited to the confirmed root causes. Further human review feedback for F8-01 is pending.
+
+Actual review approval / merge evidence: Rachel reviewed and approved F8-02 PR #26. Both repair PRs were merged into `debug/stage08`. F8-01's requested reviews were not completed before its merge; any later review will be recorded separately.
+
+Integrated code SHA and team pull/retest command / working directory / result: `8c70964`. Rachel pulled `debug/stage08` and ran `python -m pytest -q` from `project/`. Result: 113 passed in 0.05s.
+
+Evidence-only later SHA / explanation if different: Pending Stage 8 test organisation and documentation commit. This commit reorganises existing regression tests and updates the evidence record without changing application behaviour.
+
+Each member's substantive contribution and artefact: Rachel – preparation, F8-01 diagnosis and repair, PR #27, and Stage 8 test organisation. Novera – F8-02 diagnosis and repair, PR #26. Merlin – refactoring pending. Tarnima – review and integration evidence pending.
 
 ## J. Required reflections
 
-1. Which Copilot diagnosis appeared convincing but lacked evidence? [complete; report honestly if none and discuss the least-supported real suggestion]
-2. What evidence changed your group's view? [complete]
+1. Which Copilot diagnosis appeared convincing but lacked evidence?
+
+For F8-02, Copilot suggested that the program might be loading a different version of the code. This seemed possible, but checking the module path and Git history showed that the correct faulty version was running. We rejected this explanation.
+
+2. What evidence changed your group's view?
+
+The failing tests and code inspection helped us confirm both faults. For F8-01, changing the incorrect practitioner comparison made the test pass. For F8-02, we confirmed that cancelled appointments were still stored but were being excluded from lookup.
+
 3. How did regression tests protect the refactoring? [complete]
+
 
 ## K. Ten formative questions
 
 1. What should an engineer do before changing code in response to a failure?
 
-Response: [complete]
+First understand the problem, reproduce the failure, check the requirements and collect evidence before making changes.
 
 2. Where should expected behaviour come from during debugging?
 
-Response: [complete]
+Expected behaviour should come from the project requirements, acceptance criteria and agreed business rules.
 
 3. What is a debugging hypothesis?
 
-Response: [complete]
+A debugging hypothesis is a possible explanation for a problem that needs to be checked using evidence.
 
 4. What is a regression test and why is it retained?
 
-Response: [complete]
+A regression test checks that a previously fixed problem does not happen again. It is retained to protect the code from future changes.
 
 5. What is meant by root cause?
 
-Response: [complete]
+The root cause is the actual underlying reason why a problem occurs.
 
 6. What is refactoring?
 
-Response: [complete]
+Refactoring means improving the structure or readability of code without changing how it behaves.
 
 7. What is a swallowed exception?
 
-Response: [complete]
+A swallowed exception happens when an error is caught but ignored, making the problem harder to notice or debug.
 
 8. What is a code smell?
 
-Response: [complete]
+A code smell is a sign that some code may be difficult to understand, maintain or improve.
 
 9. How should GitHub Copilot-generated debugging diagnoses be treated?
 
-Response: [complete]
+Copilot suggestions should be treated as possible explanations, not confirmed facts. We should check them against the code, tests and requirements.
 
 10. What is the Stage 8 engineering rule?
 
-Response: [complete]
+Understand the failure, collect evidence, confirm the root cause, make the smallest justified repair and verify it with regression tests. Refactoring should be separate and must preserve behaviour.
+
 
 ## L. Completion and handover
 
