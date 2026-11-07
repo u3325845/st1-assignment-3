@@ -195,7 +195,7 @@ Response and reason: Changing code immediately can lead to incorrect fixes becau
 
 Classification responses (1–5, each with reason): Completed in Section A.1.
 Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: Completed in Section A.2 using the F8-02 cancelled appointment scenario.
-Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: Completed in Section A.5 using F8-02. The application failure was recorded at smartcare/services.py line 147.
+Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: Completed in Section A.5 using F8-02. The exact test assertion line was not recorded; the application failure was reported at smartcare/services.py line 147.
 
 
 ## B. Stage 7 baseline and safe preparation
@@ -225,7 +225,7 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 - Failure location: `tests/test_starter.py:127`.
 - Supported root cause: The practitioner ID comparison in SmartCareDataStore.has_practitioner_conflict() incorrectly used != instead of ==. This prevented the system from detecting overlapping appointments for the same practitioner.
 - Smallest justified repair: Changed the practitioner ID comparison from != to ==, restoring the required conflict detection without changing unrelated booking behaviour.
-- Repair SHA / verification: 3c4ea3e, PR #27. The focused test passed after the repair. The full regression suite later passed with 113 tests after both defects were integrated at SHA 8c70964.
+- Repair SHA / verification: `3c4ea3e`, PR #27. The focused test passed after the repair. At this checkpoint, the full suite had 111 passed and 2 failed (both related to F8-02). After both defects were repaired and integrated at SHA `8c70964`, the full suite passed with 113 tests.
 
 ## D. F8-02 diagnosis and repair
 
