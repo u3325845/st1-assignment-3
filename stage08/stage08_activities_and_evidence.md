@@ -199,13 +199,13 @@ Unrelated failures investigated / resolution: [complete or not applicable with r
 
 ## H. Refactoring decision and before/after verification
 
-Smell and exact location: [complete]
-Small proposed structural change / why justified: [complete before editing]
-External behaviour to preserve / relevant tests: [complete]
-Before result: see G, full passing suite.
-Actual change / diff / separate refactor SHA: [complete]
-Focused and full after-refactor commands / working directory / results / evidence: [complete]
-Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: [complete]
+Smell and exact location: project/smartcare/services.py, AppointmentService.book_appointment(). The method handles several responsibilities, including participant lookup, validation, conflict checking and appointment creation, making it harder to read.
+Small proposed structural change / why justified: Extract the patient and practitioner lookup and missing-record checks into a small private helper method. This will simplify book_appointment() without changing its functionality. Issue: https://github.com/u3325845/st1-assignment-3/issues/29
+External behaviour to preserve / relevant tests: Preserve existing validation rules, exception types, error messages, validation order, booking behaviour, and conflict detection; verify using the existing appointment service tests and the full regression suite.
+Before results: 113 passed in 0.30s, using python -m pytest -q from project/ on debug/stage08 (SHA 8c70964), before refactoring.
+Actual change / diff / separate refactor SHA: Extracted the patient and practitioner lookup and missing-record checks from AppointmentService.book_appointment() into a private helper, _get_registered_participants(). Only project/smartcare/services.py was changed in the application code. Refactor SHA: cca6971.
+Focused and full after-refactor commands / working directory / results / evidence: From project/, ran python -m pytest -q tests/test_services.py — 9 passed in 0.03s. Ran python -m pytest -q — 113 passed in 0.19s. git diff --check returned no errors.
+Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: Accepted. The refactoring separates participant lookup and validation from booking logic without intentionally changing behaviour. The focused tests and full regression suite passed, supporting that existing functionality was preserved.
 
 ## I. Git, human review and integration
 
