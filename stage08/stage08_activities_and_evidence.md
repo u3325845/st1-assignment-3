@@ -4,9 +4,17 @@ UG and PG | One evolving group project | Complete this blank record using the St
 
 All Assignment 3 stage materials are provided from the beginning. Complete this stage only after the previous applicable stage has been integrated, verified and recorded. Use this supplied record in stage08/ in your EXISTING repository. Preserve project/, all earlier tests, records and responses. Do not download another starter or copy staff solutions. The Stage 8 preparation utility is supplied or run by teaching staff when Stage 8 begins. Follow your tutor’s controlled workflow and the handout. If temporarily supplied, keep it outside the repository in a sibling Stage_8_Assets/ folder; exclude it from Git and the final submission.
 
-Group/tutorial: [complete]
-Members and UG/PG cohorts: [complete]
-Record owner / contribution links for each member: [complete]
+Group/tutorial: Grp 2 tutorial Wed 4:30 - 6:30
+Members and UG/PG cohorts: RachelUC, Merlin3313611, TarnimaKhan22, u3325845 (Novera)
+Record owner / contribution links for each member:
+
+Rachel – F8-01 practitioner conflict repair: https://github.com/u3325845/st1-assignment-3/pull/27
+
+Novera – F8-02 cancelled appointment lookup repair: https://github.com/u3325845/st1-assignment-3/pull/26
+
+Merlin – AppointmentService refactoring: https://github.com/u3325845/st1-assignment-3/pull/30
+
+Tarnima – Refactoring PR #30 review and Stage 8 regression verification and documentation: https://github.com/u3325845/st1-assignment-3/pull/30 and https://github.com/u3325845/st1-assignment-3/pull/31
 
 Use concise results and accessible artefact links rather than copying entire logs. Keep human-first entries before consulting GitHub Copilot. Link shared evidence once; do not repeat it across sections. No entries below are specimen answers or claimed results.
 
@@ -186,9 +194,8 @@ Response and reason: Changing code immediately can lead to incorrect fixes becau
 
 
 Classification responses (1–5, each with reason): Completed in Section A.1.
-Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: expected; observed; reproduction; hypothesis; evidence to inspect: Completed in Section A.2 using the F8-02 cancelled appointment scenario.
-Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: Completed in Section A.5 using F8-02. Exact test assertion line is not recorded; the application failure is at smartcare/services.py line 147.
-
+Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: Completed in Section A.2 using the F8-02 cancelled appointment scenario.
+Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: Completed in Section A.5 using F8-02. The application failure was recorded at smartcare/services.py line 147.
 
 
 ## B. Stage 7 baseline and safe preparation
@@ -216,6 +223,9 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 - Observed behaviour: The expected `ValueError` was not raised.
 - Result: 1 failed in 0.02s.
 - Failure location: `tests/test_starter.py:127`.
+- Supported root cause: The practitioner ID comparison in SmartCareDataStore.has_practitioner_conflict() incorrectly used != instead of ==. This prevented the system from detecting overlapping appointments for the same practitioner.
+- Smallest justified repair: Changed the practitioner ID comparison from != to ==, restoring the required conflict detection without changing unrelated booking behaviour.
+- Repair SHA / verification: 3c4ea3e, PR #27. The focused test passed after the repair. The full regression suite later passed with 113 tests after both defects were integrated at SHA 8c70964.
 
 ## D. F8-02 diagnosis and repair
 
@@ -323,14 +333,15 @@ Final human conclusion and comparison with initial hypothesis: My initial hypoth
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|-------------------|-|-|
-| F8-01 before repair | [complete]        | [complete] | [complete] |
-| F8-01 after repair | [complete]        | [complete] | [complete] |
+| F8-01 before repair | e6319d8 | `python -m pytest tests/test_starter.py::test_conflict_rule_and_different_practitioner -v`, run from `project/` on `fix/stage08-f8-01` | 1 failed in 0.02s. The expected `ValueError` was not raised for a same-practitioner/time booking (`tests/test_starter.py:127`). See Section C. |
+| F8-01 after repair | 3c4ea3e | `python -m pytest tests/test_starter.py::test_conflict_rule_and_different_practitioner -v`, run from `project/` on `fix/stage08-f8-01` | Focused test passed after correcting the practitioner ID comparison from `!=` to `==`. Rachel recorded the passing result in Section F. Repair commit: `3c4ea3e`, PR #27. |
 | F8-02 before repair | ec3fc09           | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable, run from project/ on fix/stage08-f8-02|1 failed, LookupError: Appointment not found (services.py:147). Full-suite failure summary recorded in B (3 failed, 110 passed) |
 | F8-02 after repair | e7fad56                  | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable tests/test_services.py::test_cancel_already_cancelled_appointment_raises_value_error, then python -m pytest -q, run from project/ on fix/stage08-f8-02 | Focused: 2 passed. Full suite: 112 passed, 1 failed (test_conflict_rule_and_different_practitioner, F8-01, not part of this fix) |
-| Full suite after both repairs, before refactor | [complete]        | [complete] | [complete] |
+| Full suite after both repairs, before refactor | 8c70964 | `python -m pytest -q`, run from `project/` on `debug/stage08` | 113 passed, 0 failed in 0.30s. Both F8-01 and F8-02 repairs were integrated before refactoring. See Section H. |
 
-Explain how the assertions detect each relevant incorrect result and protect previous behaviour: [complete]
-Unrelated failures investigated / resolution: [complete or not applicable with reason]
+Explain how the assertions detect each relevant incorrect result and protect previous behaviour: The F8-01 test checks that booking two appointments for the same practitioner at the same date and time raises `ValueError`, while allowing different practitioners to be booked at that time. This protects the practitioner conflict rule. The F8-02 tests verify that cancelled appointments remain findable with `CANCELLED` status and that attempting to cancel an already-cancelled appointment raises `ValueError`. Additional tests check that unknown appointment IDs raise `LookupError` and blank IDs raise `ValueError`. Together, these assertions help detect the reintroduction of both defects while protecting existing booking, cancellation and lookup behaviour.
+
+Unrelated failures investigated / resolution: Not applicable. The three failures in the prepared faulty state were associated with F8-01 and F8-02. After both repairs and the refactoring, the full regression suite passed with 113 passed and 0 failed at commit `91f2d4f`. No unrelated test failures were observed in this verification.
 
 ## H. Refactoring decision and before/after verification
 
@@ -338,7 +349,7 @@ Smell and exact location: project/smartcare/services.py, AppointmentService.book
 
 Small proposed structural change / why justified: Extract the patient and practitioner lookup and missing-record checks into a small private helper method. This will simplify book_appointment() without changing its functionality. Issue: https://github.com/u3325845/st1-assignment-3/issues/29
 
-External behaviour to preserve / relevant tests: Preserve existing validation rules, exception types, error messages, validation order, booking behaviour, and conflict detection; verify using the existing appointment service tests and the full regression suite., fix the root cause with a small justified change, and run focused and regression tests to confirm the fix. Refactoring should preserve existing behaviour.
+External behaviour to preserve / relevant tests: Preserve existing validation rules, exception types, error messages, validation order, booking behaviour and practitioner conflict detection. Verify behaviour using the existing appointment service tests and the full regression suite.
 
 Before results: 113 passed in 0.30s, using python -m pytest -q from project/ on debug/stage08 (SHA 8c70964), before refactoring.
 
@@ -356,7 +367,8 @@ Branch / prepared, repair and refactor checkpoints:Prepared faulty-state SHA: ec
 
 PR link and another member's reviewer identity: F8-01: PR #27 (Rachel) reviewed by Novera. F8-02: PR #26 (Novera) reviewed by Rachel. Refactoring: PR #30, created by Merlin and reviewed by Tarnima
 
-Key human feedback, difference from Copilot findings and response/outcome: [complete]
+Key human feedback, difference from Copilot findings and response/outcome: Tarnima reviewed and approved Merlin's refactoring PR #30 without requesting changes. The refactoring extracted participant lookup and validation into `_get_registered_participants()` while preserving the existing booking behaviour. The recorded focused and full regression tests passed, supporting the decision to approve. Unlike the Copilot debugging suggestions in Section F, which required investigation and evidence-based acceptance or rejection, this human review evaluated the actual refactoring and its test results. PR #30 was subsequently merged into `debug/stage08` at commit `c2f6485`.
+
 **Actual review approval / merge evidence:** PR #26 (Novera), PR #27 (Rachel) and PR #30 (Merlin) were merged into `debug/stage08`. Review and merge evidence is available at:
 - https://github.com/u3325845/st1-assignment-3/pull/26
 - https://github.com/u3325845/st1-assignment-3/pull/27
@@ -364,23 +376,33 @@ Key human feedback, difference from Copilot findings and response/outcome: [comp
 
 Integrated code SHA and team pull/retest command / working directory / result: c2f6485 on debug/stage08. Ran git switch debug/stage08, git pull --ff-only origin debug/stage08, then python -m pytest -q from project/. Result: 113 passed in 0.23s.
 
-Evidence-only later SHA / explanation if different: [complete or not applicable]
+Evidence-only later SHA / explanation if different: 91f2d4f is the Stage 8 documentation integration commit from PR #31, following the refactoring integration at c2f6485. No further application-code changes were introduced by the documentation update. Tarnima verified the three focused regression tests (3 passed in 0.02s) and the full regression suite (113 passed in 0.16s) on test/stage08-regression at 91f2d4f.
 
-Each member's substantive contribution and artefact: Each member's substantive contribution and artefact:
+Each member's substantive contribution and artefact:
 
-Rachel - Investigated and repaired F8-01 practitioner conflict. PR #27. [add if more]
+Rachel - Investigated and repaired F8-01 practitioner conflict. Recorded the human-first hypothesis, evaluated Copilot's suggestions and verified the repair using the focused regression test. PR #27, repair SHA 3c4ea3e.
 
 Novera - Investigated and repaired F8-02 cancelled appointment lookup. PR #26.
 
 Merlin - Refactored participant lookup and validation in AppointmentService.book_appointment(). Issue #29, PR #30, SHA cca6971. Verified 9 focused tests and 113 full-suite tests.
 
-Tarnima - Supported regression testing, review and integration. Reviewed Merlin's PR #30. [add more]
+Tarnima - Reviewed Merlin's refactoring PR #30 and supported Stage 8 integration and regression verification. Created `test/stage08-regression` from `debug/stage08` and independently verified the three focused F8-01/F8-02 regression tests (3 passed in 0.02s) and the complete test suite (113 passed in 0.16s) at commit `91f2d4f`. Completed the missing Section G regression evidence using the team's recorded repair results and Git history.
 
 ## J. Required reflections
 
-1. Which Copilot diagnosis appeared convincing but lacked evidence? [complete; report honestly if none and discuss the least-supported real suggestion]
-2. What evidence changed your group's view? [complete]
-3. How did regression tests protect the refactoring? [complete]
+1. Which Copilot diagnosis appeared convincing but lacked evidence?
+
+For F8-02, Copilot suggested that the application might be loading a different version of the code. This seemed possible because the code Copilot described did not contain the cancelled-appointment filter. However, checking the loaded module path and Git history confirmed that the correct faulty version was being executed. The actual cause was the condition that excluded cancelled appointments from lookup. Therefore, the suggestion was rejected because it did not match the observed evidence.
+
+
+2. What evidence changed your group's view?
+
+For F8-02, the team initially considered whether cancellation removed the appointment from storage. However, the runtime check showed that appointment A1 was still present in list_appointments(), while find_appointment() returned None. Inspecting the data-store code confirmed that cancelled appointments were being excluded during lookup. For F8-01, the failing test and code inspection showed that the practitioner ID comparison used != instead of ==. These findings helped the team identify the actual causes and make small, justified repairs instead of changing unrelated code.
+
+3. How did regression tests protect the refactoring?
+
+Regression tests helped the team confirm that Merlin's refactoring did not change the existing booking behaviour. Before refactoring, the full test suite passed with 113 tests. After extracting participant lookup and validation into a separate helper method, all 9 focused service tests and 113 regression tests passed. These tests checked that existing validation, booking, conflict detection and cancellation behaviour continued working. This provided evidence that the internal code structure was improved without introducing new defects.
+
 
 ## K. Ten formative questions
 
@@ -426,18 +448,20 @@ Response: Reproduce and understand the failure before making changes, fix the ro
 
 ## L. Completion and handover
 
-- [ ] Existing project, earlier tests and stage records preserved.
-- [ ] Passing Stage 7 SHA and safe preparation details recorded.
-- [ ] Both defects reproduced with meaningful failing tests.
-- [ ] Both human hypotheses recorded before Copilot; actual suggestions evaluated with evidence.
-- [ ] Supported causes and minimal repairs explained; focused and full regression results recorded.
-- [ ] One genuine refactor verified under passing before/after tests.
-- [ ] Human PR review, feedback resolution and integrated retest recorded.
-- [ ] Tutorial, three reflections and ten formative responses complete.
-- [ ] Local recovery metadata excluded from submitted source.
-- [ ] Same project and full suite ready for Stage 9 after Stage 8 integration, verification and recording.
+- [x] Existing project, earlier tests and stage records preserved.
+- [x] Passing Stage 7 SHA and safe preparation details recorded.
+- [x] Both defects reproduced with meaningful failing tests.
+- [x] Both human hypotheses recorded before Copilot; actual suggestions evaluated with evidence.
+- [x] Supported causes and minimal repairs explained; focused and full regression results recorded.
+- [x] One genuine refactor verified under passing before/after tests.
+- [x] Human PR review, feedback resolution and integrated retest recorded.
+- [x] Tutorial, three reflections and ten formative responses complete.
+- [x] Local recovery metadata excluded from submitted source.
+- [x] Same project and full suite ready for Stage 9 after Stage 8 integration, verification and recording.
 
-Verified integrated code SHA / result: see I.
-Submitted SHA and evidence-only difference if any: [complete]
-Unresolved issues or incomplete checks / owner / next action: [complete]
-Handover note: [complete]
+Verified integrated code SHA / result: c2f6485 on debug/stage08. The full regression suite passed with 113 tests in 0.23s after integration. Following the documentation merge at 91f2d4f, the team verified 3 focused regression tests (3 passed in 0.02s) and the full suite (113 passed in 0.16s) on test/stage08-regression.
+Submitted SHA and evidence-only difference if any: 91f2d4f. Subsequent changes are documentation-only; final commit SHA will be available in the PR.
+
+Unresolved issues or incomplete checks / owner / next action: No unresolved code defects or test failures. Stage 8 documentation awaits final review and integration.
+
+Handover note: Both defects repaired, refactoring integrated and 113 regression tests passed. The verified project is ready for Stage 9.
