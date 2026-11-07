@@ -4,9 +4,14 @@ UG and PG | One evolving group project | Complete this blank record using the St
 
 All Assignment 3 stage materials are provided from the beginning. Complete this stage only after the previous applicable stage has been integrated, verified and recorded. Use this supplied record in stage08/ in your EXISTING repository. Preserve project/, all earlier tests, records and responses. Do not download another starter or copy staff solutions. The Stage 8 preparation utility is supplied or run by teaching staff when Stage 8 begins. Follow your tutor’s controlled workflow and the handout. If temporarily supplied, keep it outside the repository in a sibling Stage_8_Assets/ folder; exclude it from Git and the final submission.
 
-Group/tutorial: [complete]
-Members and UG/PG cohorts: [complete]
-Record owner / contribution links for each member: [complete]
+Group/tutorial: Grp 2 tutorial Wed 4:30 - 6:30
+Members and UG cohorts: RachelUC, Merlin3313611, TarnimaKhan22, u3325845 (Novera)
+Record owner / contribution links for each member:
+- Rachel: Stage 8 preparation, F8-01 diagnosis, repair, regression testing and test organisation. PR #27: https://github.com/u3325845/st1-assignment-3/pull/27
+- Novera: F8-02 diagnosis, repair and regression testing. PR #26: https://github.com/u3325845/st1-assignment-3/pull/26
+- Merlin: Stage 8 refactoring and verification (pending).
+- Tarnima: Stage 8 review and integration evidence (pending).
+
 
 Use concise results and accessible artefact links rather than copying entire logs. Keep human-first entries before consulting GitHub Copilot. Link shared evidence once; do not repeat it across sections. No entries below are specimen answers or claimed results.
 
@@ -216,6 +221,11 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 - Observed behaviour: The expected `ValueError` was not raised.
 - Result: 1 failed in 0.02s.
 - Failure location: `tests/test_starter.py:127`.
+- Human hypothesis and intended checks: See Section E, F8-01.
+- Root cause: The practitioner ID comparison in `SmartCareDataStore.has_practitioner_conflict()` used `!=` instead of `==`. This prevented the system from detecting bookings for the same practitioner at the same time.
+- Smallest justified fix: Changed `!=` to `==` in `has_practitioner_conflict()`. No other application behaviour was changed.
+- Repair SHA / focused verification result: `3c4ea3e` on `fix/stage08-f8-01` (PR #27). Focused test: 1 passed. Full suite: 111 passed, 2 failed (both related to F8-02).
+
 
 ## D. F8-02 diagnosis and repair
 
@@ -322,15 +332,18 @@ Final human conclusion and comparison with initial hypothesis: My initial hypoth
 ## G. Failing to passing regression evidence
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
-|---|-------------------|-|-|
-| F8-01 before repair | [complete]        | [complete] | [complete] |
-| F8-01 after repair | [complete]        | [complete] | [complete] |
-| F8-02 before repair | ec3fc09           | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable, run from project/ on fix/stage08-f8-02|1 failed, LookupError: Appointment not found (services.py:147). Full-suite failure summary recorded in B (3 failed, 110 passed) |
-| F8-02 after repair | e7fad56                  | python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable tests/test_services.py::test_cancel_already_cancelled_appointment_raises_value_error, then python -m pytest -q, run from project/ on fix/stage08-f8-02 | Focused: 2 passed. Full suite: 112 passed, 1 failed (test_conflict_rule_and_different_practitioner, F8-01, not part of this fix) |
-| Full suite after both repairs, before refactor | [complete]        | [complete] | [complete] |
+|---|---|---|---|
+| F8-01 before repair | `e6319d8` | `python -m pytest tests/test_starter.py::test_conflict_rule_and_different_practitioner -v` from `project/` | 1 failed in 0.02s; expected `ValueError` was not raised. |
+| F8-01 after repair | `3c4ea3e` | Focused test above, then `python -m pytest -q` from `project/` | Focused: 1 passed in 0.01s. Full suite: 111 passed, 2 failed (F8-02). |
+| F8-02 before repair | `ec3fc09` | `python -m pytest -q tests/test_services.py::test_cancelled_appointment_is_retained_and_findable` from `project/` | 1 failed with `LookupError: Appointment not found`. |
+| F8-02 after repair | `e7fad56` | Both F8-02 tests in `tests/test_services.py`, then `python -m pytest -q` from `project/` | Focused: 2 passed. Full suite: 112 passed, 1 failed (F8-01). |
+| Full suite after both repairs, before refactor | `8c70964` | `python -m pytest -q` from `project/` | 113 passed in 0.05s. Both repairs integrated into `debug/stage08`. |
 
-Explain how the assertions detect each relevant incorrect result and protect previous behaviour: [complete]
-Unrelated failures investigated / resolution: [complete or not applicable with reason]
+**Stage 8 test organisation:** After both repairs were merged, the two F8-02 regression tests were moved from `tests/test_services.py` to `tests/test_starter.py`. The original tests were removed from `test_services.py` to avoid duplication. The full suite still contained 113 tests, and all passed in 0.06s.
+
+Explain how the assertions detect each relevant incorrect result and protect previous behaviour: The F8-01 test rejects double bookings for the same practitioner while allowing different practitioners at the same time. The F8-02 tests confirm that cancelled appointments remain findable and cannot be cancelled twice. The full suite checks that previous behaviour is preserved.
+
+Unrelated failures investigated / resolution: No unrelated failures remained. The full suite passed with 113 tests.
 
 ## H. Refactoring decision and before/after verification
 
@@ -378,9 +391,16 @@ Tarnima - Supported regression testing, review and integration. Reviewed Merlin'
 
 ## J. Required reflections
 
-1. Which Copilot diagnosis appeared convincing but lacked evidence? [complete; report honestly if none and discuss the least-supported real suggestion]
-2. What evidence changed your group's view? [complete]
+1. Which Copilot diagnosis appeared convincing but lacked evidence?
+
+For F8-02, Copilot suggested that the program might be loading a different version of the code. This seemed possible, but checking the module path and Git history showed that the correct faulty version was running. We rejected this explanation.
+
+2. What evidence changed your group's view?
+
+The failing tests and code inspection helped us confirm both faults. For F8-01, changing the incorrect practitioner comparison made the test pass. For F8-02, we confirmed that cancelled appointments were still stored but were being excluded from lookup.
+
 3. How did regression tests protect the refactoring? [complete]
+
 
 ## K. Ten formative questions
 
