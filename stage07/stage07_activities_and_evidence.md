@@ -502,7 +502,7 @@ Run python -m pytest from project/. Retain all accumulated tests. Record the tes
 | `python -m pytest` | `project/` | `614f3e9` | 82 | 0 | No failures | None | Full regression run after adding Stage 7 Appointment tests alongside existing team tests. All 82 tests passed in 0.17s. Evidence: Local PyCharm terminal output; [PR #18](https://github.com/u3325845/st1-assignment-3/pull/18).|
 | `python -m pytest -q` | `project/` | `0b6bb58` | 108 | 0 | No failures | None | Full regression run after practitioner domain and service test improvements. All 108 tests passed in 0.20s. Evidence: local PyCharm terminal output; [Commit 0b6bb58](https://github.com/u3325845/st1-assignment-3/commit/0b6bb58). |
 | `python -m pytest` | `project/` | `1bc002e` | 113 | 0 | No failures reported | None reported | PR #22 reports 113 tests passed after adding cancellation tests. Final main regression still needs verification. |
-
+| `python -m pytest -q` | `project/` | `b28d4d0` | 113 | 0 | No failures | None | Full regression verification after finalizing the Stage 7 domain test file. All 113 tests passed in 0.15s. Evidence: [PR #32](https://github.com/u3325845/st1-assignment-3/pull/32), commit `b28d4d0` (submitted for review). |
 Individual test runs and changed-order independence evidence:
 
 Individual test runs: `python -m pytest tests/test_domain.py -v` — 35 passed (13 Patient cases and 22 Appointment cases). Full regression: `python -m pytest` — 82 passed, 0 failed. Changed-order independence was not separately tested.
@@ -517,7 +517,7 @@ Requirement → test → failure/observation → diagnosis → change → verifi
 
 **What does your test suite still not prove?**
 
-The latest PR (#22) reported 113 passing tests, but the final regression run on the integrated main branch has not yet been recorded. Even when all tests pass, the suite does not prove that every possible input or complete user workflow works correctly. The tests cover Patient, Practitioner and Appointment domain validation, registration, lookup and cancellation behaviour. However, they do not fully verify the user interface, concurrent operations or persistence after restarting the application.
+The Stage 7 test suite was finalized and verified with **113 tests passing and no failures** (`b28d4d0`, PR #32). The tests cover Patient, Practitioner and Appointment domain validation, registration, lookup, cancellation and relevant negative and boundary cases. However, passing tests do not guarantee that every possible input or complete user workflow behaves correctly. The suite does not fully verify the user interface, concurrent operations or persistence after restarting the application. Final integration verification on `main` remains outstanding until the pending PR is merged.
 
 **Coverage if used:**
 
@@ -602,9 +602,14 @@ The main question is, "What required behaviour does this test actually prove?". 
 
 ## O Stage Completion
 
-Tested Stage 7 main SHA: [complete]
-Full-suite result: [complete]
-Unresolved defects and effect on baseline: [complete or none]
-Clean working tree and integration evidence: [complete]
-Stage 8 handover status: [complete; no Stage 8 work assigned]
-All tutorial/formative responses and traceability/Copilot decisions complete: [confirm]
+Tested Stage 7 main SHA: `c384995` (baseline); final verification performed on `b28d4d0` (PR #32).
+
+Full-suite result: python -m pytest -q — 113 passed, 0 failed in 0.15s on commit b28d4d0.
+
+Unresolved defects and effect on baseline: No failures or unresolved defects identified in the verified Stage 7 test suite. The known limitations are documented in Section K.
+
+Clean working tree and integration evidence: Stage 7 test contributions were integrated through PRs #16, #18, #20 and #22. Final test verification recorded in PR #32, submitted for review. The documentation finalization is being prepared separately on `docs/stage07-finalization`.
+
+Stage 8 handover status: Stage 7 testing and documentation finalized for handover. Existing regression tests retained for Stage 8 verification and defect investigation.
+
+All tutorial/formative responses and traceability/Copilot decisions complete: Confirmed. Sections A–N contain the completed activities, test evidence, requirement traceability, Copilot evaluations, review records and formative responses.
