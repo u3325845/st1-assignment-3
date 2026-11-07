@@ -149,3 +149,35 @@ def test_domain_cancellation_and_guard() -> None:
     with pytest.raises(ValueError):
         appointment.cancel()
     assert appointment.status is AppointmentStatus.CANCELLED
+
+
+
+def test_cancelled_appointment_is_retained_and_findable() -> None:
+    """Check that cancelled appointments remain findable."""
+    _, _, _, appointment_service = foundation()
+
+    appointment = appointment_service.book_appointment(
+        'A1', 'P1', 'D1', datetime(2026, 10, 1, 9)
+    )
+    appointment_service.cancel_appointment('A1')
+
+    found = appointment_service.find_appointment('A1')
+
+    assert found is appointment
+    assert found.status is AppointmentStatus.CANCELLED
+
+
+
+def test_cancel_already_cancelled_appointment_raises_value_error() -> None:
+    """Check that cancelling an appointment twice raises ValueError."""
+    _, _, _, appointment_service = foundation()
+
+    appointment = appointment_service.book_appointment(
+        'A1', 'P1', 'D1', datetime(2026, 10, 1, 9)
+    )
+    appointment_service.cancel_appointment('A1')
+
+    with pytest.raises(ValueError):
+        appointment_service.cancel_appointment('A1')
+
+    assert appointment.status is AppointmentStatus.CANCELLED
