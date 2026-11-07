@@ -26,38 +26,173 @@ For each, choose symptom, evidence or hypothesis/opinion, and explain your reaso
 - Traceback points to smartcare/services.py line 42 in the example.
 The example line number is illustrative; inspect the actual line in your run. The removal hypothesis must be tested against the current project, which has no public delete operation.
 
-Response and reason: [complete]
+Response and reason:
+
+1. Appointment disappears after cancellation.
+
+Classification: Symptom.
+
+Reason: This describes the problem noticed by the user, but it does not explain why the appointment disappeared.
+
+2. The data-store removal path is probably being called.
+
+Classification: Hypothesis.
+
+Reason: This is a possible explanation for the problem, but it needs to be checked against the code. The current project does not have a public delete operation.
+
+3. The failing test shows store.find_appointment('A1') returns None.
+
+Classification: Evidence.
+
+Reason: This is an observed test result that can help investigate the failure.
+
+4. The service layer is badly designed.
+
+Classification: Opinion.
+
+Reason: This is a judgement about the code without enough evidence to support it.
+
+5. Traceback points to smartcare/services.py line 42 in the example.
+
+Classification: Evidence.
+
+Reason: The traceback shows where the failure was reported. However, line 42 is only an example and does not prove the root cause.
+
+
 
 ### A.2 Build a debugging record
 Choose the cancelled-history scenario or a same-practitioner/time booking. Before changing code, record expected behaviour, observed behaviour, minimal reproduction, a hypothesis and evidence to inspect. Use a requirement to justify the expectation. Keep the initial hypothesis even if later evidence disproves it.
 
-Response and reason: [complete]
+Response and reason:
+
+Scenario: Cancelled appointment history is not retained.
+
+Expected behaviour: According to FR-07, cancelling an appointment should change its status while keeping the appointment record available for future lookup.
+
+Observed behaviour: The failing test showed that a cancelled appointment could not be found using the lookup operation.
+
+Minimal reproduction: Create an appointment, cancel it, and attempt to retrieve it using its appointment ID.
+
+Initial hypothesis: The cancellation process may be removing the appointment or preventing the lookup method from returning cancelled records.
+
+Evidence to inspect: The failing test, cancellation service method, appointment lookup method, data-store code and FR-07 requirements.
+
+Reason: Recording the expected and observed behaviour before changing code helps the team investigate the actual problem instead of guessing.
 
 ### A.3 Test defect or product defect
 A test expects cancelled appointments to be deleted, but FR-07 says history must be retained. What should be changed? Explain why. Also decide whether a test expecting different practitioners at the same time to conflict reflects AC-04.2. Do not assume every failing test is correct.
 
-Response and reason: [complete]
+Response and reason:
+1. A test expects cancelled appointments to be deleted, but FR-07 requires history to be retained.
+
+Response: The test should be corrected because it contradicts FR-07. Cancelled appointments must remain stored and available for lookup. The expected result should check that the appointment is retained with its cancelled status.
+
+2. A test expects different practitioners at the same time to conflict.
+
+Response: The test should be corrected if AC-04.2 defines conflicts for the same practitioner and time. Different practitioners should be able to have appointments at the same time, provided the other booking rules are satisfied.
+
+Reason: Tests should follow the actual requirements. A failing test does not automatically mean the application code is wrong.
 
 ### A.4 Refactoring smell hunt
 Consider a hypothetical 70-line AppointmentService method containing duplicate status strings, direct collection manipulation, printing, validation and four nested conditionals. Identify the smells and propose small refactorings that preserve required behaviour. The direct collection work replaces the old storage-specific scenario; use the existing SmartCareDataStore boundary. Do not implement an extra architecture.
 Classify these proposed changes as refactoring, repair or feature: rename appt to appointment; extract a repeated conflict helper; add rescheduling; restore retained cancellation lookup; replace a magic status string with the existing enum. Explain the behaviour that must remain unchanged.
 
-Response and reason: [complete]
+Response and reason:
+
+Code smells identified in the hypothetical 70-line AppointmentService method:
+
+Long method: The method handles too many responsibilities, making it difficult to read and maintain.
+
+Duplicated status strings: Repeated status values can cause inconsistencies and make updates harder.
+
+Direct collection manipulation: The service directly accesses collections instead of using the existing SmartCareDataStore boundary.
+
+Printing inside service logic: Mixing output statements with business logic makes the code harder to test.
+
+Deep nesting: Four nested conditionals make the code complicated and difficult to follow.
+
+Proposed small refactorings:
+
+Extract repeated validation and conflict-checking logic into private helper methods.
+
+- Replace repeated status strings with the existing status enum.
+
+- Move direct collection operations behind the existing SmartCareDataStore methods.
+
+- Separate printing from the service logic.
+
+- Simplify nested conditions using clearer checks and early returns where appropriate.
+
+Classification of proposed changes:
+
+Rename appt to appointment: Refactoring - improves readability without changing behaviour.
+
+Extract a repeated conflict helper: Refactoring - reduces duplicated code while keeping the same conflict rules.
+
+Add rescheduling: Feature - introduces new functionality.
+
+Restore retained cancellation lookup: Repair - fixes incorrect behaviour so cancelled appointments remain available according to FR-07.
+
+Replace a magic status string with the existing enum: Refactoring - improves consistency without changing the required status values.
+
+Behaviour that must remain unchanged:
+
+Existing booking rules, patient and practitioner validation, exception handling, conflict detection, appointment statuses and cancelled appointment history must continue working according to the requirements.
+
+Reason:  Refactoring improves the internal code structure without changing external behaviour. A repair corrects an existing defect, while a feature adds new functionality.
+
 
 ### A.5 Traceback and hypothesis ranking
 Using one actual failure, identify its exception/assertion, expected and observed values, test line, application call path and supporting requirement. List three plausible causes and rank them by fit with the available evidence. For each cause, name a check that could distinguish it from the others. Explain why a traceback alone does not establish the cause.
 
-Response and reason: [complete]
+Response and reason:
+Actual failure: F8-02 - cancelled appointment history is not findable.
+
+Exception: LookupError: Appointment not found
+
+Expected behaviour: After cancelling appointment A1, find_appointment("A1") should return the appointment with status CANCELLED.
+
+Observed behaviour: SmartCareDataStore.find_appointment("A1") returned None, causing AppointmentService.find_appointment() to raise LookupError.
+
+Failing test: project/tests/test_services.py::test_cancelled_appointment_is_retained_and_findable
+
+Application failure location: smartcare/services.py, line 147.
+
+Application call path: Test → AppointmentService.find_appointment() → SmartCareDataStore.find_appointment().
+
+Supporting requirements: FR-06, FR-07, FR-08, BR-07 and AC-05.2.
+
+Three possible causes, ranked:
+
+Cancelled appointments are excluded by the data-store lookup - most likely.
+Check: Inspect SmartCareDataStore.find_appointment() for a status filter. The condition appointment.status.value != "cancelled" confirmed this cause.
+
+The cancellation method removes the appointment from storage.
+Check: Run list_appointments() after cancellation. The result [('A1', 'cancelled')] showed that A1 was still stored, disproving this hypothesis.
+
+The test uses an incorrect appointment ID or setup.
+Check: Verify that A1 was created successfully and that the same ID was used for cancellation and lookup.
+
+Why the traceback alone is not enough:
+
+The traceback identifies where the error occurred but does not prove its root cause. The team inspected the data-store code and runtime results to confirm that cancelled appointments were being filtered out during lookup.
+
+Confirmed root cause and repair:
+
+The condition appointment.status.value != "cancelled" incorrectly excluded cancelled appointments. Removing this condition restored the required lookup behaviour without changing the handling of unknown appointment IDs.
+
+Repair evidence: Commit e7fad56, PR #26. Both focused F8-02 tests passed.
+
 
 ### A.6 Exit question
 Why is changing code immediately after seeing a failure often a poor debugging strategy?
 
-Response and reason: [complete]
+Response and reason: Changing code immediately can lead to incorrect fixes because the real cause may not be understood. Engineers should first reproduce the failure, examine the evidence, check the requirements and test possible causes. This helps avoid introducing new defects.
 
 
-Classification responses (1–5, each with reason): [complete]
-Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: [complete]
-Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: [complete]
+Classification responses (1–5, each with reason): Completed in Section A.1.
+Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: expected; observed; reproduction; hypothesis; evidence to inspect: Completed in Section A.2 using the F8-02 cancelled appointment scenario.
+Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: Completed in Section A.5 using F8-02. Exact test assertion line is not recorded; the application failure is at smartcare/services.py line 147.
 
 
 
@@ -96,10 +231,10 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 
 - Symptom / observed behaviour: After A1 is cancelled, the store's find_appointment("A1") returns None, so AppointmentService.find_appointment raises LookupError: Appointment not found. As a result, a second cancel_appointment("A1") also raises LookupError instead of ValueError.
 - Expected behaviour and requirement: A cancelled appointment stays stored and findable with status CANCELLED, and a repeated cancellation is rejected with ValueError. Requirements: FR-06, FR-07, FR-08, BR-07 and AC-05.2 (cancelled appointments are retained as history and lookup still finds them).
-- Minimal synthetic reproduction steps: (1) register patient P1 and practitioner D1; 
+- Minimal synthetic reproduction steps: (1) register patient P1 and practitioner D1;
 (2) book A1 for P1 with D1 on 1 Oct 2026 at 09:00;
-(3) cancel A1 with service.cancel_appointment("A1"); 
-(4) look it up with service.find_appointment("A1"); 
+(3) cancel A1 with service.cancel_appointment("A1");
+(4) look it up with service.find_appointment("A1");
 (5) observe LookupError instead of the cancelled appointment.
 
 - Meaningful failing test path/name and exact relevant failure: project/tests/test_services.py::test_cancelled_appointment_is_retained_and_findable fails with LookupError: Appointment not found at smartcare/services.py line 147. Related: test_cancel_already_cancelled_appointment_raises_value_error fails with the same LookupError.
@@ -190,7 +325,7 @@ Treat all suggested explanations as hypotheses. Consulted 5 Nov 2026 in a separa
 Chat link: https://github.com/copilot/share/02194300-0840-8080-8051-ce4dc4b049e8
 1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: Copilot: find_appointment filters out cancelled records, so the appointment is in list_appointments() but the status.value != "cancelled" condition stops it being returned; the second cancel then raises LookupError before appointment.cancel() can raise ValueError. Suggested check: inspect the ID and status at the loop and whether the ID matches. Observed evidence: the code in data_store.py contains `and appointment.status.value != "cancelled"`; my runtime check printed [('A1', 'cancelled')] for list_appointments() and None for find_appointment("A1"); the second-cancel test fails at services.py line 157 through the same failed lookup. Correct. Accept: it matches my hypothesis and the evidence.
 2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason:  Copilot: the runtime is loading different code from the repository version it inspected (it described a plain dictionary lookup with no cancelled filter). Suggested check: verify the loaded module path, working directory, import path and commit. Observed evidence: smartcare.data_store.__file__ is ...\st1-assignment-3\project\smartcare\data_store.py on branch fix/stage08-f8-02; `git diff c384995 ec3fc09 -- project/smartcare/data_store.py` shows the Stage 7 find_appointment was a plain dictionary lookup (self._appointments.get(required_text(...))), replaced in the prepared commit ec3fc09 by a loop that skips cancelled appointments. Wrong as a cause of my failure (it accurately describes the unprepared Stage 7 code, which is not the code under test). Reject as a cause: the code I ran is the prepared faulty file in my repo, so the failure comes from the planted change.
-3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: Copilot: the list and the lookup do not observe the same store state or exact key (different store instances, a mock, or an ID mismatch). Suggested check: confirm service.data_store is the store used for the list call and compare repr of the stored ID with the lookup argument. Observed evidence: `a.data_store is s` printed True; repr(x.appointment_id) printed 'A1' and `x.appointment_id == 'A1'` printed True; find_appointment('A1') still printed None. Wrong. Reject: the service, list and lookup use the same store and the same key, so neither explains the failure. 
+3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: Copilot: the list and the lookup do not observe the same store state or exact key (different store instances, a mock, or an ID mismatch). Suggested check: confirm service.data_store is the store used for the list call and compare repr of the stored ID with the lookup argument. Observed evidence: `a.data_store is s` printed True; repr(x.appointment_id) printed 'A1' and `x.appointment_id == 'A1'` printed True; find_appointment('A1') still printed None. Wrong. Reject: the service, list and lookup use the same store and the same key, so neither explains the failure.
 
 Final human conclusion and comparison with initial hypothesis: My initial hypothesis (saved before Copilot in commit e95806d) was that the store's find_appointment skips cancelled appointments because of status.value != "cancelled". Copilot's top suggestion agreed; I checked it against the code and my runtime output. Suggestions 2 and 3 were plausible but contradicted by evidence. Root cause: the condition `appointment.status.value != "cancelled"` in SmartCareDataStore.find_appointment, which contradicts FR-07 and AC-05.2 by hiding retained cancelled appointments from lookup. Copilot did not change my diagnosis; it confirmed the hypothesis and added two alternatives that I had to rule out.
 
@@ -212,31 +347,47 @@ Unrelated failures investigated / resolution: No unrelated failures remained. Th
 
 ## H. Refactoring decision and before/after verification
 
-Smell and exact location: [complete]
-Small proposed structural change / why justified: [complete before editing]
-External behaviour to preserve / relevant tests: [complete]
-Before result: see G, full passing suite.
-Actual change / diff / separate refactor SHA: [complete]
-Focused and full after-refactor commands / working directory / results / evidence: [complete]
-Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: [complete]
+Smell and exact location: project/smartcare/services.py, AppointmentService.book_appointment(). The method handles several responsibilities, including participant lookup, validation, conflict checking and appointment creation, making it harder to read.
+
+Small proposed structural change / why justified: Extract the patient and practitioner lookup and missing-record checks into a small private helper method. This will simplify book_appointment() without changing its functionality. Issue: https://github.com/u3325845/st1-assignment-3/issues/29
+
+External behaviour to preserve / relevant tests: Preserve existing validation rules, exception types, error messages, validation order, booking behaviour, and conflict detection; verify using the existing appointment service tests and the full regression suite., fix the root cause with a small justified change, and run focused and regression tests to confirm the fix. Refactoring should preserve existing behaviour.
+
+Before results: 113 passed in 0.30s, using python -m pytest -q from project/ on debug/stage08 (SHA 8c70964), before refactoring.
+
+Actual change / diff / separate refactor SHA: Extracted the patient and practitioner lookup and missing-record checks from AppointmentService.book_appointment() into a private helper, _get_registered_participants(). Only project/smartcare/services.py was changed in the application code. Refactor SHA: cca6971.
+
+Focused and full after-refactor commands / working directory / results / evidence: From project/, ran python -m pytest -q tests/test_services.py — 9 passed in 0.03s. Ran python -m pytest -q — 113 passed in 0.19s. git diff --check returned no errors.
+
+Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: Accepted. The refactoring separates participant lookup and validation from booking logic without intentionally changing behaviour. The focused tests and full regression suite passed, supporting that existing functionality was preserved.
 
 ## I. Git, human review and integration
 
-Issues for both defects / refactor scope and owners: F8-01 – Rachel, Issue #24, PR #27. F8-02 – Novera, PR #26. Refactoring – Merlin (pending).
+Issues for both defects / refactor scope and owners: F8-01 practitioner conflict - Rachel (fix/stage08-f8-01). F8-02 cancelled appointment lookup - Novera (fix/stage08-f8-02). Appointment booking validation refactoring - Merlin, Issue #29.
 
-Branch / prepared, repair and refactor checkpoints: Prepared branch `debug/stage08`, faulty-state SHA `ec3fc09`. F8-01 repair SHA `3c4ea3e`. F8-02 repair SHA `e7fad56`. Integrated repair SHA `8c70964`. Refactor pending.
+Branch / prepared, repair and refactor checkpoints:Prepared faulty-state SHA: ec3fc09 on debug/stage08. F8-01 repair SHA: 3c4ea3e. F8-02 repair SHA: e7fad56. Both repairs were integrated before refactoring (SHA 8c70964). Refactoring branch: refactor/stage08; refactoring SHA: cca6971. Evidence update SHA: 189f23b. See Sections B, C, D and H.
 
-PR link and another member's reviewer identity: F8-01 PR #27: https://github.com/u3325845/st1-assignment-3/pull/27 (Merlin and Tarnima requested as reviewers). F8-02 PR #26: https://github.com/u3325845/st1-assignment-3/pull/26 (reviewed and approved by Rachel).
+PR link and another member's reviewer identity: F8-01: PR #27 (Rachel) reviewed by Novera. F8-02: PR #26 (Novera) reviewed by Rachel. Refactoring: PR #30, created by Merlin and reviewed by Tarnima
 
-Key human feedback, difference from Copilot findings and response/outcome: Both defects were investigated by group members before consulting Copilot. Copilot's suggested causes were checked against the code and failing tests. Both repairs were limited to the confirmed root causes. Further human review feedback for F8-01 is pending.
+Key human feedback, difference from Copilot findings and response/outcome: [complete]
+**Actual review approval / merge evidence:** PR #26 (Novera), PR #27 (Rachel) and PR #30 (Merlin) were merged into `debug/stage08`. Review and merge evidence is available at:
+- https://github.com/u3325845/st1-assignment-3/pull/26
+- https://github.com/u3325845/st1-assignment-3/pull/27
+- https://github.com/u3325845/st1-assignment-3/pull/30
 
-Actual review approval / merge evidence: Rachel reviewed and approved F8-02 PR #26. Both repair PRs were merged into `debug/stage08`. F8-01's requested reviews were not completed before its merge; any later review will be recorded separately.
+Integrated code SHA and team pull/retest command / working directory / result: c2f6485 on debug/stage08. Ran git switch debug/stage08, git pull --ff-only origin debug/stage08, then python -m pytest -q from project/. Result: 113 passed in 0.23s.
 
-Integrated code SHA and team pull/retest command / working directory / result: `8c70964`. Rachel pulled `debug/stage08` and ran `python -m pytest -q` from `project/`. Result: 113 passed in 0.05s.
+Evidence-only later SHA / explanation if different: [complete or not applicable]
 
-Evidence-only later SHA / explanation if different: Pending Stage 8 test organisation and documentation commit. This commit reorganises existing regression tests and updates the evidence record without changing application behaviour.
+Each member's substantive contribution and artefact: Each member's substantive contribution and artefact:
 
-Each member's substantive contribution and artefact: Rachel – preparation, F8-01 diagnosis and repair, PR #27, and Stage 8 test organisation. Novera – F8-02 diagnosis and repair, PR #26. Merlin – refactoring pending. Tarnima – review and integration evidence pending.
+Rachel - Investigated and repaired F8-01 practitioner conflict. PR #27. [add if more]
+
+Novera - Investigated and repaired F8-02 cancelled appointment lookup. PR #26.
+
+Merlin - Refactored participant lookup and validation in AppointmentService.book_appointment(). Issue #29, PR #30, SHA cca6971. Verified 9 focused tests and 113 full-suite tests.
+
+Tarnima - Supported regression testing, review and integration. Reviewed Merlin's PR #30. [add more]
 
 ## J. Required reflections
 
@@ -255,44 +406,43 @@ The failing tests and code inspection helped us confirm both faults. For F8-01, 
 
 1. What should an engineer do before changing code in response to a failure?
 
-First understand the problem, reproduce the failure, check the requirements and collect evidence before making changes.
+Response: They should first reproduce the failure, read the error message and traceback, and identify what is causing the problem. They should avoid changing code without understanding the failure.
 
 2. Where should expected behaviour come from during debugging?
 
-Expected behaviour should come from the project requirements, acceptance criteria and agreed business rules.
+Response: Expected behaviour should come from the project requirements, acceptance criteria, specifications and existing tests, rather than assumptions.
 
 3. What is a debugging hypothesis?
 
-A debugging hypothesis is a possible explanation for a problem that needs to be checked using evidence.
+Response: A debugging hypothesis is a possible explanation for why a failure is happening. It should be tested using evidence before deciding on a fix.
 
 4. What is a regression test and why is it retained?
 
-A regression test checks that a previously fixed problem does not happen again. It is retained to protect the code from future changes.
+Response: A regression test checks that a previously fixed problem does not happen again. It is retained to prevent future changes from reintroducing the same defect.
 
 5. What is meant by root cause?
 
-The root cause is the actual underlying reason why a problem occurs.
+Response: The root cause is the underlying reason a problem occurs, rather than just the visible error or symptom.
 
 6. What is refactoring?
 
-Refactoring means improving the structure or readability of code without changing how it behaves.
+Response: Refactoring means improving the internal structure, readability or maintainability of code without changing its external behaviour.
 
 7. What is a swallowed exception?
 
-A swallowed exception happens when an error is caught but ignored, making the problem harder to notice or debug.
+Response: A swallowed exception happens when an error is caught but ignored without proper handling or reporting. This can hide problems and make debugging harder.
 
 8. What is a code smell?
 
-A code smell is a sign that some code may be difficult to understand, maintain or improve.
+Response: A code smell is a sign that code may have a design or maintainability problem, such as duplicated code, long methods or unclear names. It does not always mean the code is incorrect.
 
 9. How should GitHub Copilot-generated debugging diagnoses be treated?
 
-Copilot suggestions should be treated as possible explanations, not confirmed facts. We should check them against the code, tests and requirements.
+Response: Copilot's suggestions should be treated as possible explanations, not confirmed facts. Engineers must check them against the code, requirements and test results before accepting them.
 
 10. What is the Stage 8 engineering rule?
 
-Understand the failure, collect evidence, confirm the root cause, make the smallest justified repair and verify it with regression tests. Refactoring should be separate and must preserve behaviour.
-
+Response: Reproduce and understand the failure before making changes, fix the root cause with a small justified change, and run focused and regression tests to confirm the fix. Refactoring should preserve existing behaviour.
 
 ## L. Completion and handover
 

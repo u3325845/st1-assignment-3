@@ -96,6 +96,17 @@ class AppointmentService:
         """Use the shared store to coordinate appointment operations."""
         self.data_store = data_store
 
+    def _get_registered_participants(self, patient_id, practitioner_id):
+        patient = self.data_store.find_patient(patient_id)
+        practitioner = self.data_store.find_practitioner(practitioner_id)
+
+        if patient is None:
+            raise LookupError('Patient not found')
+        if practitioner is None:
+            raise LookupError('Practitioner not found')
+
+        return patient, practitioner
+
     def book_appointment(
         self,
         appointment_id: str,
@@ -110,12 +121,10 @@ class AppointmentService:
         invalid values, duplicate appointment IDs or a practitioner
         conflict.
         """
-        patient = self.data_store.find_patient(patient_id)
-        practitioner = self.data_store.find_practitioner(practitioner_id)
-        if patient is None:
-            raise LookupError('Patient not found')
-        if practitioner is None:
-            raise LookupError('Practitioner not found')
+        patient, practitioner = self._get_registered_participants(
+            patient_id,
+            practitioner_id,
+        )
         appointment = Appointment(
             appointment_id,
             patient,
