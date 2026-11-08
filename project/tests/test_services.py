@@ -100,3 +100,104 @@ def test_cancelling_one_appointment_leaves_other_unchanged():
 
     assert first.status == AppointmentStatus.CANCELLED
     assert second.status == AppointmentStatus.SCHEDULED
+
+
+
+
+# Stage 9 - Practitioner appointment listing
+
+def test_list_practitioner_appointments_returns_booked_appointment():
+    service, appointment = make_booked_appointment()
+
+    result = service.list_practitioner_appointments("D1")
+
+    assert result == [appointment]
+    assert result[0] is appointment
+
+
+
+def test_list_practitioner_appointments_no_appointments():
+    store = SmartCareDataStore()
+    practitioners = PractitionerService(store)
+    service = AppointmentService(store)
+
+    practitioners.register_practitioner("D1", "Taylor", "General")
+
+    result = service.list_practitioner_appointments("D1")
+
+    assert result == []
+
+
+def test_list_practitioner_appointments_unknown_practitioner():
+    service, appointment = make_booked_appointment()
+
+    with pytest.raises(LookupError):
+        service.list_practitioner_appointments("D999")
+
+    assert service.find_appointment("A1") is appointment
+
+
+def test_list_practitioner_appointments_blank_id():
+    service, appointment = make_booked_appointment()
+
+    with pytest.raises(ValueError):
+        service.list_practitioner_appointments("   ")
+
+    assert service.find_appointment("A1") is appointment
+
+
+def test_list_practitioner_appointments_invalid_id():
+    service, appointment = make_booked_appointment()
+
+    with pytest.raises(ValueError):
+        service.list_practitioner_appointments(None)
+
+    assert service.find_appointment("A1") is appointment
+
+
+def test_list_practitioner_appointments_invalid_status():
+    service, appointment = make_booked_appointment()
+
+    with pytest.raises(ValueError):
+        service.list_practitioner_appointments("D1", "INVALID")
+
+    assert service.find_appointment("A1") is appointment
+    assert appointment.status == AppointmentStatus.SCHEDULED
+
+
+def test_list_practitioner_appointments_filters_cancelled():
+    service, first = make_booked_appointment()
+
+    second = service.book_appointment(
+        "A2", "P1", "D1", datetime(2026, 10, 1, 10, 0)
+    )
+
+    service.cancel_appointment("A1")
+
+    result = service.list_practitioner_appointments(
+        "D1", AppointmentStatus.CANCELLED
+    )
+
+    assert result == [first]
+    assert first.status == AppointmentStatus.CANCELLED
+    assert second.status == AppointmentStatus.SCHEDULED
+
+
+def test_list_practitioner_appointments_includes_all_statuses():
+    service, first = make_booked_appointment()
+
+    second = service.book_appointment(
+        "A2", "P1", "D1", datetime(2026, 10, 1, 10, 0)
+    )
+
+    service.cancel_appointment("A1")
+
+    result = service.list_practitioner_appointments("D1")
+
+    assert result == [first, second]
+    assert first.status == AppointmentStatus.CANCELLED
+    assert second.status == AppointmentStatus.SCHEDULED
+    assert service.find_appointment("A1") is first
+
+
+
