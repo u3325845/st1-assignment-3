@@ -16,7 +16,8 @@ The demo registers synthetic records and books/finds an appointment. All supplie
 `domain.py` contains the entities, status and guarded cancellation. `data_store.py` holds three dictionaries through add/find/list methods. The three services share that object. Supplied registration, booking, appointment lookup and conflict checking work. IDs are trimmed, non-blank and case-sensitive. Properties provide read-only identity/appointment state; changes go through domain methods. No special architecture terminology is required.
 
 
-Stage 6 patient/practitioner lookup and appointment cancellation are implemented. Stage 9 pure appointment queries and the named sort key are implemented. The interactive console menu is implemented, while practitioner appointment listing remains dependent on the Stage 9 service integration. No PG rescheduling or assurance solution is supplied.
+Stage 6 patient/practitioner lookup and appointment cancellation are implemented. Stage 9 pure appointment queries and the named sort key are implemented. 
+The interactive console menu and practitioner appointment listing service are implemented and integrated. Listing supports optional status filtering and retains cancelled appointment history. No PG rescheduling or assurance solution is supplied.
 
 Service booking accepts IDs and a `datetime` (local, minute precision). Console parser accepts exactly `YYYY-MM-DD HH:MM`. Store lookups return None when absent; service lookups raise LookupError. Invalid values, duplicates, conflicts and illegal transitions raise ValueError. Lists are new containers holding the stored objects. No age, duration, patient-conflict or past-date rules apply.
 

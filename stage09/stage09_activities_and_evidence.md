@@ -151,9 +151,9 @@ The full regression suite passed with 125 tests. However, the tests do not prove
 
 | Scenario / acceptance ID | Reproducible inputs / artefact | Expected result | Observed result and state check | Evidence link |
 |---|---|---|---|---|
-| UI-01 full menu workflow | Run `python main.py --interactive`. Register patient P1 (Alex) and practitioner DR1 (Taylor, General Practice). Book appointment A1 for `2026-11-20 09:00`, cancel A1, find A1, then exit. | Registration, booking, cancellation and lookup work using one shared session store. Cancelled appointments remain retrievable until exit. | PASS for the tested operations. A1 was booked as SCHEDULED, changed to CANCELLED and remained retrievable as CANCELLED. The menu continued until exit. Practitioner listing and filtering are pending Rachel's service integration. | [Console implementation](../project/smartcare/console.py), [Workflow tests](../project/tests/test_workflows.py) |
-| UI-02 invalid-input recovery | Run `python main.py --interactive`. Enter an invalid menu choice (`99`), then register and find patient P1. In a separate session, attempt booking with malformed date `2026-11-20  09:00`, attempt to cancel unknown appointment A1, and exit. Also test cancelling an already-cancelled appointment. | Invalid choices and expected errors display messages without terminating the menu. Subsequent valid operations remain possible. | PASS for tested cases. Invalid menu choice displayed an error and patient registration/lookup succeeded afterwards. Malformed date and unknown appointment produced errors without crashing. Repeated cancellation was rejected because only SCHEDULED appointments may be cancelled; A1 remained CANCELLED. | [Console implementation](../project/smartcare/console.py), [Workflow tests](../project/tests/test_workflows.py) |
-| Automated service workflow | Run `python -m pytest tests/test_workflows.py -q` and `python -m pytest -q` from `project/`. The five workflow tests cover patient registration/lookup, practitioner registration/lookup, appointment booking/lookup, cancellation/history, and invalid menu choice recovery. | Automated tests confirm that menu operations use shared session data, cancelled appointments remain retrievable, invalid choices recover, and existing functionality has no regressions. | PASS: 5 workflow tests passed. Full regression suite: 130 passed in 0.33s. Practitioner listing/filtering workflow tests remain pending service integration. | [Workflow tests](../project/tests/test_workflows.py), [Console implementation](../project/smartcare/console.py) |
+| UI-01 full menu workflow | Run `python main.py --interactive`. Register patient P1 (Alex) and practitioner DR1 (Taylor, General Practice). Book appointment A1 for `2026-11-20 09:00`, cancel A1, find A1, and list DR1's appointments with blank, SCHEDULED and CANCELLED status filters before exiting. | Registration, booking, cancellation, lookup and listing work using one shared session store. Cancelled appointments remain retrievable and listable until exit. | PASS. A1 was booked as SCHEDULED and changed to CANCELLED. It remained retrievable and appeared in the all-status and CANCELLED listings. The SCHEDULED filter returned no matching appointments. | [Console implementation](../project/smartcare/console.py), [Workflow tests](../project/tests/test_workflows.py) |
+| UI-02 invalid-input recovery | Run `python main.py --interactive`. Enter an invalid menu choice (`99`), then register and find patient P1. Separately, test a malformed date, unknown appointment, unknown practitioner, invalid status and repeated cancellation. | Invalid inputs display errors without terminating the menu. Subsequent valid operations remain possible. | PASS for tested cases. Invalid menu choices, malformed dates, unknown records, invalid status and repeated cancellation displayed errors without crashing. The menu continued accepting input. | [Console implementation](../project/smartcare/console.py), [Workflow tests](../project/tests/test_workflows.py) |
+| Automated console workflow | Run `python -m pytest tests/test_workflows.py -q` and `python -m pytest -q` from `project/`. Six workflow tests cover registration/lookup, booking/lookup, cancellation/history, invalid menu recovery and practitioner listing/status filtering. | Automated tests verify shared session data, retained cancellation history, listing filters and regression safety. | PASS. The new listing workflow test passed individually (1 passed in 0.04s). The full regression suite passed with 141 tests in 0.18s. | [Workflow tests](../project/tests/test_workflows.py), [Console implementation](../project/smartcare/console.py) |
 
 Include registration/find, booking, conflict rejection, different-practitioner booking, cancellation, retrieval, listing/filtering, freed slot and exit; duplicate/unknown/blank IDs, malformed/impossible date, invalid status, unknown choice and repeated cancellation. Identify before/after state and subsequent successful action.
 
@@ -165,13 +165,13 @@ Actual prompt/context supplied: Asked GitHub Copilot to review the proposed `run
 Actual response: Copilot supported the shared-store design, separation of console and service responsibilities, date parsing, appointment formatting and expected error handling. It recommended testing session continuity, invalid-input recovery and appointment listing. It also flagged unfinished query and service dependencies, although the query functions had already been integrated. Additional framework classes and persistence were unnecessary.
 
 
-| AI finding | Code/test evidence | Severity | Accept/Modify/Reject and reason | Change or no change | Actual verification |
-|---|---|---|---|---|---|
-| Shared session data store | `smartcare/console.py`, `tests/test_workflows.py` | Essential | Accept — one shared store preserves records between menu operations without persistence. | Created one `SmartCareDataStore` and reused it across all three services in `run_menu()`. | Registration followed by lookup passed in the automated workflow tests. |
-| Separation of responsibilities | `smartcare/console.py`, `smartcare/services.py` | Essential | Accept — the console should handle input/output while existing services enforce business rules. | Used service methods for registration, lookup, booking and cancellation instead of duplicating domain logic in the console. | Five automated workflow tests passed; full suite 130 passed. |
-| Input validation and error recovery | `smartcare/console.py`, `tests/test_workflows.py` | Essential | Accept — invalid inputs should display an error without terminating the session. | Caught expected `ValueError` and `LookupError` exceptions and displayed an error message before returning to the menu. | Invalid menu choice recovery passed in automated tests. Malformed date, unknown appointment and repeated cancellation were manually verified. |
-| Query and service dependencies | `smartcare/queries.py`, `smartcare/services.py` | Essential | Modify — Copilot identified both queries and service listing as unfinished, but its review used an older commit. The query functions were already integrated; only the listing service remained pending. | Kept the existing query implementation unchanged and deferred console listing verification until Rachel's service is integrated. | Query tests passed; listing workflow verification remains pending. |
-| Unnecessary complexity | `smartcare/console.py`, `project/README.md` | Optional | Reject — additional menu framework classes and persistent storage are outside the Stage 9 requirements. | Used a simple `run_menu()` loop with the existing services and session-only data store. No additional framework or persistence was introduced. | Code inspection and 130 passing tests confirmed the existing implementation remained functional. |
+| AI finding | Code/test evidence | Severity | Accept/Modify/Reject and reason | Change or no change | Actual verification                                                                                                                              |
+|---|---|---|---|---|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| Shared session data store | `smartcare/console.py`, `tests/test_workflows.py` | Essential | Accept — one shared store preserves records between menu operations without persistence. | Created one `SmartCareDataStore` and reused it across all three services in `run_menu()`. | Registration followed by lookup passed in the automated workflow tests.                                                                          |
+| Separation of responsibilities | `smartcare/console.py`, `smartcare/services.py` | Essential | Accept — the console should handle input/output while existing services enforce business rules. | Used service methods for registration, lookup, booking and cancellation instead of duplicating domain logic in the console. | Six automated workflow tests passed, full regression suite passed with 141 tests.                                                                |
+| Input validation and error recovery | `smartcare/console.py`, `tests/test_workflows.py` | Essential | Accept — invalid inputs should display an error without terminating the session. | Caught expected `ValueError` and `LookupError` exceptions and displayed an error message before returning to the menu. | Invalid menu choice recovery passed in automated tests. Malformed date, unknown records, invalid status and repeated cancellation were manually verified. |
+| Query and service dependencies | `smartcare/queries.py`, `smartcare/services.py`, `tests/test_workflows.py` | Essential | Modify — Copilot reviewed an older commit and incorrectly identified the query functions as unfinished. The queries were already integrated, while Rachel's listing service was integrated later. | Reused the existing query functions and merged Rachel's practitioner listing service into the console branch without duplicating functionality. | Manual console listing and status filtering passed. The automated listing workflow test passed, and the full regression suite passed with 141 tests. |
+| Unnecessary complexity | `smartcare/console.py`, `project/README.md` | Optional | Reject — additional menu framework classes and persistent storage are outside the Stage 9 requirements. | Used a simple `run_menu()` loop with the existing services and session-only data store. No additional framework or persistence was introduced. |  Code inspection confirmed the simple session-based implementation. The full regression suite passed with 141 tests.                             |
 
 
 Responsibility check: explain how domain invariants, shared-store collections, service coordination, pure queries and console effects remain separate:
@@ -191,7 +191,7 @@ For the console review, I rejected additional menu framework classes and persist
 
 3. How did you prove cancelled appointments remain retrievable and listable in the same session?
 
-The console workflow booked, cancelled and retrieved appointment A1, confirming that its CANCELLED status was retained. Rachel's service tests verified that cancelled appointments remained available in the full practitioner list and when filtering by CANCELLED. End-to-end console listing verification is still pending.
+The console workflow booked appointment A1, cancelled it and retrieved it again, confirming that its CANCELLED status was retained. I then listed DR1's appointments without a status filter and confirmed that A1 still appeared. Filtering by SCHEDULED returned no matching appointments, while filtering by CANCELLED returned A1. Rachel's service tests and my automated console workflow test also verified this behaviour. The full regression suite passed with 141 tests.
 
 
 ## G. Ten formative answers
@@ -209,23 +209,22 @@ The console workflow booked, cancelled and retrieved appointment A1, confirming 
 
 ## H. Review, completion and common handover
 
+Issues and bounded branches: Stage 9 console implementation and workflow tests were developed on `feature/stage09-console`, based on `stage09/integration`. Merlin's query implementation and Rachel's practitioner listing service were merged into the console branch. The local merge commit is `53a00e8`.
+PR/diff and another-member human reviewer: 
+Review responses and Copilot comparison: GitHub Copilot reviewed the proposed console design before implementation. I accepted its recommendations on shared session data, separation of responsibilities, error recovery and workflow testing. I rejected additional menu framework classes and persistent storage because they were unnecessary for Stage 9. The review findings and decisions are recorded in Section E.
+Integrated common Stage 9 SHA: 
+Full regression command, working directory, actual count/result and evidence: `python -m pytest -q` from `project/` — 141 passed in 0.18s. Evidence: [Workflow tests](../project/tests/test_workflows.py) and local pytest output.
+README run instructions and scope/limitations: [Project README](../project/README.md). The console runs using `python main.py --interactive` and supports registration, lookup, booking, cancellation and practitioner appointment listing. Records remain in memory and are lost when the session ends.
+Unresolved issues and support/action:
+UG common candidate / PG future branch plan:
 
-Issues and bounded branches: Stage 9 console implementation and workflow tests were developed on `feature/stage09-console`, based on `stage09/integration`. Query implementation was completed separately on Merlin's branch, while practitioner listing service integration remains assigned to Rachel.
-PR/diff and another-member human reviewer: Pending. The console branch has not yet been pushed or submitted as a pull request. The PR link and actual reviewer will be recorded after review.
-Review responses and Copilot comparison: <!-- links -->
-Integrated common Stage 9 SHA: <!-- complete -->
-Full regression command, working directory, actual count/result and evidence: <!-- complete -->
-README run instructions and scope/limitations: <!-- link -->
-Unresolved issues and support/action: <!-- complete -->
-UG common candidate / PG future branch plan: <!-- complete -->
-
-- [ ] Query contracts, purity, new lists and named-key ordering verified.
-- [ ] Service empty/unknown/invalid cases and cancellation history verified.
+- [x] Query contracts, purity, new lists and named-key ordering verified.
+- [x] Service empty/unknown/invalid cases and cancellation history verified.
 - [ ] Every console command and invalid-input recovery demonstrated.
-- [ ] Query and workflow tests plus all previous tests pass; actual evidence linked.
+- [x] Query and workflow tests plus all previous tests pass; actual evidence linked.
 - [ ] Human design, Copilot critique, review and integration recorded honestly.
 - [ ] Reflections and ten formative responses completed.
-- [ ] README updated; earlier code/tests/records preserved.
+- [x] README updated; earlier code/tests/records preserved.
 - [ ] Common SHA protected for UG Stage 12; PG Stage 10/11 work deferred until approved.
 
 No persistence, rescheduling or assurance implementation is part of Stage 9. UG: 6→7→8→9→12. PG: 6→7→8→9→10→11→12. Mixed groups keep one repository and protect the common candidate.

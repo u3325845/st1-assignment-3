@@ -108,3 +108,28 @@ def test_invalid_menu_choice_recovers(capsys):
     assert "Patient registered: P1 - Alex" in output
     assert "Patient found: P1 - Alex" in output
     assert "Goodbye!" in output
+
+
+def test_practitioner_listing_includes_cancelled_appointments(capsys):
+    """Cancelled appointments remain listable and status filters work."""
+    inputs = [
+        "1", "P1", "Alex",
+        "3", "DR1", "Taylor", "General Practice",
+        "5", "A1", "P1", "DR1", "2026-11-20 09:00",
+        "6", "A1",
+        "8", "DR1", "",
+        "8", "DR1", "scheduled",
+        "8", "DR1", "cancelled",
+        "0",
+    ]
+
+    with patch("builtins.input", side_effect=inputs):
+        run_menu()
+
+    output = capsys.readouterr().out
+    expected = "A1: P1 with DR1, 2026-11-20 09:00, cancelled"
+
+    assert f"Appointment cancelled: {expected}" in output
+    assert output.count(expected) == 3
+    assert "No matching appointments found." in output
+    assert "Goodbye!" in output
