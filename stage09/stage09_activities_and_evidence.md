@@ -123,6 +123,18 @@ The console catches expected errors, displays a clear message and allows the use
 | QRY-02 / TEST-QRY-11    | `smartcare/queries.py`, `tests/test_queries.py` | Every enum status filters correctly; default includes all statuses. | PASS | [Query tests](../project/tests/test_queries.py) |
 | FP-03 / TEST-QRY-12     | `smartcare/queries.py`, `tests/test_queries.py` | Already-sorted input returns a fresh list containing the same appointment objects. | PASS | [Query tests](../project/tests/test_queries.py) |
 | Regression verification | `project/tests/` (full test suite) | `python -m pytest -q` | 125 passed in 0.22s | Local pytest output |
+| QRY-04 / TEST-SVC-01 | `smartcare/services.py`, `tests/test_services.py` | Registered practitioner returns their stored appointment. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-02 | `smartcare/services.py`, `tests/test_services.py` | Registered practitioner with no appointments returns an empty list. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-03 | `smartcare/services.py`, `tests/test_services.py` | Unknown practitioner raises `LookupError` without changing stored appointments. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-04 | `smartcare/services.py`, `tests/test_services.py` | Blank practitioner ID raises `ValueError`. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-05 | `smartcare/services.py`, `tests/test_services.py` | Invalid practitioner ID (`None`) raises `ValueError`. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-06 | `smartcare/services.py`, `tests/test_services.py` | Invalid appointment status raises `ValueError` without changing appointment status. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-02 / TEST-SVC-07 | `smartcare/services.py`, `tests/test_services.py` | CANCELLED filter returns only cancelled appointments. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-02 / TEST-SVC-08 | `smartcare/services.py`, `tests/test_services.py` | Default listing includes scheduled and cancelled appointments, preserving history. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-09 | `smartcare/services.py`, `tests/test_services.py` | Listing appointments for D1 excludes appointments belonging to D2. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-02 / TEST-SVC-10 | `smartcare/services.py`, `tests/test_services.py` | SCHEDULED filter returns only scheduled appointments and excludes cancelled appointments. | PASS | [Service tests](../project/tests/test_services.py) |
+| Final service regression verification | `project/tests/` | `python -m pytest -q` | 135 passed | Local pytest output |
+
 Include practitioner isolation, every enum status/default all, equal-time ID tie-break, named-key reuse, repeated calls, empty/already-sorted fresh lists, unchanged source order/fields, known-empty/unknown/invalid service cases and retained history.
 
 Purity explanation from code inspection, including absence of hidden state and I/O: 
@@ -159,9 +171,17 @@ Responsibility check: explain how domain invariants, shared-store collections, s
 
 ## F. Required reflections
 
-1. Which integration concern was architectural rather than a filtering/sorting detail? <!-- response -->
-2. Which Copilot suggestion did you reject as over-engineering, and why? <!-- response -->
-3. How did you prove cancelled appointments remain retrievable and listable in the same session? <!-- response -->
+1. Which integration concern was architectural rather than a filtering/sorting detail?
+
+The main concern was keeping responsibilities separate. The service validates the practitioner and status, the data store manages the stored appointments, and the query functions handle filtering and sorting. This keeps the code easier to understand and test.
+
+2. Which Copilot suggestion did you reject as over-engineering, and why?
+
+I did not reject any Copilot suggestion as over-engineering during this review. Copilot suggested adding tests for practitioner isolation and SCHEDULED status filtering. Both were useful, so I accepted them and added two tests. The full test suite passed with 135 tests.
+
+3. How did you prove cancelled appointments remain retrievable and listable in the same session?
+
+I cancelled an appointment and then listed the practitioner's appointments in the same session. The cancelled appointment still appeared in the full list, could be found by its appointment ID, and was returned when filtering by CANCELLED. The tests passed.
 
 ## G. Ten formative answers
 
