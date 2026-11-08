@@ -123,6 +123,18 @@ The console catches expected errors, displays a clear message and allows the use
 | QRY-02 / TEST-QRY-11    | `smartcare/queries.py`, `tests/test_queries.py` | Every enum status filters correctly; default includes all statuses. | PASS | [Query tests](../project/tests/test_queries.py) |
 | FP-03 / TEST-QRY-12     | `smartcare/queries.py`, `tests/test_queries.py` | Already-sorted input returns a fresh list containing the same appointment objects. | PASS | [Query tests](../project/tests/test_queries.py) |
 | Regression verification | `project/tests/` (full test suite) | `python -m pytest -q` | 125 passed in 0.22s | Local pytest output |
+| QRY-04 / TEST-SVC-01 | `smartcare/services.py`, `tests/test_services.py` | Registered practitioner returns their stored appointment. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-02 | `smartcare/services.py`, `tests/test_services.py` | Registered practitioner with no appointments returns an empty list. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-03 | `smartcare/services.py`, `tests/test_services.py` | Unknown practitioner raises `LookupError` without changing stored appointments. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-04 | `smartcare/services.py`, `tests/test_services.py` | Blank practitioner ID raises `ValueError`. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-05 | `smartcare/services.py`, `tests/test_services.py` | Invalid practitioner ID (`None`) raises `ValueError`. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-06 | `smartcare/services.py`, `tests/test_services.py` | Invalid appointment status raises `ValueError` without changing appointment status. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-02 / TEST-SVC-07 | `smartcare/services.py`, `tests/test_services.py` | CANCELLED filter returns only cancelled appointments. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-02 / TEST-SVC-08 | `smartcare/services.py`, `tests/test_services.py` | Default listing includes scheduled and cancelled appointments, preserving history. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-04 / TEST-SVC-09 | `smartcare/services.py`, `tests/test_services.py` | Listing appointments for D1 excludes appointments belonging to D2. | PASS | [Service tests](../project/tests/test_services.py) |
+| QRY-02 / TEST-SVC-10 | `smartcare/services.py`, `tests/test_services.py` | SCHEDULED filter returns only scheduled appointments and excludes cancelled appointments. | PASS | [Service tests](../project/tests/test_services.py) |
+| Final service regression verification | `project/tests/` | `python -m pytest -q` | 135 passed | Local pytest output |
+
 Include practitioner isolation, every enum status/default all, equal-time ID tie-break, named-key reuse, repeated calls, empty/already-sorted fresh lists, unchanged source order/fields, known-empty/unknown/invalid service cases and retained history.
 
 Purity explanation from code inspection, including absence of hidden state and I/O: 
@@ -171,16 +183,15 @@ The domain classes enforce appointment rules and status changes. The shared data
 
 1. Which integration concern was architectural rather than a filtering/sorting detail?
 
+The main architectural concern was maintaining one shared data store and keeping responsibilities separate. The console reuses the store across menu operations, services coordinate and validate actions, and pure query functions handle filtering and sorting without changing stored data.
 
-The main architectural concern was maintaining one shared data store across all console operations. Creating separate stores would prevent registered patients, practitioners and appointments from being available in later menu actions. Filtering and sorting were handled separately by the pure query functions.
+2. Which Copilot suggestion did you reject as over-engineering, and why?
 
-2. Which Copilot suggestion did you reject as over-engineering, and why? 
+For the console review, I rejected additional menu framework classes and persistent storage because Stage 9 only requires session-based interaction. For the service review, Rachel accepted the suggested practitioner isolation and SCHEDULED filtering tests because they directly verified the requirements.
 
-I rejected additional menu framework classes and persistent storage because Stage 9 only requires a simple interactive console with session-only data. The existing services and one shared data store were sufficient, so adding these features would increase complexity without meeting any additional requirement.
+3. How did you prove cancelled appointments remain retrievable and listable in the same session?
 
-3. How did you prove cancelled appointments remain retrievable and listable in the same session? 
-
-I booked appointment A1, cancelled it and retrieved it again in the same console session. The appointment remained stored with CANCELLED status instead of being deleted. The automated cancellation workflow test also passed. All-status listing and exclusion from SCHEDULED results still need verification after the listing service is integrated.
+The console workflow booked, cancelled and retrieved appointment A1, confirming that its CANCELLED status was retained. Rachel's service tests verified that cancelled appointments remained available in the full practitioner list and when filtering by CANCELLED. End-to-end console listing verification is still pending.
 
 
 ## G. Ten formative answers
