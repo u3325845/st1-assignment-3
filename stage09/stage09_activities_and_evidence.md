@@ -108,14 +108,32 @@ The console catches expected errors, displays a clear message and allows the use
 
 ## C. Implementation and query verification
 
-| Requirement / test ID | Code location | Case and meaningful assertion | Actual result | Evidence link |
-|---|---|---|---|---|
-| | | | | |
-
+| Requirement / test ID   | Code location                                   | Case and meaningful assertion | Actual result | Evidence link |
+|-------------------------|-------------------------------------------------|---|---|--|
+| QRY-03 / TEST-QRY-01    | `smartcare/queries.py`, `tests/test_queries.py` | Sorting key returns `(date_time, appointment_id)`. | PASS | [Query tests](../project/tests/test_queries.py) |
+| QRY-01 / TEST-QRY-02    | `smartcare/queries.py`, `tests/test_queries.py` | Returns only appointments for the requested practitioner. | PASS | [Query tests](../project/tests/test_queries.py) |
+| QRY-02 / TEST-QRY-03    | `smartcare/queries.py`, `tests/test_queries.py` | CANCELLED filter excludes SCHEDULED appointments. | PASS | [Query tests](../project/tests/test_queries.py) |
+| QRY-03 / TEST-QRY-04    | `smartcare/queries.py`, `tests/test_queries.py` | Sorts appointments in chronological order. | PASS | [Query tests](../project/tests/test_queries.py) |
+| QRY-03 / TEST-QRY-05    | `smartcare/queries.py`, `tests/test_queries.py` | Equal-time appointments are ordered by appointment ID. | PASS | [Query tests](../project/tests/test_queries.py) |
+| FP-01 / TEST-QRY-06     | `smartcare/queries.py`, `tests/test_queries.py` | Original list order remains unchanged; returned list is new and contains the original objects. | PASS | [Query tests](../project/tests/test_queries.py) |
+| QRY-01 / TEST-QRY-07    | `smartcare/queries.py`, `tests/test_queries.py` | Returns an empty list when no practitioner appointments match. | PASS | [Query tests](../project/tests/test_queries.py) |
+| QRY-02 / TEST-QRY-08    | `smartcare/queries.py`, `tests/test_queries.py` | Default status filter includes scheduled and cancelled appointments. | PASS | [Query tests](../project/tests/test_queries.py) |
+| FP-03 / TEST-QRY-09     | `smartcare/queries.py`, `tests/test_queries.py` | Empty input produces a separate empty list. | PASS | [Query tests](../project/tests/test_queries.py) |
+| FP-02 / TEST-QRY-10     | `smartcare/queries.py`, `tests/test_queries.py` | Repeated calls return consistent results and separate lists. | PASS | [Query tests](../project/tests/test_queries.py)|
+| QRY-02 / TEST-QRY-11    | `smartcare/queries.py`, `tests/test_queries.py` | Every enum status filters correctly; default includes all statuses. | PASS | [Query tests](../project/tests/test_queries.py) |
+| FP-03 / TEST-QRY-12     | `smartcare/queries.py`, `tests/test_queries.py` | Already-sorted input returns a fresh list containing the same appointment objects. | PASS | [Query tests](../project/tests/test_queries.py) |
+| Regression verification | `project/tests/` (full test suite) | `python -m pytest -q` | 125 passed in 0.22s | Local pytest output |
 Include practitioner isolation, every enum status/default all, equal-time ID tie-break, named-key reuse, repeated calls, empty/already-sorted fresh lists, unchanged source order/fields, known-empty/unknown/invalid service cases and retained history.
 
-Purity explanation from code inspection, including absence of hidden state and I/O: <!-- response -->
-What the tests do and do not establish: <!-- response -->
+Purity explanation from code inspection, including absence of hidden state and I/O: 
+
+The two functions in `smartcare/queries.py` are pure collection-processing functions. `appointment_sort_key()` returns the appointment date/time and appointment ID as a tuple. `select_appointments()` filters appointments using a list comprehension and returns a new list using `sorted()` with the named sorting key. Neither function changes the original list or appointment objects. Code inspection shows no global mutable state, data-store access, printing, user input, file operations, or other I/O. The results depend on the supplied appointments and parameters.
+
+What the tests do and do not establish: 
+
+The 12 query tests verify practitioner isolation, filtering by all three appointment statuses, default inclusion of all statuses, chronological sorting, appointment ID tie-breaking, empty results, repeated calls, and returning fresh lists without changing the original list order. Code inspection also confirms that `select_appointments()` reuses the named sorting key.
+
+The full regression suite passed with 125 tests. However, the tests do not prove that every possible input is handled correctly or independently verify that every appointment field remains unchanged. Service-level validation for known-empty, unknown, and invalid practitioner IDs must be verified separately. Retained cancellation history also needs service or integration evidence.
 
 ## D. Integrated console and workflow evidence
 

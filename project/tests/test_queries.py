@@ -6,7 +6,7 @@ from datetime import datetime
 from smartcare.domain import Appointment, Patient, Practitioner, AppointmentStatus
 from smartcare.queries import appointment_sort_key, select_appointments
 
-# T9-QRY-01: Verify the sorting key returns date/time and appointment ID.
+# TEST-QRY-01: Verify the sorting key returns date/time and appointment ID.
 def test_appointment_sort_key():
     patient = Patient("P1", "Alex")
     practitioner = Practitioner("DR1", "Taylor", "General")
@@ -178,3 +178,73 @@ def test_select_appointments_with_empty_input():
 
     assert result == []
     assert result is not appointments
+
+
+# TEST-QRY-10: Repeated calls return consistent results.
+def test_select_appointments_repeated_calls():
+    patient = Patient("P1", "Alex")
+    practitioner = Practitioner("D1", "Taylor", "General")
+
+    appointment = Appointment(
+        "A1", patient, practitioner, datetime(2026, 11, 10, 9, 30)
+    )
+
+    appointments = [appointment]
+
+    result1 = select_appointments(appointments, "D1")
+    result2 = select_appointments(appointments, "D1")
+
+    assert result1 == result2
+    assert result1 is not result2
+    assert result1 is not appointments
+
+
+
+# TEST-QRY-11: Verify filtering for every appointment status.
+def test_select_appointments_all_enum_statuses():
+    patient = Patient("P1", "Alex")
+    practitioner = Practitioner("D1", "Taylor", "General")
+
+    appointments = [
+        Appointment(
+            "A1", patient, practitioner,
+            datetime(2026, 11, 10, 9, 30),
+            status=status
+        )
+        for status in AppointmentStatus
+    ]
+
+    for status, appointment in zip(AppointmentStatus, appointments):
+        result = select_appointments(appointments, "D1", status)
+        assert result == [appointment]
+
+    assert select_appointments(appointments, "D1") == appointments
+
+
+
+# TEST-QRY-12: Preserve appointment fields and return a fresh sorted list.
+def test_select_appointments_preserves_appointment_data():
+    patient = Patient("P1", "Alex")
+    practitioner = Practitioner("D1", "Taylor", "General")
+
+    appointment1 = Appointment(
+        "A1", patient, practitioner, datetime(2026, 11, 10, 9, 30)
+    )
+    appointment2 = Appointment(
+        "A2", patient, practitioner, datetime(2026, 11, 10, 10, 30)
+    )
+
+    original = [appointment1, appointment2]
+
+    result = select_appointments(original, "D1")
+
+    assert result == original
+    assert result is not original
+
+    for before, after in zip(original, result):
+        assert after is before
+        assert after.appointment_id == before.appointment_id
+        assert after.patient is before.patient
+        assert after.practitioner is before.practitioner
+        assert after.date_time == before.date_time
+        assert after.status is before.status
