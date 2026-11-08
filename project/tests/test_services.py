@@ -201,3 +201,36 @@ def test_list_practitioner_appointments_includes_all_statuses():
 
 
 
+def test_list_practitioner_appointments_only_own_practitioner():
+    service, first = make_booked_appointment()
+
+    practitioners = PractitionerService(service.data_store)
+    practitioners.register_practitioner("D2", "Alex", "General")
+
+    second = service.book_appointment(
+        "A2", "P1", "D2", datetime(2026, 10, 1, 10, 0)
+    )
+
+    result = service.list_practitioner_appointments("D1")
+
+    assert result == [first]
+    assert second not in result
+
+
+
+def test_list_practitioner_appointments_filters_scheduled():
+    service, first = make_booked_appointment()
+
+    second = service.book_appointment(
+        "A2", "P1", "D1", datetime(2026, 10, 1, 10, 0)
+    )
+
+    service.cancel_appointment("A1")
+
+    result = service.list_practitioner_appointments(
+        "D1", AppointmentStatus.SCHEDULED
+    )
+
+    assert result == [second]
+    assert first not in result
+    assert first.status == AppointmentStatus.CANCELLED
