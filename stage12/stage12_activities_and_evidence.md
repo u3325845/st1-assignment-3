@@ -181,13 +181,17 @@ All members contribute to shared Stage 12 Sections K and N. Final Stage 12 contr
 
 ## J Human release decision
 
-Decision — READY FOR COURSE RELEASE / READY WITH DOCUMENTED LIMITATIONS / NOT YET READY: [response]
-Approver / date / rationale and evidence: [response]
-What risks remain / conditions / owners: [response]
-Can the team explain the system: [response]
-Can a change be recovered: [response]
-Common decision / PG decision where different: [response]
+Decision — READY FOR COURSE RELEASE / READY WITH DOCUMENTED LIMITATIONS / NOT YET READY: NOT YET READY. The undergraduate SmartCare application has passed the available regression checks and console demonstrations, but final release approval is pending completion of the team's Stage 12 verification, review, documentation and submission checks.
 
+Approver / date / rationale and evidence: Final approver and approval date are pending team confirmation. On 9 November 2026, the integrated undergraduate application passed 157 automated tests. Additional verification on the Stage 12 evidence branch also passed all 157 tests in 0.43 seconds. Section D records successful manual demonstrations of registration, lookup, booking, conflict prevention, cancellation, retained history, filtering, input validation and normal exit. These results support release readiness but do not constitute final team approval.
+
+What risks remain / conditions / owners: Rachel must complete the final regression, code-quality, responsible-AI and defect review evidence in Sections C, E and H. Novera must confirm README reproducibility, release notes, limitations and submission checks in Sections F, G and L. Merlin must confirm the final integration and review evidence in Sections A, B and I. The team must complete shared Sections K and N, identify the final tested release SHA, verify the submission package and confirm that no release-blocking defects remain. Session-only storage is an accepted undergraduate scope limitation.
+
+Can the team explain the system: The available development records, tests and Section D demonstration provide evidence that the system's requirements, architecture and workflows can be explained. The application separates domain objects, the in-memory data store, services, pure queries and console interaction. Individual team understanding must still be confirmed through the final demonstration or viva.
+
+Can a change be recovered: Yes, Git history and the verified Stage 9 integration baseline at commit c871297 provide a known-good recovery reference. Changes can be compared against that baseline and corrected through reviewed commits, followed by focused and full regression testing. The final tested release SHA and recovery reference must be updated after Stage 12 integration.
+
+Common decision / PG decision where different: Common undergraduate release — NOT YET READY, pending the final checks and team approval listed above. PG-only rescheduling and assurance requirements are not applicable because all four group members follow the undergraduate pathway.
 
 ## K Final tested release SHA
 
