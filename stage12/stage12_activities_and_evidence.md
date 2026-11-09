@@ -76,9 +76,9 @@ Remaining failure / limitation: No failing tests were reported in the current re
 | PG conflict/invalid status/failure non-mutation | Not demonstrated | PG-only requirement | Not verified in this common-scope demonstration; applicability to be confirmed | Pending scope confirmation |
 | PG old slot / current lookup/list ordering / assurance risks | Not demonstrated | PG-only requirement | Not verified in this common-scope demonstration; applicability to be confirmed | Pending scope confirmation |
 
-Stable demo owner / fresh process / command: To be confirmed by the team. From the `project` directory, run `python main.py --interactive`. Both manual demonstrations used a fresh process and synthetic data. The second session also confirmed that cancelling A001 freed the 10:00 slot for A004 while retaining the cancelled record.
+Stable demo owner / fresh process / command: Tarnima completed two manual console demonstrations using fresh processes and synthetic data. The application was launched from the project/ directory using python main.py --interactive. The demonstrations covered patient registration, lookup, appointment booking, conflict prevention, cancellation, retained history, filtering, invalid-input recovery and normal exit.
 
-PG demonstrations through service/tests or not applicable: To be confirmed based on the group's UG/PG applicability and final integrated candidate.
+PG demonstrations through service/tests or not applicable: Not applicable. All four group members follow the undergraduate pathway, so PG-only requirements are excluded from this release.
 
 
 ## E Final code quality and AI review
