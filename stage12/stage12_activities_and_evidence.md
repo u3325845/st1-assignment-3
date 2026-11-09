@@ -102,38 +102,48 @@ Available AI evidence and missing evidence honestly disclosed: [response]
 
 ## F README and reproducibility check
 
-| README item | Location | Verifier | Result/gap |
-|---|---|---|---|
-| Purpose and included common/PG scope | [response] | [response] | [response] |
-| Out-of-scope capabilities and known limitations | [response] | [response] | [response] |
-| Confirmed teaching Python version and dependency installation | [response] | [response] | [response] |
-| Working directory / demo / interactive / test commands | [response] | [response] | [response] |
-| Repository structure and architecture responsibilities | [response] | [response] | [response] |
-| Responsible AI summary / synthetic-data rule | [response] | [response] | [response] |
-| Release label/version and SHA links | [response] | [response] | [response] |
-Root README index and project/README verified: [response]
-Fresh clone or extracted ZIP / candidate identity: [response]
-Verifier and clean environment / actual version: [response]
-Setup/run/test commands and observed results: [response]
-Missing local file or setup gap / remedy and recheck: [response]
+| README item | Location | Verifier                                                           | Result/gap |
+|---|---|--------------------------------------------------------------------|--|
+| Purpose and included common/PG scope | `project/README.md` introduction and Features | Novera(author)                                                     | Present. Undergraduate common scope only; PG scope not applicable. |
+| Out-of-scope capabilities and known limitations | `project/README.md` Limitations | Novera(author)                                                     | Present: session-only data, no rescheduling, past-date, duration or patient-conflict rules. |
+| Confirmed teaching Python version and dependency installation | `project/README.md` Setup | Merlin3313611 (fresh clone, Python 3.14.3); Novera (Python 3.14.7) | PASS: pytest 8.3.5 installed from `requirements-dev.txt`. Gap: PowerShell blocked `Activate.ps1`; workaround added to Setup. |
+| Working directory / demo / interactive / test commands | `project/README.md` Running the program and Running the tests | Merlin3313611                                                      | PASS: `python main.py` demo ran, `python main.py --interactive` menu opened and exited, `python -m pytest -q` gave 157 passed in 0.39s. The three focused test commands were not run by Merlin. |
+| Repository structure and architecture responsibilities | `project/README.md` How the code is organised | Novera(author)                                                     | Present; the five listed modules exist in `project/smartcare/`. |
+| Responsible AI summary / synthetic-data rule | `project/README.md` Responsible AI use and Limitations | Novera(author)                                                     | Gap found by this check- no AI summary in the README. Added in this PR. |
+| Release label/version and SHA links | `project/README.md` Release; root `README.md`  | Novera(author)                                                     | Gap found: no release section. Added; it points to the root README and Section K for the final SHA. |
+Root README index and project/README verified: project/README.md commands were reproduced by Merlin on a fresh clone. The root README was updated by Merlin (PR #48); its final submitted SHA field is still open, and its "verified baseline is Python 3.13" statement differs from the Python 3.14.3 and 3.14.7 actually used. Merlin is asked to correct it before release.
+Fresh clone or extracted ZIP / candidate identity: Fresh GitHub clone of main at 2a6cc811cc82f511f5bfbb60bba45d9015aeb297 on 9 November 2026. ZIP verification is still to be done (Section L).
+Verifier and clean environment / actual version: Merlin (Merlin3313611), new folder outside the development repository, new virtual environment, Windows PowerShell, Python 3.14.3, pytest 8.3.5. Novera(author) also ran the suite on Python 3.14.7.   Full report: [Merlin's fresh-clone verification report](https://github.com/u3325845/st1-assignment-3/issues/51).
+Setup/run/test commands and observed results: git clone, python -m venv .venv, pip install -r requirements-dev.txt, python main.py (printed A1: P1 with DR1, 2026-10-01 09:00, scheduled and the session-only notice), python main.py --interactive (menu displayed, exit 0 printed the goodbye message), python -m pytest -q (157 passed in 0.39s). Merlin also checked patient registration, case-sensitive lookup and invalid menu recovery manually.
+Missing local file or setup gap / remedy and recheck:  Gap: PowerShell execution policy blocked Activate.ps1 on Merlin's machine. Remedy: added a README note to run the environment's Python directly. Recheck: Novera ran `..\.venv\Scripts\python.exe -m pytest -q` from project/ on 9 November 2026: 157 passed in 0.24s. A second recheck of the updated README by another member is done by Merlin.
 
 
 ## G Known limitations debt and release notes
 
-Delivered features: [response]
-Important fixes: [response]
-Architecture/quality improvements: [response]
-Known limitations: [response]
-AI-assisted development note: [response]
+Delivered features: Register and find patients and practitioners; book appointments with a practitioner conflict rule; cancel SCHEDULED appointments with cancelled history kept; find appointments by ID; list a practitioner's appointments with optional status filter and deterministic order; interactive console menu with error recovery.
 
-| Debt item | Impact | Priority | Future action | Accepted? / release rationale |
-|---|---|---|---|---|
-| [response] | [response] | [response] | [response] | [response] |
-Session-only synthetic data and minute-precision local time: [response]
-Production auth/roles, portal, notifications, billing/insurance, clinical AI exclusions: [response]
-Scale/concurrency, timezone policy, operations/monitoring, accessibility/usability limitations: [response]
-Difference between accepted scope limit and unresolved required behaviour: [response]
-PG assurance residual risks / owner / status or not applicable: [response]
+Important fixes: Stage 8 F8-01 (practitioner double-booking conflict) and F8-02 (appointment lookup skipped cancelled appointments; fixed so retained history can be found).
+
+Architecture/quality improvements: Pure query functions separated from services; services coordinate the store and domain; the console handles only input and output; console validation tests added for invalid-input recovery.
+
+Known limitations: Data is session-only and lost on exit. No rescheduling, past-date rule, appointment duration or patient-conflict rule.
+
+AI-assisted development note: GitHub Copilot was used for design review and diagnosis.All AI output was reviewed, run and checked by the members and decisions are recorded in the stage records.
+
+| Debt item | Impact | Priority | Future action   | Accepted? / release rationale       |
+|-|--|----------|-----------------|-------------------------------------|
+| Session-only data| Records are lost on exit | Medium   | Add persistence | Yes. FR-10 retired and out of scope |
+| No rescheduling | Users must cancel and rebook | Low | Add a reschedule service | Yes, rescheduling is PG scope |
+| Stale `Stage 6 TODO` docstrings in `services.py` and outdated `main.py` docstring | Confusing to readers, no behaviour effect | Low | Clean up comments in a reviewed PR | Yes, cosmetic |
+Session-only synthetic data and minute-precision local time: All data is synthetic and held in memory only; it is lost when the program exits. Appointment times use local time with minute precision and no timezone handling.
+
+Production auth/roles, portal, notifications, billing/insurance, clinical AI exclusions: Not implemented and out of scope. SmartCare has no login or roles, patient portal, notifications, billing or insurance, and no clinical decision or AI features.
+
+Scale/concurrency, timezone policy, operations/monitoring, accessibility/usability limitations: Designed for a single user and a single session; no concurrency handling, timezone policy or monitoring. The console menu is text-only and has no accessibility features beyond plain text.
+
+Difference between accepted scope limit and unresolved required behaviour: The limits above are accepted scope decisions under requirements revision 2 (FR-10 retired). No required behaviour (FR-01 to FR-09, QRY, FP, UI-01 and UI-02) is known to be unresolved.
+
+PG assurance residual risks / owner / status or not applicable: Not applicable (all members are undergraduates).
 
 
 ## H Release findings and corrective action

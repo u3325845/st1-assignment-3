@@ -17,6 +17,7 @@ python -m pip install -r requirements-dev.txt
 
 On macOS or Linux, activate with `source .venv/bin/activate` instead.
 
+If PowerShell blocks activation ("running scripts is disabled on this system"), no need to activate the environment. From `project/`, run its Python directly: `..\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt`, then `..\.venv\Scripts\python.exe -m pytest -q`.
 ## Running the program
 
 Run all commands from the `project/` directory.
@@ -90,3 +91,11 @@ python -m pytest tests/test_queries.py -q                 # query tests
 - Data is stored in memory only and is lost when the program exits. There is no database and no file persistence.
 - There is no rescheduling, no past-date rule, no appointment duration and no patient-conflict rule.
 - Use synthetic patient and practitioner information only.
+
+## Responsible AI use
+
+GitHub Copilot was used as assistant during development, for design review, diagnosis, drafting and explanation. All AI output was reviewed, run and approved by group members and significant decisions (accepted, modified or rejected) are recorded in the stage records under `stage06/` to `stage12/`. Only synthetic data is used.
+
+## Release
+
+SmartCare Stage 12 final release candidate (undergraduate scope). The final tested and submitted commit SHA is recorded in the root `README.md` and in Section K of `stage12/stage12_activities_and_evidence.md`.
