@@ -205,16 +205,36 @@ The console workflow booked appointment A1, cancelled it and retrieved it again,
 
 ## G. Ten formative answers
 
-1. What makes select_appointments pure, and what side effect breaks purity? <!-- response -->
-2. Which explicit inputs are needed, and why avoid a global store? <!-- response -->
-3. How can a new list reuse Appointment objects safely? <!-- response -->
-4. Why use a named key, and what breaks equal-time ties? <!-- response -->
-5. How do default and explicit status filters differ? <!-- response -->
-6. How do empty, unknown practitioner and invalid filter cases differ? <!-- response -->
-7. Which console errors recover, and how is unchanged state checked? <!-- response -->
-8. What is data integrity for registered participants, conflicts and history? <!-- response -->
-9. What is Copilot's review role, and who verifies findings? <!-- response -->
-10. How do pure functions and OOP responsibilities work together? <!-- response -->
+1. What makes select_appointments pure, and what side effect breaks purity?
+
+It is pure because it only uses the appointments list, practitioner ID and status it is given and returns a new filtered and sorted list without changing anything. It would stop being pure if it sorted the original list in place, changed an appointment's status or printed to the screen.
+2. Which explicit inputs are needed, and why avoid a global store?
+
+It needs the appointments list, practitioner ID and optional status as inputs. A global store is avoided because it hides what the function depends on, makes results change when other code edits the store and makes it hard to test with a small list.
+3. How can a new list reuse Appointment objects safely?
+
+A new list can hold the same Appointment objects as long as the function only reads them. Filtering and sorting change only the new list, so the store’s list and the objects stay unchanged.
+4. Why use a named key, and what breaks equal-time ties? 
+
+The named key offers one ordering rule that can be used over again. The rule of sorting just based on date/time will not help in breaking the ties because when two dates/times are same, the records will keep their previous insertion order.
+5. How do default and explicit status filters differ? 
+
+Default status does not have any status filters so all the appointments scheduled for the practitioner, including the cancelled ones are listed. An explicit status returns only appointments with that status.
+6. How do empty, unknown practitioner and invalid filter cases differ? 
+
+Empty is a normal result as a known practitioner with no matches returns an empty list. An unknown practitioner raises LookupError because the ID is valid but not registered. An invalid ID or status raises ValueError because the input itself is wrong.
+7. Which console errors recover, and how is unchanged state checked?
+
+Blank, duplicate and unknown IDs, malformed dates, double booking, repeated cancellation and invalid status filters all print an Error message and return to the menu. I checked that nothing changed by doing a lookup or listing afterwards, such as finding the original patient or showing that a rejected appointment was not stored.
+8. What is data integrity for registered participants, conflicts and history?
+
+Booking should use only registered patients and practitioners, IDs are unique, a practitioner does not have any conflicting appointment schedules, and cancelled appointments remain in history. Any rejected transaction must never alter stored information.
+9. What is Copilot's review role, and who verifies findings? 
+
+Copilot gives suggestions and analytical review but it can be wrong. The team members verify each finding against the code and tests and then record whether it was accepted, modified or rejected.
+10. How do pure functions and OOP responsibilities work together? 
+
+OOP class contains data and rules, whereas pure function operates on collections without altering any data. The service retrieves appointments from the store and passes them to the pure query, and the console module just deals with inputs and outputs.
 
 ## H. Review, completion and common handover
 
