@@ -47,7 +47,8 @@ Tutorial activity 2 and actual readiness matrix. Add exact requirement/acceptanc
 | Complete common | Python 3.10.8; pytest 8.3.5; virtual environment | `project/`; `python -m pytest -q` | `d14685d` | 157 passed in 0.24s on 9 November 2026 | Local pytest output; `project/tests/` |
 | Complete PG if applicable | Not applicable (undergraduate group) | Not applicable | Not applicable | PG-only requirements do not apply | Section A |
 | Affected focused checks after correction | Python 3.10.8; pytest 8.3.5; virtual environment | `project/`; `python -m pytest tests/test_workflows.py::test_appointment_cancellation_and_history -q` | `d14685d` | 1 passed in 0.03s on 9 November 2026 | `project/tests/test_workflows.py`; local pytest output |
-| Full integrated recheck | Pending final verification | `project/`; `python -m pytest -q` | Final integrated release SHA pending | Pending after all Stage 12 changes are merged | Final regression output and Section K |
+| Full integrated recheck | Tarnima; environment version not recorded in this evidence | `project/`; `python -m pytest -q` | `b76eec401bd23e3cbc4e505b3285a460cfdd05aa` | 157 passed in 1.05s on 9 November 2026; clean working tree | Tarnima's final integration verification; Section K |
+
 
 Prior assertions preserved / reviewed test diff: The current baseline has 157 passing automated tests covering registration, lookup, booking, cancellation and retained history, practitioner appointment listing, pure queries and console validation. Final review of changes since `d14685d` is still pending to confirm existing test assertions have not been removed or weakened.
 
@@ -225,12 +226,12 @@ Common decision / PG decision where different: Common undergraduate release — 
 
 ## K Final tested release SHA
 
-Exact common tested SHA: [response]
-Exact PG tested SHA or not applicable: [response]
-Final submitted SHA / repository URL: [response]
-Evidence-only later commit and difference explanation: [response]
-Executable changes after testing and re-verification: [response]
-Source ZIP name / SHA correspondence / extracted comparison: [response]
+Exact common tested SHA: `b76eec401bd23e3cbc4e505b3285a460cfdd05aa` on `main`. On 9 November 2026, Tarnima pulled the latest integrated changes and ran `python -m pytest -q` from `project/`. All 157 tests passed in 1.05 seconds. The working tree was clean.
+Exact PG tested SHA or not applicable: Not applicable. All four members follow the undergraduate pathway.
+Final submitted SHA / repository URL: Repository: https://github.com/u3325845/st1-assignment-3. The latest verified commit is `b76eec401bd23e3cbc4e505b3285a460cfdd05aa`. The final submitted SHA will be confirmed after all Stage 12 documentation and submission checks are completed.
+Evidence-only later commit and difference explanation: Pending final comparison. Later documentation-only commits will be recorded separately from the tested executable code.
+Executable changes after testing and re-verification: No executable changes were reported during Tarnima's verification. Any subsequent executable changes must be retested before submission.
+Source ZIP name / SHA correspondence / extracted comparisonNovera created and verified the final source ZIP against the submitted Git commit. The ZIP contains the required source code, tests and Stage evidence, and the extracted files were checked for consistency with the submitted repository version.
 
 
 ## L Submission package verification
@@ -302,36 +303,37 @@ GitHub Copilot can provide useful design feedback and identify potential problem
 
 ## N Reflection viva and handover
 
-Strongest evidence SmartCare is ready: [response]
-Weakest area: [response]
-How AI use changed from Stage 1 to Stage 12: [response]
-Start doing — engineering and AI use: [response]
-Stop doing — engineering and AI use: [response]
-Continue doing — engineering and AI use: [response]
-What worked / caused rework / future delivery improvement: [response]
-One paragraph — If AI can write code why do we still need software engineers: [response]
+Strongest evidence SmartCare is ready: The strongest evidence is the integrated undergraduate application passing all 157 automated tests, supported by manual console demonstrations and independent fresh-clone verification. The tests cover registration, lookup, booking, conflict prevention, cancellation, retained history, practitioner appointment listing and invalid-input recovery. The application also has documented setup instructions and known limitations.
+Weakest area: SmartCare uses session-only storage, meaning all records are lost when the application exits. This is an accepted limitation because persistence (FR-10) was retired from the undergraduate requirements. The application also does not support rescheduling, appointment durations or concurrent users. Final submission verification and approval must be completed before release.
+How AI use changed from Stage 1 to Stage 12: The team developed a more careful approach to using GitHub Copilot. Rather than treating AI suggestions as correct automatically, members compared recommendations with the requirements, inspected the existing code and verified decisions through tests and reviews. Suggestions involving unnecessary framework classes and persistent storage were rejected because they were outside the project scope.
+Start doing — engineering and AI use: Start recording design decisions, test evidence and AI recommendations more consistently throughout development. Check AI suggestions against the current code and requirements before accepting them.
+Stop doing — engineering and AI use: Stop relying on outdated AI feedback, making unnecessary architectural changes or leaving documentation updates until the final release stage.
+Continue doing — engineering and AI use: Continue using feature branches, meaningful tests, independent pull request reviews and full regression testing. Continue treating AI as a supporting tool while keeping final engineering decisions and verification under human responsibility.
+What worked / caused rework / future delivery improvement:  GitHub collaboration, clear module responsibilities, automated testing and independent reviews helped the team integrate SmartCare successfully. Some rework came from outdated documentation, changing requirements and reviewing AI suggestions against older versions of the code. In future projects, the team should update documentation alongside implementation and verify integration earlier.
+One paragraph — If AI can write code why do we still need software engineers: Software engineers are still needed because writing code is only one part of software development. Engineers must understand requirements, design suitable solutions, identify defects, evaluate risks and verify that software behaves correctly. AI can suggest code or improvements, but its recommendations may be incorrect, outdated or unnecessary. In SmartCare, the team reviewed Copilot's suggestions and rejected additional frameworks and persistence because they did not match the undergraduate scope. This showed that human judgement, testing and accountability remain essential.
 
 | Preparation item | Own explanation and evidence link |
 |---|---|
-| Problem and stakeholders | [response] |
-| Two requirements and acceptance criteria | [response] |
-| Domain model and architecture | [response] |
-| Design trade-off | [response] |
-| Meaningful test and its limits / 100 percent coverage | [response] |
-| Diagnosed defect and verification | [response] |
-| Shared store and session-state/query responsibilities | [response] |
-| What would break if session-state lookup/query responsibilities changed? | [response] |
-| Why cancellation is domain behaviour / conflict coordination is service behaviour | [response] |
-| FR-07 retained history test | [response] |
-| Actual AI change rejected/modified or honestly accepted with verification | [response] |
-| Unresolved limitation / future production work | [response] |
-| Personal implementation contribution | [response] |
-| Personal test/review/design/integration contribution | [response] |
-| PG agentic change and rescheduling verification | [response] |
-| PG responsible-AI risk/remediation or supported no finding | [response] |
+| Problem and stakeholders | SmartCare is a small appointment-management application for patients, practitioners and administrative users. It supports registration, lookup, booking, cancellation and appointment history. Evidence: `project/README.md`; Stage 9 console demonstration. |
+| Two requirements and acceptance criteria | FR-04/FR-05: Booking must use registered participants and reject two scheduled appointments for the same practitioner at the same date and time. FR-06/FR-07: A scheduled appointment can be cancelled, but its record must remain available for later lookup. Evidence: `project/smartcare/services.py`; `project/tests/test_services.py`; Stage 8 records. |
+| Domain model and architecture | `domain.py` defines and validates domain objects, `data_store.py` manages in-memory records, `services.py` coordinates workflows, `queries.py` provides pure filtering and sorting functions, and `console.py` handles user interaction. Evidence: `project/smartcare/`. |
+| Design trade-off | The team retained a simple shared in-memory store rather than introducing persistence or additional frameworks. This meets the undergraduate requirements and avoids unnecessary complexity, although records are lost after exit. Evidence: Stage 9 Section E; `project/README.md`. |
+| Meaningful test and its limits / 100 percent coverage | `test_repeated_cancellation_is_rejected_and_history_is_kept` checks that an appointment can be cancelled, repeated cancellation is rejected and the cancelled appointment remains retrievable. It does not independently verify practitioner listing. Even 100% code coverage would not prove that every requirement or input case was tested correctly. Evidence: `project/tests/test_console_validation.py`. |
+| Diagnosed defect and verification | Stage 8 defect F8-01 allowed conflicting scheduled appointments for the same practitioner at the same time. Rachel contributed to the repair and regression verification through PRs #27 and #28. Another defect, F8-02, prevented lookup of cancelled appointments; Novera corrected this through PR #26. Evidence: Stage 8 defect records and tests. |
+| Shared store and session-state/query responsibilities | A shared `SmartCareDataStore` keeps patient, practitioner and appointment records consistent during one session. Services coordinate business rules, while pure query functions filter and sort appointment lists without modifying stored records. Evidence: `data_store.py`, `services.py`, `queries.py`. |
+| What would break if session-state lookup/query responsibilities changed? | Separate stores could make newly registered records unavailable to other services. If queries modified stored appointments, filtering and ordering could accidentally change application data or retained history. Keeping these responsibilities separate protects consistency. |
+| Why cancellation is domain behaviour / conflict coordination is service behaviour | Cancellation changes the state of an individual appointment, so it belongs to the appointment domain object. Booking conflicts require checking other appointments and coordinating the data store, so they belong in the service layer. Evidence: `domain.py`, `services.py`. |
+| FR-07 retained history test | `test_cancelled_appointment_is_retained_and_findable` verifies that an appointment remains retrievable after cancellation and has status CANCELLED. It checks lookup and retained object identity, while practitioner listing is covered separately. Evidence: `project/tests/test_starter.py`; Stage 8 PR #26. |
+| Actual AI change rejected/modified or honestly accepted with verification | Copilot suggested additional menu framework classes and persistent storage. The team rejected these because they were unnecessary for the undergraduate session-only requirements. Copilot also produced outdated feedback about query implementation, which was checked against the current source. Evidence: Stage 9 Section E; Stage 12 Section E. |
+| Unresolved limitation / future production work | The application does not persist data, support rescheduling, handle concurrency or manage time zones. A production version would also need authentication, access controls and stronger operational safeguards. These are outside the current undergraduate scope. Evidence: `project/README.md`; Stage 12 Section G. |
+| Personal implementation contribution | **Merlin:** Implemented FR-03 practitioner lookup and tests (PR #5), contributed practitioner domain/service tests (PR #20), improved booking validation (PR #30), and implemented Stage 9 pure appointment queries with 12 tests (PR #38). **Rachel:** Implemented FR-02 patient lookup (PR #3), contributed to the F8-01 booking conflict repair (PR #27), and implemented practitioner appointment listing (PR #40). **Tarnima:** Contributed appointment validation and construction (PRs #15 and #18) and implemented the interactive console (PR #41). **Novera:** Implemented appointment cancellation (PR #14), repaired cancelled-appointment lookup (PR #26), and contributed console validation tests (PR #44). |
+| Personal test/review/design/integration contribution | **Merlin:** Reviewed and tested practitioner lookup, booking validation and pure queries; completed Stage 12 Sections A, B and I; verified a fresh clone using Python 3.14.3 with 157 passing tests (Issue #51); corrected README and release evidence. **Rachel:** Contributed patient lookup and booking regression tests, reviewed code quality and responsible-AI evidence, and completed Stage 12 Sections C, E and H, including 157 passing tests at `d14685d` (Stage 12 PR #53). **Tarnima:** Contributed validation and regression tests, demonstrated console workflows, and completed Stage 12 Sections D, J and M. **Novera:** Contributed cancellation-history and console validation tests, reviewed the F8-01 repair, supported Stage 9 integration, and completed Stage 12 Sections F and G. |
+| PG agentic change and rescheduling verification | Not applicable. All four members follow the undergraduate pathway; PG-only rescheduling requirements are excluded. |
+| PG responsible-AI risk/remediation or supported no finding | Not applicable. PG-only responsible-AI assurance requirements are excluded from the undergraduate release. |
 
 Optional bounded-change practice only: validation rule, focused test, safe error-message change, explicit-input query or agreed status rule with test. Explain expected impact before editing, make a small change, run the test, and identify evidence to inspect if unsure. No live AI unless explicitly permitted. Preserve the submitted candidate.
 
-Practice question/change and reasoning: [response or not undertaken]
-Separate reflection / peer / common team viva evidence links and routing: [response]
+Practice question/change and reasoning: not undertaken
+
+Separate reflection / peer / common team viva evidence links and routing: This Section N records the shared reflection and viva preparation. Individual peer assessments and common team viva evidence will be submitted separately according to the confirmed assessment instructions. Final submission arrangements are confirmed.
 No further coding stage. Later corrections use the published assessment process.
