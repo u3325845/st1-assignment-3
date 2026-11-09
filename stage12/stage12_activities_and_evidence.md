@@ -44,12 +44,15 @@ Tutorial activity 2 and actual readiness matrix. Add exact requirement/acceptanc
 
 | Suite/scope | Environment/version | Working directory and command | Tested SHA | Actual result | Evidence link |
 |---|---|---|---|---|---|
-| Complete common | [response] | [response] | [response] | [response] | [response] |
-| Complete PG if applicable | [response] | [response] | [response] | [response] | [response] |
-| Affected focused checks after correction | [response] | [response] | [response] | [response] | [response] |
-| Full integrated recheck | [response] | [response] | [response] | [response] | [response] |
-Prior assertions preserved / reviewed test diff: [response]
-Remaining failure / limitation: [response]
+| Complete common | Python 3.10.8; pytest 8.3.5; virtual environment | `project/`; `python -m pytest -q` | `d14685d` | 157 passed in 0.24s on 9 November 2026 | Local pytest output; `project/tests/` |
+| Complete PG if applicable | Not applicable (undergraduate group) | Not applicable | Not applicable | PG-only requirements do not apply | Section A |
+| Affected focused checks after correction | Python 3.10.8; pytest 8.3.5; virtual environment | `project/`; `python -m pytest tests/test_workflows.py::test_appointment_cancellation_and_history -q` | `d14685d` | 1 passed in 0.03s on 9 November 2026 | `project/tests/test_workflows.py`; local pytest output |
+| Full integrated recheck | Pending final verification | `project/`; `python -m pytest -q` | Final integrated release SHA pending | Pending after all Stage 12 changes are merged | Final regression output and Section K |
+
+Prior assertions preserved / reviewed test diff: The current baseline has 157 passing automated tests covering registration, lookup, booking, cancellation and retained history, practitioner appointment listing, pure queries and console validation. Final review of changes since `d14685d` is still pending to confirm existing test assertions have not been removed or weakened.
+
+Remaining failure / limitation: No failing tests were reported in the current regression run. Final integrated regression is pending. SmartCare uses session-only storage, so records are not saved after the application exits.
+
 
 
 ## D Console and end to end demonstration
@@ -82,22 +85,28 @@ PG demonstrations through service/tests or not applicable: To be confirmed based
 
 | Review area | Code/evidence location | Finding or no finding | Correction/no change and recheck |
 |---|---|---|---|
-| OOP responsibilities and pure-query boundaries | [response] | [response] | [response] |
-| PascalCase and snake_case naming | [response] | [response] | [response] |
-| Useful type hints and meaningful docstrings | [response] | [response] | [response] |
-| Four-space indentation and imports/layout | [response] | [response] | [response] |
-| Focused methods / duplication / dead or commented code | [response] | [response] | [response] |
-| Globals / leakage / unnecessary inheritance or frameworks | [response] | [response] | [response] |
-| No SQLite/persistence/repository ABCs/speculative features | [response] | [response] | [response] |
-| Synthetic data / secrets / dependencies / provenance | [response] | [response] | [response] |
-| Significant common Copilot contributions and human verification | [response] | [response] | [response] |
-| PG plan/diff/test approvals and Stage 11 VERIFY/TRUST | [response] | [response] | [response] |
+| OOP responsibilities and pure-query boundaries | `project/smartcare/domain.py`, `data_store.py`, `services.py`, `queries.py`, `console.py` | Domain classes validate their data and appointment status changes. The store manages records, services coordinate workflows, pure queries filter and sort, and the console handles input/output. | No change needed. Reviewed source code and 157 tests passed. |
+| PascalCase and snake_case naming | `project/smartcare/` | Classes use PascalCase and functions, methods and variables generally use snake_case. | No change needed. |
+| Useful type hints and meaningful docstrings | `project/smartcare/services.py`, `data_store.py`, `domain.py`, `queries.py`, `console.py`, `project/main.py` | Most public methods have type hints and docstrings. Some helper methods lack annotations or docstrings. Two lookup docstrings still contain Stage 6 TODO wording, and the main entry-point docstring is outdated. | Minor documentation debt; no functional correction needed for release. |
+| Four-space indentation and imports/layout | `project/smartcare/`, `project/main.py` | Source files generally follow four-space indentation and readable imports. The console imports AppointmentStatus inside `run_menu()`, but this does not affect functionality. | No change needed. |
+| Focused methods / duplication / dead or commented code | `project/smartcare/services.py`, `queries.py`, `console.py` | Query functions are short and focused. Services reuse shared validation and storage operations. `run_menu()` is relatively long but remains understandable for the undergraduate scope. | No release-blocking issue identified; no change needed. |
+| Globals / leakage / unnecessary inheritance or frameworks | `project/smartcare/data_store.py`, `services.py`, `console.py` | Each menu session creates one shared store for its services. No global patient, practitioner or appointment collections or unnecessary inheritance frameworks were found. | No change needed. Session data remains in memory only. |
+| No SQLite/persistence/repository ABCs/speculative features | `project/smartcare/`, `project/requirements-dev.txt` | No database, persistence framework or speculative architecture was found. This follows the undergraduate session-only requirements. | No change needed. |
+| Synthetic data / secrets / dependencies / provenance | `project/smartcare/console.py`, `project/requirements-dev.txt`, `.gitignore`; Git checks | Demo uses synthetic records. The development dependency is pinned to pytest 8.3.5. Git filename and tracked-project text searches found no matches for the checked secret patterns. Environments, caches and IDE files are ignored. | No finding from these checks. They do not replace a complete security or final ZIP review. |
+| Significant common Copilot contributions and human verification | `stage09/stage09_activities_and_evidence.md`, Section E; `project/smartcare/console.py` | Previous Copilot review supported the shared store, responsibility separation and input validation. Human review corrected outdated query feedback and rejected unnecessary frameworks and persistence. | Decisions checked against the recorded Stage 9 review and current source code. Current regression: 157 passed at `d14685d`. |
+| PG plan/diff/test approvals and Stage 11 VERIFY/TRUST | Stage 12 Section A | Not applicable; all four members follow the undergraduate pathway. | No PG verification required. |
 
 | AI claim | Affected requirement/code | Human check | Accept/Modify/Reject and reason | Actual outcome/action or no change |
 |---|---|---|---|---|
-| [response] | [response] | [response] | [response] | [response] |
-Access route or approved equivalent / limitations: [response]
-Available AI evidence and missing evidence honestly disclosed: [response]
+| One shared data store and separated responsibilities | `smartcare/console.py`, `services.py`; common workflows | Reviewed shared-store creation and service calls against Stage 9 evidence. | Accept — maintains session continuity and avoids duplicated business rules. | Existing design retained; 157 regression tests passed. |
+| Invalid-input recovery should be tested | `smartcare/console.py`, `tests/test_workflows.py` | Checked expected exception handling and recorded Stage 9 tests and demonstrations. | Accept — errors should not terminate the menu. | Existing validation retained; current regression passed. |
+| Query and service dependencies were unfinished | `smartcare/queries.py`, `services.py` | Confirmed the query functions and practitioner listing service are implemented. | Modify — Copilot reviewed an older commit, so part of its feedback was outdated. | Existing query functions reused; no duplicate implementation added. |
+| Additional menu framework classes and persistent storage | `smartcare/console.py`, `data_store.py` | Compared suggestions with the undergraduate session-only scope and existing implementation. | Reject — unnecessary complexity and persistence are outside the requirements. | Simple menu and in-memory storage retained; no change required. |
+
+Access route or approved equivalent / limitations: GitHub Copilot review was recorded in Stage 9 Section E. Stage 12 independently inspected the current local source and reviewed the previous AI decisions against the implemented code. No new Stage 12 Copilot response has been recorded.
+
+Available AI evidence and missing evidence honestly disclosed: Stage 9 contains the actual Copilot prompt, findings, human decisions and verification evidence. The current code and tests were reviewed at SHA `d14685d`, with 157 tests passing in 0.24s. A separate fresh Stage 12 Copilot review remains pending if required by the release checklist.
+
 
 
 ## F README and reproducibility check
@@ -150,9 +159,17 @@ PG assurance residual risks / owner / status or not applicable: Not applicable (
 
 | Requirement/claim | Reproduction/observation | Impact/severity | Owner/action | Corrective diff | Focused/full recheck | Residual limit |
 |---|---|---|---|---|---|---|
-| [response] | [response] | [response] | [response] | [response] | [response] | [response] |
-Justified no-change conclusion if no defect found: [response]
-Release blockers still open / status: [response]
+| FR-01–FR-03 Registration and lookup | Reviewed patient and practitioner registration, validation and lookup code. Existing tests passed. | No confirmed defect | Rachel — no change needed | None | Full regression: 157 passed | Final integrated recheck pending |
+| FR-04–FR-05 Booking and conflict prevention | Reviewed booking and conflict logic. Section D records rejection of same-practitioner exact-time conflicts and acceptance of different-practitioner bookings. | No confirmed defect | Rachel — no change needed | None | Full regression: 157 passed | Conflict checking uses exact date/time; no duration or concurrency handling |
+| FR-06–FR-08 Cancellation and retained history | Reviewed `Appointment.cancel()` and appointment lookup. Section D records successful cancellation, retained history and rejection of repeated cancellation. | No confirmed defect | Rachel — no change needed | None | Focused test: 1 passed in 0.03s; full regression: 157 passed | Session-only records are lost on exit |
+| FR-09, QRY-01–QRY-04, FP-01–FP-03 Listing and pure queries | Reviewed `select_appointments()` and practitioner listing service. Filtering and chronological ordering use a new list without modifying stored records. | No confirmed defect | Rachel — no change needed | None | Full regression: 157 passed; Section D demonstrations | Final integrated recheck pending |
+| UI-01–UI-02 Console and invalid-input recovery | Reviewed menu input handling and exception recovery. Section D records successful invalid-date, invalid-status, unknown-record and menu-choice recovery. | No confirmed defect | Rachel — no change needed | None | Full regression: 157 passed; Section D demonstrations | Unexpected process interruptions are not handled by normal menu recovery |
+| Code quality and documentation | Reviewed source modules. Found outdated Stage 6 TODO docstrings, an outdated `main.py` docstring and some missing annotations/docstrings. | Low — maintainability/documentation only | Rachel — documented as minor technical debt | None | Code inspection; full regression: 157 passed | Cosmetic documentation cleanup can be done later |
+
+Justified no-change conclusion if no defect found: The Stage 12 review did not identify a confirmed release-blocking defect in the inspected undergraduate application. The full regression suite passed 157 tests in 0.24s at SHA `d14685d`, and the focused cancellation-history test passed in 0.03s. Existing Stage 12 Section D demonstrations also support the required workflows. The identified documentation issues and session-only limitations do not require changes to working code for this release.
+
+Release blockers still open / status: Final regression on the fully integrated Stage 12 release SHA, completion of release documentation and submission checks, and independent team review and release approval remain pending. A separate Stage 12 Copilot review is not yet recorded.
+
 
 
 ## I Git review and integration evidence
