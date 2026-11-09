@@ -256,7 +256,7 @@ Software maintenance is the process of correcting defects, improving code qualit
 
 8. What is the purpose of the individual demonstration/viva?
 
-The individual demonstration or viva checks whether each student understands the system and can explain their own contributions. Students should be able to demonstrate requirements, discuss architecture, explain tests and design decisions, and describe how they verified AI-assisted work.
+The individual demonstration or viva checks whether each student understands the system and can explain their own contributions. Students should be able to demonstrate requirements, discuss architecture, explain tests and design decisions, and describe how they evaluated GitHub Copilot's review feedback.
 
 9. What should the final responsible-AI check establish before release?
 
@@ -264,8 +264,7 @@ GitHub Copilot was used to review the proposed design and provide recommendation
 
 10. What is the main course conclusion about AI and the role of the software engineer?
 
-AI can help generate code, identify possible problems and suggest improvements, but it cannot replace the software engineer's responsibility for understanding requirements, making design decisions and verifying correctness. SmartCare demonstrated this when we reviewed Copilot's suggestions and rejected unnecessary framework classes and persistent storage. Software engineers must use their judgement to ensure the final solution is appropriate, reliable and maintainable.
-
+GitHub Copilot can provide useful design feedback and identify potential problems, but the software engineer remains responsible for evaluating recommendations, making decisions and verifying correctness. In SmartCare, I reviewed Copilot's suggestions and rejected unnecessary framework classes and persistent storage because they were outside the project scope. This demonstrated the importance of human judgement in developing reliable and maintainable software.
 
 ## N Reflection viva and handover
 
