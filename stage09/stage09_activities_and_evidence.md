@@ -239,21 +239,28 @@ OOP class contains data and rules, whereas pure function operates on collections
 ## H. Review, completion and common handover
 
 Issues and bounded branches: Stage 9 console implementation and workflow tests were developed on `feature/stage09-console`, based on `stage09/integration`. Merlin's query implementation and Rachel's practitioner listing service were merged into the console branch. The local merge commit is `53a00e8`.
-PR/diff and another-member human reviewer: 
+
+PR/diff and another-member human reviewer: PR #44 (console validation tests, Section D evidence, README, opening lines and formative answers) into stage09/integration: https://github.com/u3325845/st1-assignment-3/pull/44. Reviewed on GitHub by Merlin and merged by Merlin3313611. Issue #43.
+
 Review responses and Copilot comparison: GitHub Copilot reviewed the proposed console design before implementation. I accepted its recommendations on shared session data, separation of responsibilities, error recovery and workflow testing. I rejected additional menu framework classes and persistent storage because they were unnecessary for Stage 9. The review findings and decisions are recorded in Section E.
-Integrated common Stage 9 SHA: 
-Full regression command, working directory, actual count/result and evidence: `python -m pytest -q` from `project/` — 141 passed in 0.18s. Evidence: [Workflow tests](../project/tests/test_workflows.py) and local pytest output.
+
+Integrated common Stage 9 SHA: 34cbd2d (stage09/integration after PR #44), tested 9 Nov 2026.
+
+Full regression command, working directory, actual count/result and evidence:`python -m pytest -q` from `project/` at 34cbd2d - 157 passed. Evidence: [Console validation tests](../project/tests/test_console_validation.py), [Workflow tests](../project/tests/test_workflows.py) and local pytest output.
+
 README run instructions and scope/limitations: [Project README](../project/README.md). The console runs using `python main.py --interactive` and supports registration, lookup, booking, cancellation and practitioner appointment listing. Records remain in memory and are lost when the session ends.
-Unresolved issues and support/action:
-UG common candidate / PG future branch plan:
+
+Unresolved issues and support/action:  No functional issues known. Minor clean-up for the group: stale "Stage 6 TODO" comments in services.py and an outdated docstring in main.py (comments only, no behaviour change). No further support needed.
+
+UG common candidate / PG future branch plan: UG group: protect the final Stage 9 common candidate on main for Stage 12. No PG branch needed.
 
 - [x] Query contracts, purity, new lists and named-key ordering verified.
 - [x] Service empty/unknown/invalid cases and cancellation history verified.
-- [ ] Every console command and invalid-input recovery demonstrated.
+- [x] Every console command and invalid-input recovery demonstrated.
 - [x] Query and workflow tests plus all previous tests pass; actual evidence linked.
 - [ ] Human design, Copilot critique, review and integration recorded honestly.
-- [ ] Reflections and ten formative responses completed.
+- [x] Reflections and ten formative responses completed.
 - [x] README updated; earlier code/tests/records preserved.
-- [ ] Common SHA protected for UG Stage 12; PG Stage 10/11 work deferred until approved.
+- [x] Common SHA protected for UG Stage 12; PG Stage 10/11 work deferred until approved.
 
 No persistence, rescheduling or assurance implementation is part of Stage 9. UG: 6→7→8→9→12. PG: 6→7→8→9→10→11→12. Mixed groups keep one repository and protect the common candidate.
