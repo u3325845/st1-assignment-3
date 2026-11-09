@@ -2,8 +2,17 @@
 
 Common UG and PG record. All Assignment 3 stage materials are provided from the beginning. Complete this stage only after the previous applicable stage has been integrated, verified and recorded. Use this supplied record in stage09/ in your EXISTING repository. Preserve project/, all earlier tests, records and responses. Do not download another starter or copy staff solutions. Use the Stage 9 handout and Overview/revision 2 baseline. Keep responses concise and link accessible artefacts; do not paste entire logs or private peer ratings.
 
-Group: <!-- complete -->
-Members and responsibilities: <!-- complete -->
+Group: Grp 2 tutorial Wed 4:30 - 6:30
+
+Members and responsibilities:RachelUC, Merlin3313611, TarnimaKhan22, u3325845 (Novera)
+
+Merlin - appointment queries (appointment_sort_key, select_appointments) and query tests; 
+
+Rachel - practitioner appointment listing service and tests;
+
+Tarnima Khan - interactive console menu and console workflow tests;
+
+Novera Anowar - console validation tests (UI-02), manual console demonstration (UI-01/UI-02), README, Section D evidence for those, PR #44.
 Stage 8 integrated SHA, command, working directory and actual result: 
 - Stage 8 integrated SHA: 253a2d3
 - Command: python -m pytest -q
@@ -151,9 +160,9 @@ The full regression suite passed with 125 tests. However, the tests do not prove
 
 | Scenario / acceptance ID | Reproducible inputs / artefact | Expected result | Observed result and state check | Evidence link |
 |---|---|---|---|---|
-| UI-01 full menu workflow | Run `python main.py --interactive`. Register patient P1 (Alex) and practitioner DR1 (Taylor, General Practice). Book appointment A1 for `2026-11-20 09:00`, cancel A1, find A1, and list DR1's appointments with blank, SCHEDULED and CANCELLED status filters before exiting. | Registration, booking, cancellation, lookup and listing work using one shared session store. Cancelled appointments remain retrievable and listable until exit. | PASS. A1 was booked as SCHEDULED and changed to CANCELLED. It remained retrievable and appeared in the all-status and CANCELLED listings. The SCHEDULED filter returned no matching appointments. | [Console implementation](../project/smartcare/console.py), [Workflow tests](../project/tests/test_workflows.py) |
-| UI-02 invalid-input recovery | Run `python main.py --interactive`. Enter an invalid menu choice (`99`), then register and find patient P1. Separately, test a malformed date, unknown appointment, unknown practitioner, invalid status and repeated cancellation. | Invalid inputs display errors without terminating the menu. Subsequent valid operations remain possible. | PASS for tested cases. Invalid menu choices, malformed dates, unknown records, invalid status and repeated cancellation displayed errors without crashing. The menu continued accepting input. | [Console implementation](../project/smartcare/console.py), [Workflow tests](../project/tests/test_workflows.py) |
-| Automated console workflow | Run `python -m pytest tests/test_workflows.py -q` and `python -m pytest -q` from `project/`. Six workflow tests cover registration/lookup, booking/lookup, cancellation/history, invalid menu recovery and practitioner listing/status filtering. | Automated tests verify shared session data, retained cancellation history, listing filters and regression safety. | PASS. The new listing workflow test passed individually (1 passed in 0.04s). The full regression suite passed with 141 tests in 0.18s. | [Workflow tests](../project/tests/test_workflows.py), [Console implementation](../project/smartcare/console.py) |
+| UI-01 full menu workflow (manual) | Run `python main.py --interactive` from `project/` on 9 Nov 2026 (branch `test/stage09-console-validation`, commit 7cdc625; console code unchanged from integration `b13eddd`). Register P1 (Alex), DR1 (Taylor), P2 (Sam), DR2 (Lee); find P1 and DR1; book A1 (P1, DR1, 2026-11-20 09:00); try A2 (P2, DR1, same time); book A2 with DR2 at the same time; cancel A1; find A1; list DR1's appointments with blank, `scheduled` and `cancelled`; book A3 (P2, DR1) in the freed slot; exit with 0. | Registration, lookup, booking and cancellation work in one shared session. Same-practitioner double-booking is rejected; a different practitioner at the same time is allowed. Cancelled A1 stays findable and listable, and its slot can be booked again. | PASS. A1 booked as scheduled; A2 for DR1 rejected with `Error: Practitioner already has a SCHEDULED appointment at this time`; A2 for DR2 booked. A1 cancelled and still found with status cancelled. Blank listing and `cancelled` listing showed A1; `scheduled` listing showed `No matching appointments found.` A3 was booked into the freed slot. Exit printed the session-only message. | [Manual transcript](https://github.com/u3325845/st1-assignment-3/pull/44#issuecomment-6730481905), [Workflow tests](../project/tests/test_workflows.py) |
+| UI-02 invalid-input recovery (manual) | In the same session: menu choice `99`; blank patient ID; duplicate patient P1; date `not-a-date`; date `2026-02-30 09:00`; find unknown A9; cancel A1 again; status filter `archived`; then find P1 and exit. | Each invalid input shows a clear error, the menu returns, stored data is unchanged, and a later valid operation succeeds. | PASS. `Invalid menu option. Please choose 0-8.`; `Error: Patient ID cannot be blank`; `Error: Patient ID already exists`; `Error: Use date/time format YYYY-MM-DD HH:MM`; `Error: Invalid calendar date/time; use YYYY-MM-DD HH:MM`; `Error: Appointment not found`; `Error: Only SCHEDULED appointments may be cancelled`; `Error: 'archived' is not a valid AppointmentStatus`. After the errors, `Find patient P1` still returned `P1 - Alex`. One earlier booking attempt with mistyped input (wrong ID and unknown patient) produced `Error: Patient not found` and stored nothing; it was an accidental entry, not a planned step. | [Manual transcript](https://github.com/u3325845/st1-assignment-3/pull/44#issuecomment-6730481905), [Console validation tests](../project/tests/test_console_validation.py) |
+| Automated console validation (UI-02) | `python -m pytest -q tests\test_console_validation.py` and `python -m pytest -q` from `project/` at commit 7cdc625. 16 tests cover bad menu choices, blank/duplicate/unknown IDs, malformed and impossible dates, invalid status, double-booking, repeated cancellation, freed slot and unknown practitioners. | Errors are handled without crashing; rejected operations leave stored data unchanged; the menu continues. | PASS. Focused: 16 passed. Full suite: 157 passed. | [Console validation tests](../project/tests/test_console_validation.py), https://github.com/u3325845/st1-assignment-3/pull/44#issuecomment-6730481905 |
 
 Include registration/find, booking, conflict rejection, different-practitioner booking, cancellation, retrieval, listing/filtering, freed slot and exit; duplicate/unknown/blank IDs, malformed/impossible date, invalid status, unknown choice and repeated cancellation. Identify before/after state and subsequent successful action.
 
@@ -196,35 +205,62 @@ The console workflow booked appointment A1, cancelled it and retrieved it again,
 
 ## G. Ten formative answers
 
-1. What makes select_appointments pure, and what side effect breaks purity? <!-- response -->
-2. Which explicit inputs are needed, and why avoid a global store? <!-- response -->
-3. How can a new list reuse Appointment objects safely? <!-- response -->
-4. Why use a named key, and what breaks equal-time ties? <!-- response -->
-5. How do default and explicit status filters differ? <!-- response -->
-6. How do empty, unknown practitioner and invalid filter cases differ? <!-- response -->
-7. Which console errors recover, and how is unchanged state checked? <!-- response -->
-8. What is data integrity for registered participants, conflicts and history? <!-- response -->
-9. What is Copilot's review role, and who verifies findings? <!-- response -->
-10. How do pure functions and OOP responsibilities work together? <!-- response -->
+1. What makes select_appointments pure, and what side effect breaks purity?
+
+It is pure because it only uses the appointments list, practitioner ID and status it is given and returns a new filtered and sorted list without changing anything. It would stop being pure if it sorted the original list in place, changed an appointment's status or printed to the screen.
+2. Which explicit inputs are needed, and why avoid a global store?
+
+It needs the appointments list, practitioner ID and optional status as inputs. A global store is avoided because it hides what the function depends on, makes results change when other code edits the store and makes it hard to test with a small list.
+3. How can a new list reuse Appointment objects safely?
+
+A new list can hold the same Appointment objects as long as the function only reads them. Filtering and sorting change only the new list, so the store’s list and the objects stay unchanged.
+4. Why use a named key, and what breaks equal-time ties? 
+
+The named key offers one ordering rule that can be used over again. The rule of sorting just based on date/time will not help in breaking the ties because when two dates/times are same, the records will keep their previous insertion order.
+5. How do default and explicit status filters differ? 
+
+Default status does not have any status filters so all the appointments scheduled for the practitioner, including the cancelled ones are listed. An explicit status returns only appointments with that status.
+6. How do empty, unknown practitioner and invalid filter cases differ? 
+
+Empty is a normal result as a known practitioner with no matches returns an empty list. An unknown practitioner raises LookupError because the ID is valid but not registered. An invalid ID or status raises ValueError because the input itself is wrong.
+7. Which console errors recover, and how is unchanged state checked?
+
+Blank, duplicate and unknown IDs, malformed dates, double booking, repeated cancellation and invalid status filters all print an Error message and return to the menu. I checked that nothing changed by doing a lookup or listing afterwards, such as finding the original patient or showing that a rejected appointment was not stored.
+8. What is data integrity for registered participants, conflicts and history?
+
+Booking should use only registered patients and practitioners, IDs are unique, a practitioner does not have any conflicting appointment schedules, and cancelled appointments remain in history. Any rejected transaction must never alter stored information.
+9. What is Copilot's review role, and who verifies findings? 
+
+Copilot gives suggestions and analytical review but it can be wrong. The team members verify each finding against the code and tests and then record whether it was accepted, modified or rejected.
+10. How do pure functions and OOP responsibilities work together? 
+
+OOP class contains data and rules, whereas pure function operates on collections without altering any data. The service retrieves appointments from the store and passes them to the pure query, and the console module just deals with inputs and outputs.
 
 ## H. Review, completion and common handover
 
 Issues and bounded branches: Stage 9 console implementation and workflow tests were developed on `feature/stage09-console`, based on `stage09/integration`. Merlin's query implementation and Rachel's practitioner listing service were merged into the console branch. The local merge commit is `53a00e8`.
-PR/diff and another-member human reviewer: 
+
+PR/diff and another-member human reviewer: PR #44 (console validation tests, Section D evidence, README, opening lines and formative answers) into stage09/integration: https://github.com/u3325845/st1-assignment-3/pull/44. Reviewed on GitHub by Merlin and merged by Merlin3313611. Issue #43.
+
 Review responses and Copilot comparison: GitHub Copilot reviewed the proposed console design before implementation. I accepted its recommendations on shared session data, separation of responsibilities, error recovery and workflow testing. I rejected additional menu framework classes and persistent storage because they were unnecessary for Stage 9. The review findings and decisions are recorded in Section E.
-Integrated common Stage 9 SHA: 
-Full regression command, working directory, actual count/result and evidence: `python -m pytest -q` from `project/` — 141 passed in 0.18s. Evidence: [Workflow tests](../project/tests/test_workflows.py) and local pytest output.
+
+Integrated common Stage 9 SHA: 34cbd2d (stage09/integration after PR #44), tested 9 Nov 2026.
+
+Full regression command, working directory, actual count/result and evidence:`python -m pytest -q` from `project/` at 34cbd2d - 157 passed. Evidence: [Console validation tests](../project/tests/test_console_validation.py), [Workflow tests](../project/tests/test_workflows.py) and local pytest output.
+
 README run instructions and scope/limitations: [Project README](../project/README.md). The console runs using `python main.py --interactive` and supports registration, lookup, booking, cancellation and practitioner appointment listing. Records remain in memory and are lost when the session ends.
-Unresolved issues and support/action:
-UG common candidate / PG future branch plan:
+
+Unresolved issues and support/action:  No functional issues known. Minor clean-up for the group: stale "Stage 6 TODO" comments in services.py and an outdated docstring in main.py (comments only, no behaviour change). No further support needed.
+
+UG common candidate / PG future branch plan: UG group: protect the final Stage 9 common candidate on main for Stage 12. No PG branch needed.
 
 - [x] Query contracts, purity, new lists and named-key ordering verified.
 - [x] Service empty/unknown/invalid cases and cancellation history verified.
-- [ ] Every console command and invalid-input recovery demonstrated.
+- [x] Every console command and invalid-input recovery demonstrated.
 - [x] Query and workflow tests plus all previous tests pass; actual evidence linked.
-- [ ] Human design, Copilot critique, review and integration recorded honestly.
-- [ ] Reflections and ten formative responses completed.
+- [x] Human design, Copilot critique, review and integration recorded honestly.
+- [x] Reflections and ten formative responses completed.
 - [x] README updated; earlier code/tests/records preserved.
-- [ ] Common SHA protected for UG Stage 12; PG Stage 10/11 work deferred until approved.
+- [x] Common SHA protected for UG Stage 12; PG Stage 10/11 work deferred until approved.
 
 No persistence, rescheduling or assurance implementation is part of Stage 9. UG: 6→7→8→9→12. PG: 6→7→8→9→10→11→12. Mixed groups keep one repository and protect the common candidate.
