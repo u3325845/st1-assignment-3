@@ -118,20 +118,30 @@ Missing local file or setup gap / remedy and recheck: [response]
 
 ## G Known limitations debt and release notes
 
-Delivered features: [response]
-Important fixes: [response]
-Architecture/quality improvements: [response]
-Known limitations: [response]
-AI-assisted development note: [response]
+Delivered features: Register and find patients and practitioners; book appointments with a practitioner conflict rule; cancel SCHEDULED appointments with cancelled history kept; find appointments by ID; list a practitioner's appointments with optional status filter and deterministic order; interactive console menu with error recovery.
 
-| Debt item | Impact | Priority | Future action | Accepted? / release rationale |
-|---|---|---|---|---|
-| [response] | [response] | [response] | [response] | [response] |
-Session-only synthetic data and minute-precision local time: [response]
-Production auth/roles, portal, notifications, billing/insurance, clinical AI exclusions: [response]
-Scale/concurrency, timezone policy, operations/monitoring, accessibility/usability limitations: [response]
-Difference between accepted scope limit and unresolved required behaviour: [response]
-PG assurance residual risks / owner / status or not applicable: [response]
+Important fixes: Stage 8 F8-01 (practitioner double-booking conflict) and F8-02 (appointment lookup skipped cancelled appointments; fixed so retained history can be found).
+
+Architecture/quality improvements: Pure query functions separated from services; services coordinate the store and domain; the console handles only input and output; console validation tests added for invalid-input recovery.
+
+Known limitations: Data is session-only and lost on exit. No rescheduling, past-date rule, appointment duration or patient-conflict rule.
+
+AI-assisted development note: GitHub Copilot was used for design review and diagnosis.All AI output was reviewed, run and checked by the members and decisions are recorded in the stage records.
+
+| Debt item | Impact | Priority | Future action   | Accepted? / release rationale       |
+|-|--|----------|-----------------|-------------------------------------|
+| Session-only data| Records are lost on exit | Medium   | Add persistence | Yes. FR-10 retired and out of scope |
+| No rescheduling | Users must cancel and rebook | Low | Add a reschedule service | Yes, rescheduling is PG scope |
+| Stale `Stage 6 TODO` docstrings in `services.py` and outdated `main.py` docstring | Confusing to readers, no behaviour effect | Low | Clean up comments in a reviewed PR | Yes, cosmetic |
+Session-only synthetic data and minute-precision local time: All data is synthetic and held in memory only; it is lost when the program exits. Appointment times use local time with minute precision and no timezone handling.
+
+Production auth/roles, portal, notifications, billing/insurance, clinical AI exclusions: Not implemented and out of scope. SmartCare has no login or roles, patient portal, notifications, billing or insurance, and no clinical decision or AI features.
+
+Scale/concurrency, timezone policy, operations/monitoring, accessibility/usability limitations: Designed for a single user and a single session; no concurrency handling, timezone policy or monitoring. The console menu is text-only and has no accessibility features beyond plain text.
+
+Difference between accepted scope limit and unresolved required behaviour: The limits above are accepted scope decisions under requirements revision 2 (FR-10 retired). No required behaviour (FR-01 to FR-09, QRY, FP, UI-01 and UI-02) is known to be unresolved.
+
+PG assurance residual risks / owner / status or not applicable: Not applicable (all members are undergraduates).
 
 
 ## H Release findings and corrective action
