@@ -1,35 +1,40 @@
 # Software Technology 1 Assignment 3
 
-One group repository and one evolving SmartCare application.
-Baseline: Stage 6 foundation, 2026 revision 2. This starter deliberately leaves the three Stage 6 service tasks incomplete.
+One group repository and one evolving SmartCare application. The project follows the 2026 revision 2 requirements baseline.
+
+SmartCare has completed undergraduate development Stages 6-9 and is currently undergoing Stage 12 release verification.
 
 ## Group index
 
-- Group and tutorial: [complete]
-- Member names, GitHub usernames and UG/PG cohorts: [complete]
-- Shared repository URL: [complete]
-- Latest completed stage: [complete]
-- Verified code SHA: [complete]
-- Test command, working directory and observed result: [complete]
+- Group and tutorial: Group 2, Wednesday 4:30 - 6:30 pm
+- Member names, GitHub usernames and UG/PG cohorts:
+  - Merlin - Merlin3313611 (UG)
+  - Rachel - RachelUC (UG)
+  - Tarnima - TarnimaKhan22 (UG)
+  - Novera - u3325845 (UG)
+- Shared repository URL: https://github.com/u3325845/st1-assignment-3
+- Latest completed stage: Stage 9 (Stage 12 in progress)
+- Verified code SHA: `acbb3b9`
+- Test command, working directory and observed result: `python -m pytest -q` from `project/` - 157 passed in 0.42s on 9 November 2026.
 - Final submitted SHA, if different from tested code SHA: [complete; explain evidence-only changes]
 
 Do not put student IDs, private peer ratings, credentials or personal contact details here.
 
 ## Complete package and stage sequence
 
-All Assignment 3 ordinary materials are supplied at the beginning: the Overview, Git/GitHub Group Guide, Stage 6–12 handouts, this incomplete SmartCare starter, all seven blank activity/evidence records, and assessment instructions/forms. Stage numbers control the engineering sequence, not document availability.
+All Assignment 3 ordinary materials are supplied at the beginning: the Overview, Git/GitHub Group Guide, Stage 6-12 handouts, this SmartCare application, all seven activity/evidence records, and assessment instructions/forms. Stage numbers control the engineering sequence, not document availability.
 
 Start with Stage 6. Complete each stage only after the previous applicable stage has been integrated, verified and recorded.
 
-UG: 6 → 7 → 8 → 9 → 12
+UG: 6 -> 7 -> 8 -> 9 -> 12
 
-PG: 6 → 7 → 8 → 9 → 10 → 11 → 12
+PG: 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12
 
-Use ONE group repository and ONE evolving project/ throughout. The stage folders contain your response/evidence records; all templates are already present. Preserve previous code, tests, records and Git history. Never replace project/ with another starter or copy completed staff reference implementations: those are private staff material.
+Use ONE group repository and ONE evolving `project/` throughout. The stage folders contain your response/evidence records; all templates are already present. Preserve previous code, tests, records and Git history. Never replace `project/` with another starter or copy completed staff reference implementations: those are private staff material.
 
 Stages 10 and 11 are PG-only. UG skipping these stages is correct and complete. In an UG-only submission, retain the supplied PG-only templates unchanged as intentionally not applicable; do not fill them with fabricated N/A responses. Optional UG collaboration is voluntary and unassessed. Mixed groups protect the verified common Stage 9 SHA while PG extends the same project. Use only the teaching team's confirmed Copilot agent capability or approved equivalent route.
 
-The Stage 8 preparation utility version 1.1 is a controlled teaching asset supplied or run by teaching staff when Stage 8 begins. Follow the instructions provided by your tutor. It is not included in the normal student package. If temporarily supplied for the handout commands, keep it in a sibling Stage_8_Assets/ folder outside the repository. Never include it in Git or the final submission. The Stage 7 checkpoint and Stage 8 technical activity are unchanged.
+The Stage 8 preparation utility version 1.1 is a controlled teaching asset supplied or run by teaching staff when Stage 8 begins. Follow the instructions provided by your tutor. It is not included in the normal student package. If temporarily supplied for the handout commands, keep it in a sibling `Stage_8_Assets/` folder outside the repository. Never include it in Git or the final submission. The Stage 7 checkpoint and Stage 8 technical activity are unchanged.
 
 Complete the supplied Stage 12 record when you reach Stage 12. UG releases the common scope; PG releases the extended scope, protecting the common SHA where needed. Record exact tested/submitted SHAs and create one source ZIP as the handout directs, without duplicate application copies per stage.
 
