@@ -56,24 +56,26 @@ Remaining failure / limitation: [response]
 
 | Demo step | Synthetic setup/input | Expected requirement | Observed result | Evidence/link |
 |---|---|---|---|---|
-| Problem and stakeholders | [response] | [response] | [response] | [response] |
-| Register and find Patient and two Practitioners | [response] | [response] | [response] | [response] |
-| Valid booking | [response] | [response] | [response] | [response] |
-| Same practitioner exact-time conflict rejected | [response] | [response] | [response] | [response] |
-| Different practitioner same time allowed | [response] | [response] | [response] | [response] |
-| Cancel SCHEDULED and retain/find CANCELLED object | [response] | [response] | [response] | [response] |
-| Invalid/repeated cancellation rejected | [response] | [response] | [response] | [response] |
-| Default all-status listing | [response] | [response] | [response] | [response] |
-| Explicit filtering / empty vs unknown / deterministic order | [response] | [response] | [response] | [response] |
-| Invalid date/status/menu/lookup recovery and continued operation | [response] | [response] | [response] | [response] |
-| Session-only limitation and normal exit | [response] | [response] | [response] | [response] |
-| One meaningful requirement-linked pytest test explained | [response] | [response] | [response] | [response] |
-| Architecture and one actual AI decision / known limitation | [response] | [response] | [response] | [response] |
-| PG reschedule identity/participants/time and no-op | [response] | [response] | [response] | [response] |
-| PG conflict/invalid status/failure non-mutation | [response] | [response] | [response] | [response] |
-| PG old slot / current lookup/list ordering / assurance risks | [response] | [response] | [response] | [response] |
-Stable demo owner / fresh process / command: [response]
-PG demonstrations through service/tests or not applicable: [response]
+| Problem and stakeholders | SmartCare appointment management for patients, practitioners and administrative users | Support registration, lookup, booking, cancellation and appointment history | Interactive menu displayed options 0–8 for the supported common-scope operations | `project/smartcare/console.py` |
+| Register and find Patient and two Practitioners | Patient P001; practitioners DR001 and DR002, using fictional test labels | FR-01–03: register and retrieve records | P001, DR001 and DR002 registered successfully in the first session. Patient P001 and practitioner DR001 were retrieved successfully | Manual console demonstration; `project/smartcare/console.py` |
+| Valid booking | A001: P001 with DR001, 2026-11-20 10:00 | FR-04–05: create a valid scheduled appointment | A001 booked successfully with status `scheduled` | Manual console demonstration |
+| Same practitioner exact-time conflict rejected | A002: P001 with DR001, 2026-11-20 10:00 | Reject conflicting scheduled appointments for the same practitioner | Booking rejected with "Practitioner already has a SCHEDULED appointment at this time"; menu remained available | Manual console demonstration |
+| Different practitioner same time allowed | A003: P001 with DR002, 2026-11-20 10:00 | Allow appointments with different practitioners at the same time | A003 booked successfully in the first session | Manual console demonstration |
+| Cancel SCHEDULED and retain/find CANCELLED object | Cancel A001, then find A001 | FR-06–08: cancellation changes status while retaining appointment history | A001 changed to `cancelled` and was retrieved afterward with the same appointment ID, patient, practitioner and time | Manual console demonstration |
+| Invalid/repeated cancellation rejected | Attempt to cancel A001 again | Reject cancellation when the appointment is no longer scheduled | Console returned "Only SCHEDULED appointments may be cancelled" and continued operating | Manual console demonstration |
+| Default all-status listing | DR001 with blank status filter | FR-09: list practitioner appointments without excluding cancelled history | Cancelled A001 appeared in the default listing in the first session | Manual console demonstration |
+| Explicit filtering / empty vs unknown / deterministic order | DR001 with `cancelled`; DR002 with `scheduled`; registered DR001 with no appointments; unknown DR999; bookings entered at 10:00, 11:00 and 09:00 | FR-09 and QRY/FP: filtering, empty results, unknown practitioner handling and deterministic ordering | Cancelled and scheduled filters returned matching appointments. Empty registered-practitioner listing displayed "No matching appointments found"; DR999 returned "Practitioner not found". Unfiltered appointments appeared in chronological order: 09:00, 10:00, 11:00 | Two manual console demonstrations |
+| Invalid date/status/menu/lookup recovery and continued operation | 2026-02-30 10:00; `invalid-date`; status `invalid`; unknown appointment A999; menu option 9 and blank input | Reject invalid input without terminating the console | Invalid calendar date, date format, status, lookup and menu selections produced error messages. The console returned to the menu after each | Two manual console demonstrations |
+| Session-only limitation and normal exit | Menu option 0 | Exit normally and disclose that records are not persisted | Console displayed "Goodbye! Session data will not be saved." and "Session-only data: records are lost on exit." | Two manual console demonstrations |
+| One meaningful requirement-linked pytest test explained | `test_appointment_cancellation_and_history` uses synthetic patient P1, practitioner DR1 and appointment A1 | FR-06–08: cancellation must retain appointment history and allow later lookup | The test simulates registration, booking, cancellation and lookup using mocked console inputs. Assertions check that A1 is reported as cancelled, remains retrievable with its original details and that the console exits normally. This verifies the observable cancellation-history workflow, but not object identity directly. | `project/tests/test_workflows.py`, lines 69–90 |
+| Architecture and one actual AI decision / known limitation | Shared SmartCareDataStore, existing services, pure query functions and console | Keep responsibilities separate and verify AI suggestions against requirements | The console handles input/output and errors, services enforce business rules, and pure queries filter and sort appointments. GitHub Copilot suggested additional menu framework classes and persistent storage, but these were rejected as unnecessary for the session-only scope. Code inspection and the earlier 141-test regression supported the simpler design. The known limitation is that records are lost when the console exits. | `project/smartcare/console.py`; `project/smartcare/services.py`; `project/smartcare/queries.py`; `stage09/stage09_activities_and_evidence.md`, Section E |
+| PG reschedule identity/participants/time and no-op | Not demonstrated | PG-only requirement | Not verified in this common-scope demonstration; applicability to be confirmed | Pending scope confirmation |
+| PG conflict/invalid status/failure non-mutation | Not demonstrated | PG-only requirement | Not verified in this common-scope demonstration; applicability to be confirmed | Pending scope confirmation |
+| PG old slot / current lookup/list ordering / assurance risks | Not demonstrated | PG-only requirement | Not verified in this common-scope demonstration; applicability to be confirmed | Pending scope confirmation |
+
+Stable demo owner / fresh process / command: To be confirmed by the team. From the `project` directory, run `python main.py --interactive`. Both manual demonstrations used a fresh process and synthetic data. The second session also confirmed that cancelling A001 freed the 10:00 slot for A004 while retaining the cancelled record.
+
+PG demonstrations through service/tests or not applicable: To be confirmed based on the group's UG/PG applicability and final integrated candidate.
 
 
 ## E Final code quality and AI review
@@ -189,13 +191,17 @@ All members contribute to shared Stage 12 Sections K and N. Final Stage 12 contr
 
 ## J Human release decision
 
-Decision — READY FOR COURSE RELEASE / READY WITH DOCUMENTED LIMITATIONS / NOT YET READY: [response]
-Approver / date / rationale and evidence: [response]
-What risks remain / conditions / owners: [response]
-Can the team explain the system: [response]
-Can a change be recovered: [response]
-Common decision / PG decision where different: [response]
+Decision — READY FOR COURSE RELEASE / READY WITH DOCUMENTED LIMITATIONS / NOT YET READY: NOT YET READY. The undergraduate SmartCare application has passed the available regression checks and console demonstrations, but final release approval is pending completion of the team's Stage 12 verification, review, documentation and submission checks.
 
+Approver / date / rationale and evidence: Final approver and approval date are pending team confirmation. On 9 November 2026, the integrated undergraduate application passed 157 automated tests. Additional verification on the Stage 12 evidence branch also passed all 157 tests in 0.43 seconds. Section D records successful manual demonstrations of registration, lookup, booking, conflict prevention, cancellation, retained history, filtering, input validation and normal exit. These results support release readiness but do not constitute final team approval.
+
+What risks remain / conditions / owners: Rachel must complete the final regression, code-quality, responsible-AI and defect review evidence in Sections C, E and H. Novera must confirm README reproducibility, release notes, limitations and submission checks in Sections F, G and L. Merlin must confirm the final integration and review evidence in Sections A, B and I. The team must complete shared Sections K and N, identify the final tested release SHA, verify the submission package and confirm that no release-blocking defects remain. Session-only storage is an accepted undergraduate scope limitation.
+
+Can the team explain the system: The available development records, tests and Section D demonstration provide evidence that the system's requirements, architecture and workflows can be explained. The application separates domain objects, the in-memory data store, services, pure queries and console interaction. Individual team understanding must still be confirmed through the final demonstration or viva.
+
+Can a change be recovered: Yes, Git history and the verified Stage 9 integration baseline at commit c871297 provide a known-good recovery reference. Changes can be compared against that baseline and corrected through reviewed commits, followed by focused and full regression testing. The final tested release SHA and recovery reference must be updated after Stage 12 integration.
+
+Common decision / PG decision where different: Common undergraduate release — NOT YET READY, pending the final checks and team approval listed above. PG-only rescheduling and assurance requirements are not applicable because all four group members follow the undergraduate pathway.
 
 ## K Final tested release SHA
 
@@ -234,26 +240,45 @@ Remaining administration or release dependency: [response]
 
 ## M Formative questions
 
-1. What is a release candidate? [response]
+1. What is a release candidate?
 
-2. What is feature freeze and why is it used? [response]
+A release candidate is a version of the software that has completed development and is being checked before final release. It should contain the intended features and undergo testing, review and documentation checks to confirm it is ready.
 
-3. What is regression testing in a release context? [response]
+2. What is feature freeze and why is it used?
 
-4. What is a known limitation? [response]
+Feature freeze means stopping the addition of new features so the team can focus on testing, fixing defects and preparing the release. It reduces the risk of introducing new problems near submission.
 
-5. What is technical debt? [response]
+3. What is regression testing in a release context?
 
-6. What are release notes? [response]
+Regression testing means rerunning existing tests after changes or integration to ensure previously working functionality still behaves correctly. For SmartCare, this includes registration, booking, conflict prevention, cancellation, lookup and appointment listing.
 
-7. What is software maintenance? [response]
+4. What is a known limitation?
 
-8. What is the purpose of the individual demonstration/viva? [response]
+A known limitation is a restriction or missing capability that the team understands and documents. For example, SmartCare stores data only during the current session, so records are lost when the application exits. This is an accepted scope limitation rather than a defect.
 
-9. What should the final responsible-AI check establish before release? [response]
+5. What is technical debt?
 
-10. What is the main course conclusion about AI and the role of the software engineer? [response]
+Technical debt is the future maintenance work created when a team chooses a simpler or temporary solution instead of a more complete one. It should be documented so its impact and possible future improvements are understood. Not every intentionally excluded feature is technical debt.
 
+6. What are release notes?
+
+Release notes summarise what a software version delivers, including implemented features, important fixes, improvements and known limitations. They help users and reviewers understand what has changed and what the software can currently do.
+
+7. What is software maintenance?
+
+Software maintenance is the process of correcting defects, improving code quality, adapting software to changing requirements and keeping it reliable after development or release. It also includes updating tests and documentation when changes are made.
+
+8. What is the purpose of the individual demonstration/viva?
+
+The individual demonstration or viva checks whether each student understands the system and can explain their own contributions. Students should be able to demonstrate requirements, discuss architecture, explain tests and design decisions, and describe how they evaluated GitHub Copilot's review feedback.
+
+9. What should the final responsible-AI check establish before release?
+
+GitHub Copilot was used to review the proposed design and provide recommendations. I evaluated its feedback against the project requirements and decided which suggestions to accept, modify or reject. The final decisions remained my responsibility.
+
+10. What is the main course conclusion about AI and the role of the software engineer?
+
+GitHub Copilot can provide useful design feedback and identify potential problems, but the software engineer remains responsible for evaluating recommendations, making decisions and verifying correctness. In SmartCare, I reviewed Copilot's suggestions and rejected unnecessary framework classes and persistent storage because they were outside the project scope. This demonstrated the importance of human judgement in developing reliable and maintainable software.
 
 ## N Reflection viva and handover
 
