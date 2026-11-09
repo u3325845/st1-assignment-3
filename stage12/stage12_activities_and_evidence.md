@@ -100,20 +100,20 @@ Available AI evidence and missing evidence honestly disclosed: [response]
 
 ## F README and reproducibility check
 
-| README item | Location | Verifier | Result/gap |
-|---|---|---|---|
-| Purpose and included common/PG scope | [response] | [response] | [response] |
-| Out-of-scope capabilities and known limitations | [response] | [response] | [response] |
-| Confirmed teaching Python version and dependency installation | [response] | [response] | [response] |
-| Working directory / demo / interactive / test commands | [response] | [response] | [response] |
-| Repository structure and architecture responsibilities | [response] | [response] | [response] |
-| Responsible AI summary / synthetic-data rule | [response] | [response] | [response] |
-| Release label/version and SHA links | [response] | [response] | [response] |
-Root README index and project/README verified: [response]
-Fresh clone or extracted ZIP / candidate identity: [response]
-Verifier and clean environment / actual version: [response]
-Setup/run/test commands and observed results: [response]
-Missing local file or setup gap / remedy and recheck: [response]
+| README item | Location | Verifier                                                           | Result/gap |
+|---|---|--------------------------------------------------------------------|--|
+| Purpose and included common/PG scope | `project/README.md` introduction and Features | Novera(author)                                                     | Present. Undergraduate common scope only; PG scope not applicable. |
+| Out-of-scope capabilities and known limitations | `project/README.md` Limitations | Novera(author)                                                     | Present: session-only data, no rescheduling, past-date, duration or patient-conflict rules. |
+| Confirmed teaching Python version and dependency installation | `project/README.md` Setup | Merlin3313611 (fresh clone, Python 3.14.3); Novera (Python 3.14.7) | PASS: pytest 8.3.5 installed from `requirements-dev.txt`. Gap: PowerShell blocked `Activate.ps1`; workaround added to Setup. |
+| Working directory / demo / interactive / test commands | `project/README.md` Running the program and Running the tests | Merlin3313611                                                      | PASS: `python main.py` demo ran, `python main.py --interactive` menu opened and exited, `python -m pytest -q` gave 157 passed in 0.39s. The three focused test commands were not run by Merlin. |
+| Repository structure and architecture responsibilities | `project/README.md` How the code is organised | Novera(author)                                                     | Present; the five listed modules exist in `project/smartcare/`. |
+| Responsible AI summary / synthetic-data rule | `project/README.md` Responsible AI use and Limitations | Novera(author)                                                     | Gap found by this check- no AI summary in the README. Added in this PR. |
+| Release label/version and SHA links | `project/README.md` Release; root `README.md`  | Novera(author)                                                     | Gap found: no release section. Added; it points to the root README and Section K for the final SHA. |
+Root README index and project/README verified: project/README.md commands were reproduced by Merlin on a fresh clone. The root README was updated by Merlin (PR #48); its final submitted SHA field is still open, and its "verified baseline is Python 3.13" statement differs from the Python 3.14.3 and 3.14.7 actually used. Merlin is asked to correct it before release.
+Fresh clone or extracted ZIP / candidate identity: Fresh GitHub clone of main at 2a6cc811cc82f511f5bfbb60bba45d9015aeb297 on 9 November 2026. ZIP verification is still to be done (Section L).
+Verifier and clean environment / actual version: Merlin (Merlin3313611), new folder outside the development repository, new virtual environment, Windows PowerShell, Python 3.14.3, pytest 8.3.5. Novera(author) also ran the suite on Python 3.14.7.
+Setup/run/test commands and observed results: git clone, python -m venv .venv, pip install -r requirements-dev.txt, python main.py (printed A1: P1 with DR1, 2026-10-01 09:00, scheduled and the session-only notice), python main.py --interactive (menu displayed, exit 0 printed the goodbye message), python -m pytest -q (157 passed in 0.39s). Merlin also checked patient registration, case-sensitive lookup and invalid menu recovery manually.
+Missing local file or setup gap / remedy and recheck:  Gap: PowerShell execution policy blocked Activate.ps1 on Merlin's machine. Remedy: added a README note to run the environment's Python directly. Recheck: Novera ran `..\.venv\Scripts\python.exe -m pytest -q` from project/ on 9 November 2026: 157 passed in 0.24s. A second recheck of the updated README by another member is done by Merlin.
 
 
 ## G Known limitations debt and release notes
