@@ -154,7 +154,7 @@ What the tests do and do not establish:
 
 The 12 query tests verify practitioner isolation, filtering by all three appointment statuses, default inclusion of all statuses, chronological sorting, appointment ID tie-breaking, empty results, repeated calls, and returning fresh lists without changing the original list order. Code inspection also confirms that `select_appointments()` reuses the named sorting key.
 
-The full regression suite passed with 125 tests. However, the tests do not prove that every possible input is handled correctly or independently verify that every appointment field remains unchanged. Service-level validation for known-empty, unknown, and invalid practitioner IDs must be verified separately. Retained cancellation history also needs service or integration evidence.
+The full regression suite passed with 125 tests. However, the tests do not prove that every possible input is handled correctly or independently verify that every appointment field remains unchanged. Service-level validation for known-empty, unknown, and invalid practitioner IDs must be verified separately. Retained cancellation history also needs service or integration evidence. Subsequent service-level tests verified registered, unknown and invalid practitioner cases, status filtering and retained appointment history. The final Stage 9 integrated regression suite passed all 157 tests.
 
 ## D. Integrated console and workflow evidence
 
@@ -216,7 +216,7 @@ It needs the appointments list, practitioner ID and optional status as inputs. A
 A new list can hold the same Appointment objects as long as the function only reads them. Filtering and sorting change only the new list, so the store’s list and the objects stay unchanged.
 4. Why use a named key, and what breaks equal-time ties? 
 
-The named key offers one ordering rule that can be used over again. The rule of sorting just based on date/time will not help in breaking the ties because when two dates/times are same, the records will keep their previous insertion order.
+The named appointment_sort_key() ensures consistent ordering by date/time and then appointment ID. When two appointments have the same date/time, the appointment ID breaks the tie, rather than relying on their original insertion order.
 5. How do default and explicit status filters differ? 
 
 Default status does not have any status filters so all the appointments scheduled for the practitioner, including the cancelled ones are listed. An explicit status returns only appointments with that status.
@@ -244,7 +244,7 @@ PR/diff and another-member human reviewer: PR #44 (console validation tests, Sec
 
 Review responses and Copilot comparison: GitHub Copilot reviewed the proposed console design before implementation. I accepted its recommendations on shared session data, separation of responsibilities, error recovery and workflow testing. I rejected additional menu framework classes and persistent storage because they were unnecessary for Stage 9. The review findings and decisions are recorded in Section E.
 
-Integrated common Stage 9 SHA: 34cbd2d (stage09/integration after PR #44), tested 9 Nov 2026.
+Integrated common Stage 9 SHA: 34cbd2d (stage09/integration after PR #44), tested 9 Nov 2026. Final Stage 9 integration was completed through PR #46, with merge commit c871297 on main. The integrated regression suite passed all 157 tests.
 
 Full regression command, working directory, actual count/result and evidence:`python -m pytest -q` from `project/` at 34cbd2d - 157 passed. Evidence: [Console validation tests](../project/tests/test_console_validation.py), [Workflow tests](../project/tests/test_workflows.py) and local pytest output.
 
