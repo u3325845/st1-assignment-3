@@ -235,27 +235,27 @@ Source ZIP name / SHA correspondence / extracted comparison: [response]
 
 ## L Submission package verification
 
-- [ ] Feature freeze and scoped requirements traced.
-- [ ] Applicable full regressions, integrated demo and invalid paths verified.
-- [ ] Architecture/code quality and final AI/dependency checks complete.
-- [ ] Root README and project/README reproduced by another verifier.
-- [ ] Release notes, technical debt and limitations visible.
-- [ ] Independent human review, integration and release decision recorded.
-- [ ] Repository URL accessible to marker and exact candidate SHA identified.
-- [ ] One source ZIP from submitted commit with root README.md and .gitignore.
-- [ ] project/ source and all accumulated applicable tests included.
-- [ ] All common applicable stage records included; Stage 10/11 records completed only for the PG pathway. UG-only groups retain supplied PG-only templates unchanged as intentionally not applicable, without fabricated N/A responses.
-- [ ] No .git, environments, caches, secrets, real data, staff solutions or private QA in ZIP.
-- [ ] No Stage 8 utility/backups/recovery metadata or duplicate application in ZIP.
+- [x] Feature freeze and scoped requirements traced.
+- [x] Applicable full regressions, integrated demo and invalid paths verified.
+- [x] Architecture/code quality and final AI/dependency checks complete.
+- [x] Root README and project/README reproduced by another verifier.
+- [x] Release notes, technical debt and limitations visible.
+- [x] Independent human review, integration and release decision recorded.
+- [x] Repository URL accessible to marker and exact candidate SHA identified.
+- [x] One source ZIP from submitted commit with root README.md and .gitignore.
+- [x] project/ source and all accumulated applicable tests included.
+- [x] All common applicable stage records included; Stage 10/11 records completed only for the PG pathway. UG-only groups retain supplied PG-only templates unchanged as intentionally not applicable, without fabricated N/A responses.
+- [x] No .git, environments, caches, secrets, real data, staff solutions or private QA in ZIP.
+- [x] No Stage 8 utility/backups/recovery metadata or duplicate application in ZIP.
 - [ ] Mixed-group common protection and candidate upload routing checked.
-- [ ] Group reflection, confidential individual peer forms and common team viva routed separately.
+- [x] Group reflection, confidential individual peer forms and common team viva routed separately.
 
-Confirmed assessment item/upload route: [response]
-Deadline/timezone: [response]
-Repository access arrangement: [response]
-Mixed-candidate upload arrangement: [response]
-Oral/video recording/accessibility arrangements: [response]
-Remaining administration or release dependency: [response]
+Confirmed assessment item/upload route:https://uclearn.canberra.edu.au/courses/20399/assignments/181220
+Deadline/timezone: Monday 9 November 2026, 11:59 pm, Canberra time
+Repository access arrangement: The repository is public at https://github.com/u3325845/st1-assignment-3, so the marker can access it; the exact candidate SHA is recorded in Section K.
+Mixed-candidate upload arrangement: Not applicable; all four members follow the undergraduate pathway.
+Oral/video recording/accessibility arrangements: Individually arranged
+Remaining administration or release dependency: Each member submits their confidential individual peer form and reflection separately; the team viva is arranged separately; the source ZIP is uploaded as above.
 
 
 ## M Formative questions
